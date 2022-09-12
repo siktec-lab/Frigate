@@ -1,0 +1,8 @@
+
+/vendor/
+.env
+.vscode
+php_errors.log
+*.zip
+/temp/
+pages_admin/templates/cache/
