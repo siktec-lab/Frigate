@@ -1623,7 +1623,7 @@ class MysqliDb
      * @return array|string The results of the SQL fetch.
      * @throws Exception
      */
-    protected function _dynamicBindResults(mysqli_stmt $stmt)
+    protected function _dynamicBindResults(\mysqli_stmt $stmt)
     {
         $parameters = array();
         $results = array();
