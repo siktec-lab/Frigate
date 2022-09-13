@@ -11,13 +11,19 @@ abstract class Page {
     protected ?Environment $templating  = null;
 
     public HtmlMeta $meta;
+    public HtmlOpenGraphMeta $opengraph;
 
     public PageSources $sources;
 
-    public function __construct()
+    public string $url_base = "";
+
+    public function __construct(string $url_base = "/")
     {
-        $this->meta = new HtmlMeta();
-        $this->sources = new PageSources();
+        $this->meta          = new HtmlMeta();
+        $this->opengraph    = new HtmlOpenGraphMeta();
+        $this->sources       = new PageSources();
+        $this->url_base      = rtrim($url_base, " \n\t\r\0\x0B/\\");
+        $this->meta->baseurl = $this->url_base;
     }
 
     public function use_templates(string|array $templates, ?string $cache_path = null) : void {
@@ -29,6 +35,16 @@ abstract class Page {
             'autoescape'    => 'html',
             'optimizations' => -1 // all optimizations are enabled 
         ]);
+    }
+
+    public function tokenize(bool $reuse = false) : void {
+        if ($reuse) {
+            $this->meta->csrf = $_SESSION["page-csrf"] ?? md5(uniqid(mt_rand(), true));
+            $_SESSION["page-csrf"] = $this->meta->csrf;
+        } else {
+            $_SESSION['page-csrf'] = md5(uniqid(mt_rand(), true));
+            $this->meta->csrf = $_SESSION['page-csrf'];
+        }
     }
 
     abstract function compile() : string;
