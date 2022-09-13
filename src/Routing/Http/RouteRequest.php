@@ -26,7 +26,7 @@ class RouteRequest extends RequestDecorator {
     public function getAccept() : array {
         $accept = $this->getHeader('Accept');
         if (empty($accept)) {
-            return "";
+            return [];
         }
         $accept = preg_replace("/;.*$/", "", $accept); //remove the q=1.0 from the accept header and the charset
         $accept = explode(",", $accept);
@@ -73,8 +73,9 @@ class RouteRequest extends RequestDecorator {
                     $credential = $this->getCredentials("header");
                     if (is_array($credential) && $credential[1] === $_ENV["ADMIN_KEY"]) {
                         $authorized = true;
+                        break 2;
                     }
-                } break 2;
+                } break;
                 //Session method:
                 case "session": {
                     if (session_status() === PHP_SESSION_NONE) {
@@ -89,8 +90,9 @@ class RouteRequest extends RequestDecorator {
                         $authorized = true;
                         //Extend cookie:
                         setcookie("AUTHTOKEN", $credential[2], time() + 3600);
+                        break 2;
                     }
-                } break 2;
+                } break;
             }
         }
         
