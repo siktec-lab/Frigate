@@ -11,12 +11,65 @@ class Base {
 
     static public ?MysqliDb $db = null;
 
-    public static function init($connect = true) : void {
-        self::load_environment();
-        if ($connect) self::connect_database();
+    public static function init(string $config, bool $connect = true, bool $session = true, bool $page_buffer = false) : void {
+        self::load_environment($config);
+        
+        //connect to database:
+        if ($connect) {
+            self::connect_database();
+        }
+
+        //start session:
+        if ($session) {
+            self::start_session();
+        }
+
+        //start page buffer:
+        if ($page_buffer) {
+            self::start_page_buffer();
+        }
     }
 
-    
+    public static function start_session() : bool {
+        if (session_status() === PHP_SESSION_NONE) {
+            return session_start();
+        }
+        return true;
+    }
+
+    public static function set_paths(string $base_path = "/", $app_url = "http://localhost/") : void {
+
+        //Directory separator
+        if (!defined("DS")) 
+            define("DS", DIRECTORY_SEPARATOR);
+
+        //Application root path
+        if (!defined("APP_ROOT")) 
+            define("APP_ROOT", dirname(__DIR__));
+        
+        //Application vendor path
+        if (!defined("APP_VENDOR")) 
+            define("APP_VENDOR", APP_ROOT.DS."vendor");
+        
+        //Application base path - for applications that are not in the root directory
+        if (!defined("APP_BASE_OS_PATH")) 
+            define("APP_BASE_OS_PATH", $base_path);
+
+        //Application base url path - for applications that are not in the root directory        
+        if (!defined("APP_BASE_URL_PATH")) {
+            $base_path = trim(rtrim($base_path, " \n\t\r\0\x0B/\\")) . "/";
+            define("APP_BASE_URL_PATH", $base_path);
+        }
+
+        //Application base url: domain + base url path
+        if (!defined("APP_BASE_URL")) {
+            //normalize the app url make sure it ends with a slash
+            $app_url = trim(rtrim($app_url, " \n\t\r\0\x0B/\\")) . "/";
+            //join the app url with the base path to get the base url make sure no extra slashes are added
+            define("APP_BASE_URL", $app_url . ltrim(APP_BASE_URL_PATH, " \n\t\r\0\x0B/\\"));
+        }
+
+    }
 
     static public function connect_database() {
         try {
@@ -34,8 +87,8 @@ class Base {
         }
     }
 
-    static public function start_page_buffer() : void {
-        ob_start();
+    static public function start_page_buffer() : bool {
+        return ob_start();
     }
 
     static public function end_page_buffer() : string {
@@ -59,10 +112,10 @@ class Base {
         }
     }
 
-    static public function load_environment() {
+    static public function load_environment(string $path = "") : bool {
         if (is_null(self::$env)) {
             try {
-                self::$env = Dotenv::createImmutable(ROOT_PATH);
+                self::$env = Dotenv::createImmutable($path);
                 self::$env->safeLoad();
                 self::$env->required([
                     'ROOT_FOLDER',
@@ -80,8 +133,9 @@ class Base {
             } catch (\Throwable $e) {
                 die($e->getMessage());
             }
+            return true;    
         }
-        return true;
+        return false;
     }
 
     static public function ENV_BOOL(string $key) : bool {
