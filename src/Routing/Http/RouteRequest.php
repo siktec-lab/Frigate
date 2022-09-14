@@ -4,19 +4,8 @@ namespace Siktec\Frigate\Routing\Http;
 
 class RouteRequest extends RequestDecorator {
 
-    private string $route = "";
     private string $method = "";
     public string  $expects = "text/plain";
-    public function setRoute(string $base = "", ?string $path = null) : void {
-        $path = $path ?? $this->getPath();
-        $path = trim(!empty($base) ? str_replace($base, "", $path) : $path, " \t\n\r/\\");
-        // $this->route = $this->getMethod().(!empty($path) ? "::".$path : "");
-        $this->route = $path;
-    }
-
-    public function getRoute() : string {
-        return $this->route;
-    }
 
     public function isTest() : bool {
         return strtolower($this->getHeader('X-Perform') ?? "") === "test";
