@@ -4,6 +4,7 @@ namespace Siktec\Frigate\Routing;
 
 use \Siktec\Frigate\Base;
 use \Siktec\Frigate\Routing\Http;
+use \Siktec\Frigate\Routing\Paths\PathTree;
 use \Throwable;
 
 class Router {
@@ -16,19 +17,26 @@ class Router {
     /** @var Route[] $errors*/
     private static array $errors  = [];
 
-    /** @var Route[] $routes */
-    private static array $routes  = [];
-    
+    /** @var PathTree[] $routes */
+    private static array $routes = [];
+        
+    /**
+     * init
+     * initialize the router
+     * @param  bool $debug
+     * @return void
+     */
     public static function init(bool $debug = false) : void {
         self::$debug = $debug;
     }
+    
     /**
      * parse_request
      * load and parses the request uri
      * @param  string $route or none for SERVER => REQUEST_URI
      * @return void
      */
-    public static function parse_request(string $route = "") : void {
+    public static function parse_request(string $base = "/") : void {
 
         $server_arr = $_SERVER;
 
@@ -40,44 +48,68 @@ class Router {
 
         $got =  self::createFromServerArray($server_arr);
         self::$request = new Http\RouteRequest($got);
+        self::$request->setBaseUrl($server_arr['BASE_URL'] ?? "");
         self::$request->setBody(fopen('php://input', 'r'));
         self::$request->setPostData($_POST);
-        self::$request->setRoute($_ENV["ROOT_FOLDER"]);
+        self::$request->setBaseUrl($base);
 
         Base::debug(self::class, "got request",     (string)self::$request);
         Base::debug(self::class, "request raw parts", [
-            "ROUTE" => self::$request->getRoute(),
             "PATH"  => self::$request->getPath(),
             "POST"  => self::$request->getPostData(),
             "QUERY" => self::$request->getQueryParameters()
         ]);
     }
-    
+        
+    /**
+     * define_error
+     * define an error route to be used when an error code is raised
+     * @param  int|string $code 'any' for any error
+     * @param  Route $route the route to be used
+     * @return void
+     */
     public static function define_error(int|string $code, Route $route) : void {
         self::$errors[$code] = $route;
     }
-
-    private static function route_str(string $method, string $path) : string {
-        return $method . ( !empty($path) ? "::".$path : "");
-    }
-
+    
+    /**
+     * define
+     * define a route to be used when a request matches the route and the method
+     * @param  string $method
+     * @param  Route $route
+     * @throws Exception when the route allready exists or can't be parsed properly
+     * @return void
+     */
     public static function define(string $method, Route $route) : void {
-        self::$routes[
-            self::route_str($method, $route->path)
-        ] = $route;
+        // Initialize a new PathTree if it doesn't exist for this method:
+        $method = strtoupper($method);
+        if (!array_key_exists($method, self::$routes)) {
+            self::$routes[$method] = new PathTree();
+        }
+        // Register the route:
+        self::$routes[$method]->define($route->path, $route);
     }
-
-    public static function route_defined(?string $method = null, ?string $path = null) : bool {
-        $route = self::route_str($method ?? "", $path ?? "");
-        return array_key_exists($route, self::$routes);
-    }
-
+    
+    /**
+     * dump_routes
+     * dump the defined routes trees for debugging
+     * @return void
+     */
     public static function dump_routes() : void {
-        foreach (self::$routes as $key => $route) {
-            echo explode("::", $key)[0]." -> ".$route.PHP_EOL;
+        foreach (self::$routes as $method => $tree) {
+            print PHP_EOL."Method: ".$method;
+            print PHP_EOL.str_repeat("-", 80).PHP_EOL;
+            print $tree.PHP_EOL;
         }
     }
-
+    
+    /**
+     * negotiate_accept
+     * negotiate the accept header
+     * @param  Route $route
+     * @param  Http\RouteRequest $request
+     * @return ?string null if no match
+     */
     private static function negotiate_accept(Route $route, Http\RouteRequest $request) : ?string {
         $accept = $request->getAccept();
         foreach ($accept as $accept_type) {
@@ -87,28 +119,51 @@ class Router {
         }
         return null;
     }
-
+    
+    /**
+     * load
+     *
+     * @param  ?RouteRequest $request null when current request should be used
+     * @return Http\Response
+     */
     public static function load(?Http\RouteRequest $request = null) : Http\Response {
         $request = $request ?? self::$request;
         try {
-            if (self::route_defined($request->getMethod(), $request->getRoute())) {
-                //The route is defined
-                $route = self::$routes[self::route_str($request->getMethod(), $request->getRoute())];
-                //negotiate accept
-                $accept = self::negotiate_accept($route, $request) ?? "";
-                $request->expects = $accept;
-                if (empty($accept)) {
-                    throw new \Exception("No Supported Acceptable Content Type Found", 406);
-                }
-                return $route->exec($request);
-            } else {
+            //Check that the method is supported:
+            $method = strtoupper($request->getMethod());
+            if (!array_key_exists($method, self::$routes)) {
+                throw new \Exception("Request method not supported", 404);
+            }
+            //Get the route & evaluate it:
+            [$branch, $con] = self::$routes[$method]->eval($request->getPath());
+            if (is_null($branch)) {
                 throw new \Exception("Not Found", 404);
             }
+            //Negotiate the accept type:
+            $accept = self::negotiate_accept($branch->exec, $request) ?? "";
+            $request->expects = $accept;
+            if (empty($accept)) {
+                throw new \Exception("No Supported Acceptable Content Type Found", 406);
+            }
+            //Merge context:
+            $branch->exec->context = array_merge($branch->exec->context, $con);
+            //Execute the route:
+            return $branch->exec->exec($request);
+            
         } catch(Throwable $e) {
             return self::error($request, $e->getCode(), $e->getMessage(), $e->getTraceAsString());
         }
     } 
-    
+        
+    /**
+     * error
+     * handle an error and return a response for it
+     * @param  Http\RouteRequest $request
+     * @param  int $code
+     * @param  string $message
+     * @param  string $trace
+     * @return Http\Response
+     */
     public static function error(Http\RouteRequest $request, int $code, string $message = "", string $trace = "") : Http\Response {
         if (array_key_exists($code, self::$errors)) {
             self::$errors[$code]->context["code"] = $code;
