@@ -37,11 +37,15 @@ class Sanitize {
         ));
     }
 
-    public static function integer(string|int $int, mixed $onerror = 0) : mixed {
+    public static function integer(mixed $int, mixed $onerror = 0) : mixed {
         return filter_var($int, FILTER_VALIDATE_INT) ?: $onerror;
     }
 
-    public static function boolean(string|bool $bool, mixed $onerror = false) : mixed {
+    public static function float(mixed $int, mixed $onerror = 0.0) : mixed {
+        return filter_var($int, FILTER_VALIDATE_FLOAT) ?: $onerror;
+    }
+
+    public static function boolean(mixed $bool, mixed $onerror = false) : mixed {
         return filter_var($bool, FILTER_VALIDATE_BOOLEAN);
     }
 
