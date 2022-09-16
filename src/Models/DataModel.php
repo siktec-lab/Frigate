@@ -40,7 +40,12 @@ abstract class DataModel {
     private function match_type(string $defs, mixed $value) : mixed {
         $type = explode(":", $defs, 2);
         switch ($type[0]) {
-            case "string": 
+            case "string": {
+                if (is_array($value)) {
+                    return json_encode($value);
+                }
+                return settype($value, $type[0]) ? $value : null;
+            } break;
             case "integer": 
             case "double": 
             case "boolean": {
@@ -50,7 +55,12 @@ abstract class DataModel {
                 
             } break;
             case "array": {
-
+                    if (is_string($value)) {
+                        return json_decode($value, true);
+                    }
+                    if (is_array($value)) {
+                        return $value;
+                    }
             } break;
         }
         return null;
