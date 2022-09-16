@@ -103,6 +103,7 @@ class Response extends Message implements ResponseInterface
             $this->setStatus($status);
         }
         if (null !== $headers) {
+            $this->setHeader("X-Powered-By", "Frigate");
             $this->setHeaders($headers);
         }
         if (null !== $body) {
