@@ -37,7 +37,7 @@ class Base {
         return true;
     }
 
-    public static function set_paths(string $base_path = "/", $app_url = "http://localhost/") : void {
+    public static function set_paths(string $root, string $base_path = "/", $app_url = "http://localhost/") : void {
 
         //Directory separator
         if (!defined("DS")) 
@@ -45,7 +45,7 @@ class Base {
 
         //Application root path
         if (!defined("APP_ROOT")) 
-            define("APP_ROOT", dirname(__DIR__));
+            define("APP_ROOT", $root);
         
         //Application vendor path
         if (!defined("APP_VENDOR")) 
