@@ -4,6 +4,6 @@ Frigate is a lightweight web application framework. It is designed to be easy, a
 
 
 # TODOs
-- support returns negotiation of */* and text/* etc....
-- File server for chunking
-- Implement accept all and restriction in headers CORS policy 
+[v] support returns negotiation of */* and text/* etc....
+[v] File server for chunking
+[-] Implement accept all and restriction in headers CORS policy 
