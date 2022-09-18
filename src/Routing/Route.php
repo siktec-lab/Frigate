@@ -4,20 +4,23 @@ namespace Siktec\Frigate\Routing;
 
 use \Closure;
 use \Siktec\Frigate\Routing\Http;
+use \HTTP2;
 
 class Route {
 
-    public string   $path;
-    public array    $context = [];
+    public string    $path;
+    public array     $context = [];
     private array    $returns = [
         "text/html",
         "application/json"
     ];
+    public Http\HTTP2    $http2;
     public $func;
 
     public function __construct(string $path, array $context = [], array $returns = [], $func = null) {
         $this->path = trim($path, "\t\n\r /\\");
         $this->context = $context;
+        $this->http2 = new Http\HTTP2();
         $this->func = $func;
         if (!empty($returns)) {
             $this->set_returns(...$returns);
@@ -28,12 +31,13 @@ class Route {
     /**
      * returns
      * set return types for this route which are the accepted content types
-     * @param  string* $returns
+     * @param  array $returns
      * @return Route
      */
     public function set_returns(...$returns) : Route {
         $returns = array_map("trim", $returns);
         $returns = array_map("strtolower", $returns);
+        $returns = array_unique($returns);
         $this->returns = $returns;
         return $this;
     }
@@ -42,10 +46,14 @@ class Route {
      * supports_accept
      * checks if requested content type is supported in the route 
      * @param  string $accept
-     * @return bool
+     * @return ?string
      */
-    public function supports_accept(string $accept) : bool {
-        return in_array($accept, $this->returns);
+    public function negotiate_accept(?string $default = null) : ?string {
+        return $this->http2->negotiateMimeType(
+            $this->returns,
+            null,
+            null
+        );
     }
     
     //method that return the first supported content type

@@ -75,19 +75,22 @@ class Router {
     /**
      * define
      * define a route to be used when a request matches the route and the method
-     * @param  string $method
+     * @param  string|array $method
      * @param  Route $route
      * @throws Exception when the route allready exists or can't be parsed properly
      * @return void
      */
-    public static function define(string $method, Route $route) : void {
+    public static function define(string|array $method, Route $route) : void {
+        $methods = is_array($method) ? $method : [$method];
         // Initialize a new PathTree if it doesn't exist for this method:
-        $method = strtoupper($method);
-        if (!array_key_exists($method, self::$routes)) {
-            self::$routes[$method] = new PathTree();
+        foreach ($methods as $m) {
+            $m = strtoupper($m);
+            if (!array_key_exists($m, self::$routes)) {
+                self::$routes[$m] = new PathTree();
+            }
+            // Register the route:
+            self::$routes[$m]->define($route->path, $route);
         }
-        // Register the route:
-        self::$routes[$method]->define($route->path, $route);
     }
     
     /**
@@ -107,17 +110,10 @@ class Router {
      * negotiate_accept
      * negotiate the accept header
      * @param  Route $route
-     * @param  Http\RouteRequest $request
      * @return ?string null if no match
      */
-    private static function negotiate_accept(Route $route, Http\RouteRequest $request) : ?string {
-        $accept = $request->getAccept();
-        foreach ($accept as $accept_type) {
-            if ($route->supports_accept($accept_type)) {
-                return $accept_type;
-            }
-        }
-        return null;
+    private static function negotiate_accept(Route $route) : ?string {
+        return $route->negotiate_accept();
     }
     
     /**
@@ -140,7 +136,7 @@ class Router {
                 throw new \Exception("Not Found", 404);
             }
             //Negotiate the accept type:
-            $accept = self::negotiate_accept($branch->exec, $request) ?? "";
+            $accept = self::negotiate_accept($branch->exec) ?? "";
             $request->expects = $accept;
             if (empty($accept)) {
                 throw new \Exception("No Supported Acceptable Content Type Found", 406);
@@ -216,6 +212,7 @@ class Router {
         if (null !== $contentLength) {
             $output = fopen('php://output', 'wb');
             if (is_resource($body) && 'stream' == get_resource_type($body)) {
+                
                 // a workaround to make PHP more possible to use mmap based copy, see https://github.com/sabre-io/http/pull/119
                 $left = (int) $contentLength;
                 // copy with 4MiB chunks
