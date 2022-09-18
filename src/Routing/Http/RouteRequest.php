@@ -79,7 +79,7 @@ class RouteRequest extends RequestDecorator {
                     ) {
                         $authorized = true;
                         //Extend cookie:
-                        setcookie("AUTHTOKEN", $credential[2], time() + 3600);
+                        setcookie("AUTHTOKEN", $credential[2], time() + 3600, "/");
                         $user = $credential[0];
                         break 2;
                     }
