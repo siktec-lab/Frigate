@@ -2,15 +2,23 @@
     "name": "siktec/frigate",
     "type": "library",
     "license": "MIT",
+    "authors": [
+        {
+          "name": "SIKTEC Labs",
+          "email": "siktec.lab@gmail.com"
+        }
+    ],
     "autoload": {
         "psr-4" : {
             "Siktec\\Frigate\\" : "src/"
         }
     },
     "require": {
+        "php": ">=8.0.0",
         "guzzlehttp/guzzle": "^7.5",
         "twig/twig": "^3.4",
         "vlucas/phpdotenv": "^5.4",
         "sabre/uri": "^2.3"
-    }
+    },
+    "minimum-stability": "dev"
 }
