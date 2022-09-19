@@ -1,6 +1,7 @@
 {
     "name": "siktec/frigate",
     "type": "library",
+    "description": "Lightweight web application framework. It is designed to be easy, and extremely fast with the ability to scale up to complex applications",
     "license": "MIT",
     "authors": [
         {
