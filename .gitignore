@@ -6,3 +6,4 @@ php_errors.log
 *.zip
 /temp/
 pages_admin/templates/cache/
+composer.lock

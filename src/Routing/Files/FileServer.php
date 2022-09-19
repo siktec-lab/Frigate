@@ -48,8 +48,8 @@ class FileServer extends EndPoint {
         $this->storage_folder = $storage;
     }
 
-    public function serve_file(string $key) : ?string {
-        return $key;
+    public function serve_file(string $key) : ?array {
+        return [$key, null];
     }
 
     public function upload_validate(?array $files) : array {
@@ -90,7 +90,7 @@ class FileServer extends EndPoint {
             case Http\Methods::GET: {
 
                 $file = $this->get_context("file", $context, "");
-                $file = $this->serve_file($file);
+                [$file, $filename] = $this->serve_file($file);
 
                 //Validate file: exists, readable, not a directory
                 if (empty($file) || !file_exists($file)) {
@@ -114,6 +114,7 @@ class FileServer extends EndPoint {
                     "Accept-Ranges"                 => "bytes",
                     "Content-Length"                => $size,
                     "Content-Type"                  => $mime,
+                    "Content-Disposition"           => 'inline'.($filename ? '; filename="'.$filename.'"' : ''),
                     "Pragma"                        => "public",
                     "Expires"                       => "-1",
                     "Cache-Control"                 => "no-cache",
