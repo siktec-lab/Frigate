@@ -8,9 +8,9 @@
 
 <script>
     {% if json %}
-        var swagger_spec = `
+        var swagger_spec = JSON.parse(`
             {{ spec|raw}}
-        `;
+        `);
         window.onload = () => {
             window.ui = SwaggerUIBundle({
                 spec: swagger_spec,
