@@ -1,0 +1,61 @@
+
+<!DOCTYPE html>
+<html lang="{{ meta.lang|e('html_attr') }}">
+
+<head>
+    <!-- Meta -->
+    <meta charset="{{ meta.charset }}" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    {% if meta.viewport is defined and meta.viewport is not null %}
+        <meta name="viewport" content="{{ meta.viewport }}" />
+    {% endif %}
+    {% if meta.description is defined and meta.description is not null %}
+        <meta name="description" content="{{ meta.description }}" />
+    {% endif %}
+    {% if meta.csrf is defined and meta.csrf is not null %}
+        <meta name="csrf" content="{{ meta.csrf }}" />
+    {% endif %}
+    {% if meta.baseurl is defined and meta.baseurl is not null %}
+        <meta name="baseurl" content="{{ meta.baseurl|e('html_attr') }}" />
+    {% endif %}
+    
+    <!-- Page icon -->
+    {% if meta.favicon_ico is defined and meta.favicon_ico is not null %}
+        <link rel="shortcut icon" type="image/ico" href="{{ meta.favicon_ico|e('html_attr') }}"/>
+    {% endif %}
+    {% if meta.favicon_png180 is defined and meta.favicon_png180 is not null %}
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ meta.favicon_png180|e('html_attr') }}" />
+    {% endif %}
+    {% if meta.favicon_png32 is defined and meta.favicon_png32 is not null %}
+        <link rel="shortcut icon" type="image/png" sizes="32x32" href="{{ meta.favicon_png32|e('html_attr') }}" />
+    {% endif %}
+    {% if meta.favicon_png16 is defined and meta.favicon_png16 is not null %}
+        <link rel="shortcut icon" type="image/png" sizes="16x16" href="{{ meta.favicon_png16|e('html_attr') }}" />
+    {% endif %}
+    {% if meta.manifest is defined and meta.manifest  is not null %}
+        <link rel="manifest" href="{{ meta.manifest|e('html_attr') }}" />
+    {% endif %}
+    
+
+    <!-- Open Graph -->
+    {% if opengraph is defined and opengraph is iterable %}
+        {% for key, value in opengraph %}
+            {% if value is not null %}
+                <meta property="og:{{ key }}" content="{{ value|e('html_attr') }}" />
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    <!-- HEAD LINK sources -->
+    {% for inc in sources.head.css %}
+        <link {{ inc.id ? "id='#{inc.id}'"|raw }} href="{{ inc.href }}" {{ inc.rel ? "rel='#{inc.rel}'"|raw }} type="{{ inc.type }}" {{ inc.sizes ? "sizes='#{inc.sizes}'"|raw }} {{ inc.charset ? "charset='#{inc.charset}'"|raw }} {{ inc.crossorigin ? "crossorigin='#{inc.crossorigin}'"|raw }} />
+    {% endfor %}
+
+    <!-- HEAD SCRIPT sources -->
+    {% for inc in sources.head.scripts %}
+        <script {{ inc.id ? "id='#{inc.id}'"|raw }} src="{{ inc.src }}" type="{{ inc.type }}" {{ inc.charset ? "charset='#{inc.charset}'"|raw }}  {{ inc.crossorigin ? "crossorigin='#{inc.crossorigin}'"|raw }} {{ inc.async ? "async"|raw }} {{ inc.defer ? "defer"|raw }}></script>
+    {% endfor %}
+
+    <title>{{ meta.title }}</title>
+    
+</head>

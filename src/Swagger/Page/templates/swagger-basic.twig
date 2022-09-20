@@ -1,0 +1,18 @@
+
+
+{{ include('header.twig') }}
+
+<body>
+
+<div id="swagger-ui"></div>
+
+<script>
+  window.onload = () => {
+    window.ui = SwaggerUIBundle({
+      url: 'http://localhost/homevr-dashboard/swag.php',
+      dom_id: '#swagger-ui',
+    });
+  };
+</script>
+
+{{ include('footer.twig') }}

@@ -1,0 +1,13 @@
+
+<!-- BODY LINK sources -->
+{% for inc in sources.body.css %}
+    <link {{ inc.id ? "id='#{inc.id}'"|raw }} href="{{ inc.href }}" {{ inc.rel ? "rel='#{inc.rel}'"|raw }} type="{{ inc.type }}" {{ inc.sizes ? "sizes='#{inc.sizes}'"|raw }} {{ inc.charset ? "charset='#{inc.charset}'"|raw }} {{ inc.crossorigin ? "crossorigin='#{inc.crossorigin}'"|raw }} />
+{% endfor %}
+
+<!-- BODY SCRIPT sources -->
+{% for inc in sources.body.scripts %}
+    <script {{ inc.id ? "id='#{inc.id}'"|raw }} src="{{ inc.src }}" type="{{ inc.type }}" {{ inc.charset ? "charset='#{inc.charset}'"|raw }}  {{ inc.crossorigin ? "crossorigin='#{inc.crossorigin}'"|raw }} {{ inc.async ? "async"|raw }} {{ inc.defer ? "defer"|raw }}></script>
+{% endfor %}
+
+</body>
+</html>
