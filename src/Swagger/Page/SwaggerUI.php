@@ -41,7 +41,7 @@ class SwaggerUI extends PageBuilder {
     }
 
     public function json_source(string $json) : void {
-        $this->spec     = preg_replace('`', '\\`', $json);
+        $this->spec     = preg_replace('`', "\\`", $json);
         $this->use_json = true;
     }
 
