@@ -1,7 +1,7 @@
 <?php 
 
 namespace Siktec\Frigate\Api;
-
+  
 use \Siktec\Frigate\Base;
 use \Siktec\Frigate\Routing\Http;
 
