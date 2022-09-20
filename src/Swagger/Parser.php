@@ -2,19 +2,6 @@
 
 namespace Siktec\Frigate\Swagger;
 
-
-use \OpenApi\Generator;
-
-use \Siktec\Frigate\Pages\Page as PageBuilder;
-
-$openapi = \OpenApi\Generator::scan([
-    "./api",
-]);
-
-header('Content-Type: application/json');
-
-echo $openapi->toJSON();
-
 class Parser {
 
     private array $sources;
