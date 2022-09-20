@@ -18,7 +18,7 @@ echo $openapi->toJSON();
 class Parser {
 
     private array $sources;
-    private array $output;
+    private string $output;
     private array $options;
 
     const OUTPUT_JSON = "json";
@@ -38,7 +38,7 @@ class Parser {
             $this->sources,
             $this->options
         );
-        if ($this->output == self::OUTPUT_JSON) {
+        if ($this->output === self::OUTPUT_JSON) {
             return $openapi->toJSON();
         } else {
             return $openapi->toYaml();
