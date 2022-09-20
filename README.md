@@ -24,3 +24,9 @@ Frigate is a lightweight web application framework. It is designed to be easy, a
 - [-] Implement parsedown for documentation generating
 
 - [-] Implement swagger
+
+- [-] Global templates.
+
+- [-] Page builder should take additional default context in constructor
+
+- [-] Page builder compile should take additional context -> const context -> defined context -> compile context.
