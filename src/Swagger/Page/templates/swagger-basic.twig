@@ -7,12 +7,25 @@
 <div id="swagger-ui"></div>
 
 <script>
-  window.onload = () => {
-    window.ui = SwaggerUIBundle({
-      url: 'http://localhost/homevr-dashboard/swag.php',
-      dom_id: '#swagger-ui',
-    });
-  };
+    {% if json: %}
+        var swagger_spec = `
+            {{ spec|raw}}
+        `;
+        window.onload = () => {
+            window.ui = SwaggerUIBundle({
+                spec: swagger_spec,
+                dom_id: '#swagger-ui',
+            });
+        };
+    {% else %}
+        window.onload = () => {
+            window.ui = SwaggerUIBundle({
+                url: '{{ spec|raw }}',
+                dom_id: '#swagger-ui',
+            });
+        };
+    {% endif %}
+  
 </script>
 
 {{ include('footer.twig') }}

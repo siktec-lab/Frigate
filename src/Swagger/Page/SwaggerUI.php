@@ -10,8 +10,10 @@ class SwaggerUI extends PageBuilder {
     public string $lib;
     public string $vendor;
 
-
     public string $state = "";
+
+    public string $spec = "";
+    public bool   $use_json = false;
 
     public function __construct(string $state = "default")
     {
@@ -34,13 +36,24 @@ class SwaggerUI extends PageBuilder {
 
     }
 
+    public function url_source(string $url) : void {
+        $this->spec = $url;
+    }
+
+    public function json_source(string $json) : void {
+        $this->spec     = preg_replace('`', '\\`', $json);
+        $this->use_json = true;
+    }
+
     public function compile() : string
     {
         $context = [
             "meta"      => $this->meta->to_array(),
             "opengraph" => $this->opengraph->to_array(),
             "sources"   => $this->sources->to_array(),
-            "state"     => $this->state
+            "state"     => $this->state,
+            "json"      => $this->use_json,
+            "spec"      => $this->spec
         ];
         return $this->templating->render("swagger-basic.twig", $context);
     }
