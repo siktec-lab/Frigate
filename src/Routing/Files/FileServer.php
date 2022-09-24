@@ -235,7 +235,6 @@ class FileServer extends EndPoint {
             } break;
             case Http\Methods::HEAD: {
                 $user = $request->requireAuthorization($this->authorize_method, throw : true);
-                //TODO: implement HEAD requests.
                 $key    = trim($request->getQueryParameters()["patch"] ?? "");
 
                 [$result, $message] = Files\Upload::head_temp_file($this->temp_folder, $key);
