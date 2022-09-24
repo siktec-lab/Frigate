@@ -23,7 +23,28 @@ class RouteRequest extends RequestDecorator {
         $accept = array_map("strtolower", $accept);
         return $accept;
     }
-    
+        
+    /**
+     * getPatchData
+     * return the patch data as passed in the body -> json or string 
+     * this will destroy teh input.
+     * @return array
+     */
+    public function getPatchData() : array {
+        $data = [];
+        $str = $this->getBodyAsString();
+        //check is $str is json:
+        if (substr($str, 0, 1) === "{" || substr($str, 0, 1) === "[") {
+            $data = json_decode($str, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                $data = [];
+            }
+        } else {
+            parse_str($str, $data);
+        }
+        return $data;
+    }
+
     public function getCredentials(string $from = "header") : ?array {
         $auth = "xxxx";
         switch ($from) {
