@@ -8,7 +8,7 @@ abstract class DataModel {
     
     /**
      * set 
-     * set the internal properties directly
+     * set the internal properties directly with the inner value names
      *
      * @param  array $arr
      * @return self
@@ -25,6 +25,25 @@ abstract class DataModel {
         return $this;
     }
 
+    /** 
+     * get 
+     * return the internal properties with the inner value names
+     * @return array
+     */
+    public function get() : array {
+        $data = [];
+        foreach ($this->keys as $prop) {
+            $data[$prop[1]] = $this->{$prop[1]};
+        }
+        return $data;
+    }
+    
+    /**
+     * load_array
+     * load the internal properties from an array - keys are the outer names
+     * @param  array $arr
+     * @return self
+     */
     private function load_array(array $arr) : self {
         foreach ($this->keys as $name => $prop) {
             if (
@@ -36,7 +55,14 @@ abstract class DataModel {
         }
         return $this;
     }
-
+    
+    /**
+     * match_type
+     * match the type of the value to the type of the definition
+     * @param  string $defs
+     * @param  mixed $value
+     * @return mixed
+     */
     private function match_type(string $defs, mixed $value) : mixed {
         $type = explode(":", $defs, 2);
         switch ($type[0]) {
@@ -65,16 +91,34 @@ abstract class DataModel {
         }
         return null;
     }
-
+    
+    /**
+     * load_json
+     * load the internal properties from an json string - keys are the outer names
+     * @param  mixed $json
+     * @return self
+     */
     private function load_json(string $json) : self {
         $arr = @json_decode($json, true);
         return $this->load_array($arr ?: []);
     }
 
+        
+    /**
+     * load
+     * load the internal properties from an array or json string - keys are the outer names
+     * @param  string|array $input
+     * @return void
+     */
     public function load(string|array $input) {
         return is_string($input) ? $this->load_json($input) : $this->load_array($input);
     }
-
+    
+    /**
+     * to_array
+     * return the internal properties with the outer names as array
+     * @return array
+     */
     public function to_array() : array {
         $data = [];
         foreach ($this->keys as $name => $prop) {
@@ -84,7 +128,13 @@ abstract class DataModel {
         }
         return $data;
     }
-
+    
+    /**
+     * to_json
+     * return the internal properties with the outer names as json string
+     * @param  mixed $pretty
+     * @return string
+     */
     public function to_json(bool $pretty = true) : string {
         return json_encode($this->to_array(), $pretty ? JSON_PRETTY_PRINT : 0);
     }
