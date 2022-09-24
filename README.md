@@ -25,7 +25,9 @@ Frigate is a lightweight web application framework. It is designed to be easy, a
 
 - [v] Implement swagger
 
-- [-] Global templates.
+- [-] Global templates - include basic twig templates as helpers.
+
+- [-] Versioning with included files in page builder
 
 - [v] Implement Patch handlers.
 
