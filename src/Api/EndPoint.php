@@ -18,6 +18,6 @@ abstract class EndPoint implements EndPointInterface
         $this->authorize_method = $auth_method;
     }
 
-    abstract public function call(array $context, Http\RouteRequest $request) : Http\Response;
+    abstract public function call(array $context, Http\RequestInterface $request) : Http\Response;
 
 }

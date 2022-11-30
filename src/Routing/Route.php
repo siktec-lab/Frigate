@@ -16,14 +16,22 @@ class Route {
     ];
     public Http\HTTP2    $http2;
     public $func;
-
-    public function __construct(string $path, array $context = [], array $returns = [], $func = null) {
+    protected ?\ReflectionClass $request_mutator = null;
+    
+    public function __construct(string $path, array $context = [], array $returns = [], $func = null, \ReflectionClass|string|null $request_mutator = null) {
         $this->path = trim($path, "\t\n\r /\\");
         $this->context = $context;
         $this->http2 = new Http\HTTP2();
         $this->func = $func;
         if (!empty($returns)) {
             $this->set_returns(...$returns);
+        }
+        // set the request mutator:
+        if (is_string($request_mutator)) {
+            $this->request_mutator = new \ReflectionClass($request_mutator);
+        }
+        if ($request_mutator instanceof \ReflectionClass && $request_mutator->implementsInterface(Http\RequestInterface::class)) {
+            $this->request_mutator = $request_mutator;
         }
     }
 
@@ -61,7 +69,24 @@ class Route {
         return $this->returns[0] ?? "text/plain";
     }
 
+    //Mutate request:
+    public function mutate_request(Http\RequestInterface $request) : Http\RequestInterface {
+        if ($this->request_mutator !== null) {
+            $request = $this->request_mutator->newInstance($request);
+        }
+        return $request;
+    }
+
+    //execute the route
     public function exec(...$args) : Http\Response {
+
+        //loop through the arguments and add find the request mutate and add it to the context:
+        foreach ($args as &$arg) {
+            if ($arg instanceof Http\RequestInterface) {
+                $arg = $this->mutate_request($arg);
+                break;
+            }
+        }
         if (is_object($this->func) &&  !$this->func instanceof Closure && method_exists($this->func, "call")) {
             return $this->func->call($this->context, ...$args);
         }
