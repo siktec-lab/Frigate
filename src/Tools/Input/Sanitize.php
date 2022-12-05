@@ -4,13 +4,29 @@ namespace Siktec\Frigate\Tools\Input;
 
 
 class Sanitize {
-
+    
+    /**
+     * text
+     * sanitizes a string only english letters, numbers and common special characters are allowed
+     * @param  string $str
+     * @return string
+     */
     public static function text(string $str) : string {
-        $str = trim($str);
-        $str = preg_replace('~[^ A-Za-z0-9\\\\/_\\-:?,.!@\\(\\)\\[\\]\']"~','',$str);
+        $str = preg_replace('~[^ A-Za-z0-9\\\\/_\\-:?,.!@\\(\\)\\[\\]\']"~','', trim($str));
         return preg_replace('~\s+~',' ',$str);
     }
-
+    
+    /**
+     * text_utf8
+     * sanitize text input for utf8 characters
+     * @param  string $str
+     * @return string
+     */
+    public static function text_utf8(string $str) : string {
+        $str = preg_replace('~[^\p{L}\s0-9\\\\/_\\-:?,.!@\\(\\)\\[\\]\']+~u','', trim($str));
+        return preg_replace('~\s+~',' ',$str);
+    }
+    
     public static function chars(string $str, $allowed = "a-zA-Z") : string {
         return preg_replace('~[^'.$allowed.']~','',$str);
     }
@@ -66,6 +82,36 @@ class Sanitize {
 
     public static function array_value(string|int $key, array $arr, mixed $default = null) : mixed {
         return array_key_exists($key, $arr) ? $arr[$key] : $default;
+    }
+    
+    /**
+     * trim_length
+     * utf-8 safe string trim with optional ellipsis
+     * for utf-8 strings, mb_strlen and mb_substr are used if they are available
+     * 
+     * @param  mixed $str
+     * @param  mixed $length
+     * @param  mixed $hyphens
+     * @return string
+     */
+    public static function trim_length(string $str, int $length, string $ellipsis = '') : string {
+
+        //First trim:
+        $str = trim($str);
+
+        //Check if string is longer than $length:
+        if (function_exists('mb_strlen') && function_exists('mb_substr')) {
+            $limit = $length - mb_strlen($ellipsis);
+            if (mb_strlen($str) > $limit) {
+                return mb_substr($str, 0, $limit) . $ellipsis;
+            }
+        } else {
+            $limit = $length - strlen($ellipsis);
+            if (strlen($str) > $limit) {
+                return substr($str, 0, $limit) . $ellipsis;
+            }
+        }
+        return $str;
     }
 
 }
