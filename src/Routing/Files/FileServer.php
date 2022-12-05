@@ -72,8 +72,10 @@ class FileServer extends EndPoint {
         return [empty($message), $message];
     }
 
-    public function call(array $context, Http\RouteRequest $request) : Http\Response {
+    public function call(array $context, Http\RequestInterface $request) : Http\Response {
 
+        /** @var RouteRequest $request */ // we use this to force type hinting
+        
         Base::debug($this, "Execute endpoint - CreateProject\n".$request);
         
         // 4 types of requests:
