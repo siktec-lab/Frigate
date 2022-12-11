@@ -140,8 +140,27 @@ trait DbDataTrait
     
     /**
      * load_from_db
-     * loads the data from the database
+     * loads the data from the database - This will not query the database but use the returned row instead
+     * @param  array $row - the row from the database
+     * @param  array $args - additional arguments used for user overwrites
+     * @return bool true if the data was loaded, false if not
+     */
+    public function load_db_data(array $row, array ...$args) : bool
+    {
+        // Load data:
+        if ($row) {
+            $data = $this->_db_data->translate_data_to_properties($row);
+            $this->set($data);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * load_from_db
+     * loads the data from the database - this will query the database
      * @param  array|string|int|float $where the where clause single value (primary key) or array of key-value pairs
+     * @param  array $args - additional arguments used for user overwrites
      * @return bool true if the data was loaded, false if not
      */
     public function load_from_db(array|string|int|float $where, array ...$args) : bool
@@ -160,12 +179,7 @@ trait DbDataTrait
         $data = $this->_conn->getOne($this->get_db_table());
 
         // Load data:
-        if ($data) {
-            $data = $this->_db_data->translate_data_to_properties($data);
-            $this->set($data);
-            return true;
-        }
-        return false;
+        return $this->load_db_data($data, ...$args);
     }
     
     /**
@@ -190,15 +204,15 @@ trait DbDataTrait
 
         // Get data:
         try {
+            
+            // Query:
             $data = $this->_conn->getOne($this->get_db_table());
+            
             // Load data:
-            if ($data) {
-                $data = $this->_db_data->translate_data_to_properties($data);
-                $this->set($data);
-                return [1, ""];
-            } else {
-                return [-1, "No data found"];
-            }
+            $load = $this->load_db_data($data, ...$args);
+
+            return $load ? [1, ""] : [-1, "No data found"];
+            
         } catch (\Exception $e) {
             return [-1, $e->getMessage()];
         }
