@@ -144,7 +144,7 @@ trait DbDataTrait
      * @param  array|string|int|float $where the where clause single value (primary key) or array of key-value pairs
      * @return bool true if the data was loaded, false if not
      */
-    public function load_from_db(array|string|int|float $where) : bool
+    public function load_from_db(array|string|int|float $where, array ...$args) : bool
     {
         if (!$this->_conn || !$this->_db_data) {
             return false;
@@ -173,7 +173,7 @@ trait DbDataTrait
      * reloads the data from the database this must be primary key based
      * @return array[int, string] 1 if the data was loaded, >0 if not, error message if any
      */
-    public function reload_from_db() : array
+    public function reload_from_db(array ...$args) : array
     {
         if (!$this->_conn || !$this->_db_data) {
             return [-1, "No connection or no db data"];
@@ -209,7 +209,7 @@ trait DbDataTrait
      * saves the data to the database - this will create a new record.
      * @return array[int, string] id if the data was created, >0 if not, error message if any
      */
-    public function save_to_db(bool $auto_primary = true, array $apply_function = []) : array
+    public function save_to_db(bool $auto_primary = true, array $apply_function = [], array ...$args) : array
     {
         if (!$this->_conn || !$this->_db_data) {
             return [-1, "No database connection or no database config."];
@@ -251,7 +251,7 @@ trait DbDataTrait
      * deletes the data from the database - this must be primary key based
      * @return array[int, string] 1 if the data was deleted, >=0 if not, error message if any
      */
-    public function delete_from_db() : array
+    public function delete_from_db(array ...$args) : array
     {
         if (!$this->_conn || !$this->_db_data) {
             return [-1, "No database connection or no database config."];
@@ -286,7 +286,7 @@ trait DbDataTrait
      * @param  array $apply_function db array func to apply to the data use the property name as key
      * @return array[int, string] 1 if the data was updated, >=0 if not, error message if any
      */
-    public function update_on_db(array $apply_function = []) : array
+    public function update_on_db(array $apply_function = [], array ...$args) : array
     {
         if (!$this->_conn || !$this->_db_data) {
             return false;
