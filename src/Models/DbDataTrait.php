@@ -177,9 +177,7 @@ trait DbDataTrait
 
         // Get data:
         try {
-        
-            $data = $this->_conn->getOne($this->get_db_table()); //
-        
+            $data = $this->_conn->getOne($this->get_db_table());
         } catch (\Exception $e) {
             return false;
         }
