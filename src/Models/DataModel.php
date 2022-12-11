@@ -18,7 +18,7 @@ abstract class DataModel {
 
     /**
      * $keys
-     * the keys of the model - this hepls to map the model.
+     * the keys of the model - this helps to map the model.
      * @var array
      */
     protected array $keys = [];
