@@ -4,7 +4,7 @@ namespace Siktec\Frigate\Routing;
 
 use \Closure;
 use \Siktec\Frigate\Routing\Http;
-use \HTTP2;
+use \Siktec\Frigate\Api\BindEndpoint;
 
 class Route {
 
@@ -77,7 +77,13 @@ class Route {
         return $request;
     }
 
-    //execute the route
+        
+    /**
+     * exec
+     * execute the route endpoint
+     * @param  array $args packed arguments
+     * @return Http\Response
+     */
     public function exec(...$args) : Http\Response {
 
         //loop through the arguments and add find the request mutate and add it to the context:
@@ -87,9 +93,18 @@ class Route {
                 break;
             }
         }
-        if (is_object($this->func) &&  !$this->func instanceof Closure && method_exists($this->func, "call")) {
+
+        // Lazy load the endpoint?
+        if (is_object($this->func) && is_a($this->func, BindEndpoint::class)) {
+            $this->func = $this->func->getInstance(); // will build the endpoint only at this point
+        }
+
+        //Execute the route endpoint:
+        if (is_object($this->func) && !$this->func instanceof Closure && method_exists($this->func, "call")) {
             return $this->func->call($this->context, ...$args);
         }
+
+        // Execute the route function:
         return call_user_func_array(
             $this->func, 
             [$this->context, ...$args]
