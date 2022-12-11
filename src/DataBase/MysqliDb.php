@@ -790,7 +790,7 @@ class MysqliDb
             return $res;
         }
 
-        return null;
+        return []; //NOTE: shlomi changed this from null to empty array
     }
 
     /**
