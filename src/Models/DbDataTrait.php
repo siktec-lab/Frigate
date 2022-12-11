@@ -176,7 +176,13 @@ trait DbDataTrait
         }
 
         // Get data:
-        $data = $this->_conn->getOne($this->get_db_table());
+        try {
+        
+            $data = $this->_conn->getOne($this->get_db_table()); //
+        
+        } catch (\Exception $e) {
+            return false;
+        }
 
         // Load data:
         return $this->load_db_data($data, ...$args);
