@@ -21,6 +21,10 @@ class AuthBasic implements AuthInterface {
      */
     public function authorize(RequestInterface $request, string|array|null $credentials) : array {
         
+        if (is_string($credentials)) {
+            $credentials = ["", $credentials];
+        }
+
         if (is_null($credentials)) {
             $credentials = $this->credentials($request);
         }
@@ -29,6 +33,6 @@ class AuthBasic implements AuthInterface {
             return [true, ...$credentials];
         }
 
-        return [false, ...$credentials];
+        return empty($credentials) ? [false, null, null] : [false, ...$credentials];
     }
 }

@@ -26,6 +26,10 @@ class AuthSession implements AuthInterface {
             session_start();
         }
 
+        if (is_string($credentials)) {
+            $credentials = ["", $credentials];
+        }
+
         if (is_null($credentials)) {
             $credentials = $this->credentials($request);
         }
@@ -38,6 +42,7 @@ class AuthSession implements AuthInterface {
             setcookie("AUTHTOKEN", $credentials[2], time() + 3600, "/");
             return [true, ...$credentials];
         }
-        return [false, ...$credentials];
+
+        return empty($credentials) ? [false, null, null] : [false, ...$credentials];
     }
 }
