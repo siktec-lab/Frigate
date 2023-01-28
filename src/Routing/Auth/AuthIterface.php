@@ -6,8 +6,6 @@ namespace Siktec\Frigate\Routing\Auth;
 
 use Siktec\Frigate\Routing\Http\RequestInterface;
 
-
-
 interface AuthInterface {
     
 
