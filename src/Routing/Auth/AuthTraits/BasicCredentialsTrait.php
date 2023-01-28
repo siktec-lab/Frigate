@@ -24,7 +24,14 @@ trait BasicCredentialsTrait {
     private string $credentials_header_value_prefix  = "basic";
 
     private string $credentials_token_delimiter = ":";
-
+    
+    /**
+     * credentials - get credentials from request header
+     * Authorization: Basic base64_encode(username:password)
+     * will return [username, password, base64_encode(username:password)]
+     * @param  RequestInterface $request
+     * @return array|null [username or userId, hash] or null if not found
+     */
     public function credentials(RequestInterface $request) : array|null {
         
         $auth = $request->getHeader($this->credentials_header_key) ?? "";
