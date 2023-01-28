@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Siktec\Frigate\Routing\Auth\Traits;
 
-use Siktec\Frigate\Routing\Http\RequestInterface;
+use \Siktec\Frigate\Routing\Http\RequestInterface;
 
 /**
  * BasicCredentialsTrait

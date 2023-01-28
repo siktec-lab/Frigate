@@ -2,8 +2,8 @@
 
 namespace Siktec\Frigate\Models;
 
-use Siktec\Frigate\DataBase\MysqliDb;
-use Siktec\Frigate\Models\DbData;
+use \Siktec\Frigate\DataBase\MysqliDb;
+use \Siktec\Frigate\Models\DbData;
 
 /**
  * DbDataTrait
