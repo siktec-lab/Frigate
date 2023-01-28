@@ -53,3 +53,4 @@ class AuthFactory {
 
 /* default auth methods */
 AuthFactory::add('basic', new BaseMethods\AuthBasic());
+AuthFactory::add('session', new BaseMethods\AuthSession());
