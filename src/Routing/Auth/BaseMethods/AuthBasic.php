@@ -6,12 +6,12 @@ namespace Siktec\Frigate\Routing\Auth\BaseMethods;
 
 use \Siktec\Frigate\Routing\Http\RequestInterface;
 use \Siktec\Frigate\Routing\Auth\AuthInterface;
-use \Siktec\Frigate\Routing\Auth\Traits;
+use \Siktec\Frigate\Routing\Auth\AuthTraits;
 
 class AuthBasic implements AuthInterface {
 
 
-    use Traits\BasicCredentialsTrait;
+    use AuthTraits\BasicCredentialsTrait;
 
     /**
      * authorize - checks if a auth token passed in the header is valid and matches the ENV ADMIN_KEY
