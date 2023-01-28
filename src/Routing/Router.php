@@ -195,6 +195,7 @@ class Router {
         }
 
         //Default error handler:
+        var_dump($code);
         return new Http\Response(
             status :    $code, 
             headers :   [], 
