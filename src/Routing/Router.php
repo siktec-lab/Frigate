@@ -147,13 +147,18 @@ class Router {
             return $branch->exec->exec($request);
             
         } catch(Throwable $e) {
+            // Get code or default to 500:
+            $code = $e->getCode();
+            if ($code < 100 || $code > 599) {
+                $code = 500;
+            }
             return self::error(
                 request : $request, 
-                code : $e->getCode(), 
+                code    : $code, 
                 message : $e->getMessage(),
-                line : $e->getLine(),
-                file : $e->getFile(), 
-                trace : $e->getTraceAsString()
+                line    : $e->getLine(),
+                file    : $e->getFile(), 
+                trace   : $e->getTraceAsString()
             );
         }
     } 
@@ -175,8 +180,6 @@ class Router {
         string  $file       = "",  
         string  $trace      = ""
     ) : Http\Response {
-
-        var_dump($code);
 
         if (array_key_exists($code, self::$errors)) {
             self::$errors[$code]->context["code"] = $code;
