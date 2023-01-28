@@ -19,15 +19,21 @@ trait BasicCredentialsTrait {
      * @param  RequestInterface $request
      * @return array|null [username or userId, hash] or null if not found
      */
+    private string $credentials_header_key = "Authorization";
+
+    private string $credentials_header_value_prefix  = "basic";
+
+    private string $credentials_token_delimiter = ":";
+
     public function credentials(RequestInterface $request) : array|null {
         
-        $auth = $request->getHeader('Authorization') ?? "";
-        
-        $auth = 'basic ' !== strtolower(substr($auth, 0, 6)) ? null : trim(substr($auth, 6));
+        $auth = $request->getHeader($this->credentials_header_key) ?? "";
+        $prefix_len = strlen($this->credentials_header_value_prefix);
+        $auth = "{$this->credentials_header_value_prefix} " !== strtolower(substr($auth, 0, $prefix_len)) ? null : trim(substr($auth, $prefix_len));
         
         if (!$auth) return null;
 
-        $credentials = explode(':', base64_decode($auth), 2);
+        $credentials = explode($this->credentials_token_delimiter, base64_decode($auth), 2);
         if (2 !== count($credentials)) {
             return null;
         }

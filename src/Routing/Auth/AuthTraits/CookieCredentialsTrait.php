@@ -12,6 +12,11 @@ use \Siktec\Frigate\Routing\Http\RequestInterface;
  */
 trait CookieCredentialsTrait {
     
+
+    private string $credentials_cookie_key = "AUTHTOKEN";
+
+    private string $credentials_token_delimiter = ":";
+
     /**
      * credentials - get credentials from cookie
      * AUTHTOKEN=base64_encode(username:password)
@@ -21,11 +26,11 @@ trait CookieCredentialsTrait {
      */
     public function credentials(RequestInterface $request) : array|null {
 
-        $auth = $_COOKIE['AUTHTOKEN'] ?? null; 
+        $auth = $_COOKIE[$this->credentials_cookie_key] ?? null; 
         
         if (!$auth) return null;
 
-        $credentials = explode(':', base64_decode($auth), 2);
+        $credentials = explode($this->credentials_token_delimiter, base64_decode($auth), 2);
 
         if (2 !== count($credentials)) {
             return null;
