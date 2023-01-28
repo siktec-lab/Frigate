@@ -175,6 +175,9 @@ class Router {
         string  $file       = "",  
         string  $trace      = ""
     ) : Http\Response {
+
+        var_dump($code);
+
         if (array_key_exists($code, self::$errors)) {
             self::$errors[$code]->context["code"] = $code;
             self::$errors[$code]->context["line"] = $line;
@@ -195,7 +198,6 @@ class Router {
         }
 
         //Default error handler:
-        var_dump($code);
         return new Http\Response(
             status :    $code, 
             headers :   [], 
