@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace Siktec\Frigate\Routing\Auth\BaseMethods;
 
 use \Siktec\Frigate\Routing\Http\RequestInterface;
-use \Siktec\Frigate\Routing\Auth\AuthInterface;
 use \Siktec\Frigate\Routing\Auth\Traits;
 
-class AuthBasic implements AuthInterface {
+class AuthBasic implements \Siktec\Frigate\Routing\Auth\AuthInterface {
 
 
     use Traits\BasicCredentialsTrait;
