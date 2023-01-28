@@ -147,7 +147,14 @@ class Router {
             return $branch->exec->exec($request);
             
         } catch(Throwable $e) {
-            return self::error($request, $e->getCode(), $e->getMessage(), $e->getTraceAsString());
+            return self::error(
+                request : $request, 
+                code : $e->getCode(), 
+                message : $e->getMessage(),
+                line : $e->getLine(),
+                file : $e->getFile(), 
+                trace : $e->getTraceAsString()
+            );
         }
     } 
         
