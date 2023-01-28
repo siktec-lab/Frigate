@@ -169,11 +169,11 @@ class Router {
      */
     public static function error(
         Http\RouteRequest $request, 
-        int $code, 
-        string $message = "",
-        int $line = 0,
-        string $file = "",  
-        string $trace = ""
+        int     $code, 
+        string  $message    = "",
+        int     $line       = 0,
+        string  $file       = "",  
+        string  $trace      = ""
     ) : Http\Response {
         if (array_key_exists($code, self::$errors)) {
             self::$errors[$code]->context["code"] = $code;
@@ -194,7 +194,11 @@ class Router {
             return self::$errors["any"]->exec($request);
         }
         //Default error handler:
-        return new Http\Response($code, [], $message);
+        return new Http\Response(
+            status :    $code, 
+            headers :   [], 
+            body : sprintf("Error %d: %s \n File : %s \n Line : %d", $code, $message, $file, $line)
+        );
     }
 
 
