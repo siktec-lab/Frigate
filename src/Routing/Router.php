@@ -193,11 +193,12 @@ class Router {
             $request->expects = self::negotiate_accept(self::$errors["any"], $request) ?? self::$errors["any"]->get_default_return();
             return self::$errors["any"]->exec($request);
         }
+
         //Default error handler:
         return new Http\Response(
             status :    $code, 
             headers :   [], 
-            body : sprintf("Error %d: %s \n File : %s \n Line : %d", $code, $message, $file, $line)
+            body : sprintf("Error %d: %s \nFile : %s \nLine : %d", $code, $message, $file, $line)
         );
     }
 
