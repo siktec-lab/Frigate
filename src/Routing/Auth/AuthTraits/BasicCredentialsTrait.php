@@ -36,29 +36,3 @@ trait BasicCredentialsTrait {
     }
     
 }
-
-trait CookieCredentialsTrait {
-    
-    /**
-     * credentials - get credentials from cookie
-     * AUTHTOKEN=base64_encode(username:password)
-     * 
-     * @param  RequestInterface $request
-     * @return array|null [username or userId, hash] or null if not found
-     */
-    public function credentials(RequestInterface $request) : array|null {
-
-        $auth = $_COOKIE['AUTHTOKEN'] ?? null; 
-        
-        if (!$auth) return null;
-
-        $credentials = explode(':', base64_decode($auth), 2);
-
-        if (2 !== count($credentials)) {
-            return null;
-        }
-        $credentials[2] = $auth;
-        return $credentials;
-
-    }
-}
