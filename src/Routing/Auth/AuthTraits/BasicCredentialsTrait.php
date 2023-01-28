@@ -29,7 +29,7 @@ trait BasicCredentialsTrait {
         
         $auth = $request->getHeader($this->credentials_header_key) ?? "";
         $prefix_len = strlen($this->credentials_header_value_prefix);
-        $auth = "{$this->credentials_header_value_prefix} " !== strtolower(substr($auth, 0, $prefix_len)) ? null : trim(substr($auth, $prefix_len));
+        $auth = strtolower($this->credentials_header_value_prefix) !== strtolower(substr($auth, 0, $prefix_len)) ? null : trim(substr($auth, $prefix_len));
         
         if (!$auth) return null;
 
