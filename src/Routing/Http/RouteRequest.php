@@ -2,6 +2,8 @@
 
 namespace Siktec\Frigate\Routing\Http;
 
+use \Siktec\Frigate\Routing\Auth\AuthFactory;
+
 class RouteRequest extends RequestDecorator {
 
     private string $method = "";
@@ -45,6 +47,33 @@ class RouteRequest extends RequestDecorator {
         return $data;
     }
 
+    public function authorize(string|array $methods, array|null $manual_credentials = null, bool $throw = true) : array {
+
+        if (is_string($methods)) {
+            $methods = explode("|", trim($methods));
+        } else if (!is_array($methods) || empty($methods)) {
+            throw new \Exception("Invalid authorization method");
+        }
+
+        // check if methods are supported and execute them:
+        foreach ($methods as $method) {
+            if (!AuthFactory::has($method)) {
+                throw new \Exception("Unsupported authorization method: {$method}");
+            }
+            $auth = AuthFactory::get($method);
+            $authorized = $auth->authorize($this, $manual_credentials); // Authrization is the first array element returned
+            if ($authorized[0]) {
+                return $authorized;
+            }
+        }
+
+        //Return or throw:
+        if ($throw) {
+            throw new \Exception("Not Authorized check credentials", 401);
+        }
+        return [false, null, null]; // we return minimal data here, so that the user can check if the request was authorized
+    }
+    
     public function getCredentials(string $from = "header") : ?array {
         $auth = "xxxx";
         switch ($from) {
@@ -77,7 +106,9 @@ class RouteRequest extends RequestDecorator {
         $authorized = false;
         $user = "";
         foreach ($methods as $m) {
+
             switch (strtolower($m)) {
+            
                 //Basic method:
                 case "basic": {
                     $credential = $this->getCredentials("header");
