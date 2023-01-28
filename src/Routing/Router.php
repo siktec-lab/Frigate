@@ -160,9 +160,18 @@ class Router {
      * @param  string $trace
      * @return Http\Response
      */
-    public static function error(Http\RouteRequest $request, int $code, string $message = "", string $trace = "") : Http\Response {
+    public static function error(
+        Http\RouteRequest $request, 
+        int $code, 
+        string $message = "",
+        int $line = 0,
+        string $file = "",  
+        string $trace = ""
+    ) : Http\Response {
         if (array_key_exists($code, self::$errors)) {
             self::$errors[$code]->context["code"] = $code;
+            self::$errors[$code]->context["line"] = $line;
+            self::$errors[$code]->context["file"] = $file;
             self::$errors[$code]->context["message"] = $message;
             self::$errors[$code]->context["trace"] = $trace;
             $request->expects = self::negotiate_accept(self::$errors[$code], $request) ?? self::$errors[$code]->get_default_return();
@@ -170,6 +179,8 @@ class Router {
         }
         if (array_key_exists("any", self::$errors)) {
             self::$errors["any"]->context["code"] = $code;
+            self::$errors["any"]->context["line"] = $line;
+            self::$errors["any"]->context["file"] = $file;
             self::$errors["any"]->context["message"] = $message;
             self::$errors["any"]->context["trace"] = $trace;
             $request->expects = self::negotiate_accept(self::$errors["any"], $request) ?? self::$errors["any"]->get_default_return();
