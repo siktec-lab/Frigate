@@ -5,7 +5,8 @@ namespace Siktec\Frigate\Models;
 /**
  * DataModel
  * a base class for data models
- * @package Siktec\Frigate\Models
+ * @package \Siktec\Frigate\Models
+ * @property \Siktec\Frigate\DataBase\MysqliDb $_conn - For intelliphense error suppression
  */
 abstract class DataModel {
 
@@ -182,6 +183,7 @@ abstract class DataModel {
         if (in_array(self::$_db_use_trait, $traits)) {
             // its a db model so we need a connection:
             if (property_exists($this, "_conn")) {
+                /** @var DataModel $model */
                 $model = $ref->newInstance($this->_conn);
                 if ($model->{$use_method}($args)) {
                     return $model;
@@ -189,6 +191,7 @@ abstract class DataModel {
             }
         } else {
             // its a normal model:
+            /** @var DataModel $model */
             $model = $ref->newInstance();
             if ($model->{$use_method}($args)) {
                 return $model;
