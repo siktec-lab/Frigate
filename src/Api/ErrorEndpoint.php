@@ -42,11 +42,13 @@ class ErrorEndPoint extends EndPoint {
 
         $json_payload = [
             "code"      => $code,
-            "message"   => $message,
-            "file"      => $file,
-            "line"      => $line
+            "message"   => $message
         ];
-
+        // Only add the trace if we are in debug mode:
+        if ($this->debug) {
+            $json_payload["file"] = $file;
+            $json_payload["line"] = $line;
+        }
         //The body:
         switch ($code) {
             case 400:
