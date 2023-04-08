@@ -138,20 +138,28 @@ class Base {
         return false;
     }
 
-    static public function ENV_BOOL(string $key) : bool {
-        return array_key_exists($key, $_ENV) ? filter_var($_ENV[$key], FILTER_VALIDATE_BOOLEAN) : false;
+    static public function ENV_BOOL(string $key, ?bool $default = null) : ?bool {
+        return array_key_exists($key, $_ENV) 
+            ? filter_var($_ENV[$key], FILTER_VALIDATE_BOOLEAN) 
+            : $default;
     }
 
-    static public function ENV_STR(string $key) : string {
-        return strval($_ENV[$key] ?? "");
+    static public function ENV_STR(string $key, ?string $default = null) : ?string {
+        return array_key_exists($key, $_ENV) 
+            ? strval($_ENV[$key])
+            : $default;
     }
 
-    static public function ENV_INT(string $key) : bool {
-        return intval($_ENV[$key] ?? "");
+    static public function ENV_INT(string $key, ?int $default = null) : ?int {
+        return array_key_exists($key, $_ENV) 
+            ? intval($_ENV[$key])
+            : $default;
     }
 
-    static public function ENV_FLOAT(string $key) : bool {
-        return floatval($_ENV[$key] ?? "");
+    static public function ENV_FLOAT(string $key, ?float $default = null) : ?float {
+        return array_key_exists($key, $_ENV) 
+            ? floatval($_ENV[$key])
+            : $default;
     }
 
 }
