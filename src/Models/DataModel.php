@@ -285,11 +285,16 @@ abstract class DataModel {
     /**
      * to_array
      * return the internal properties with the outer names as array
+     * @param  array $filter - an array of outer keys to filter out
      * @return array
      */
-    public function to_array() : array {
+    public function to_array(array $filter = []) : array {
         $data = [];
+        $has_filter = !empty($filter);
         foreach ($this->keys as $name => $prop) {
+            if ($has_filter && in_array($name, $filter)) {
+                continue;
+            }
             // Get the proper casted value:
             $outer_type = $prop[1];
             $data[$name] = $this->match_type($outer_type, $prop[0]->getValue($this));
@@ -301,11 +306,13 @@ abstract class DataModel {
      * to_json
      * return the internal properties with the outer names as json string
      * @param  bool $pretty
+     * @param  array $filter - an array of outer keys to filter out
      * @return string
      */
-    public function to_json(bool $pretty = true) : string {
-        return json_encode($this->to_array(), $pretty ? JSON_PRETTY_PRINT : 0);
+    public function to_json(bool $pretty = true, array $filter = []) : string {
+        return json_encode($this->to_array($filter), $pretty ? JSON_PRETTY_PRINT : 0);
     }
+
 
     abstract public function normalize() : void;
     abstract public function validate(array &$errors = [], array $args = []);
