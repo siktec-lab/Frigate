@@ -7,7 +7,6 @@ namespace Siktec\Frigate\Routing\Auth\BaseMethods;
 use \Siktec\Frigate\Routing\Http\RequestInterface;
 use \Siktec\Frigate\Routing\Auth\AuthInterface;
 use \Siktec\Frigate\Routing\Auth\AuthTraits;
-use \Siktec\Frigate\Base;
 use \Siktec\Frigate\Tools\Hashing\JWT;
 
 class AuthJWT implements AuthInterface {
@@ -30,19 +29,16 @@ class AuthJWT implements AuthInterface {
     public ?string $secret = null;
 
     public ?JWT $jwt = null;
-
+    
+    /**
+     * __construct
+     *
+     * @param  ?string $secret JWT secret or null to use the global secret if set
+     * @return void
+     */
     public function __construct(?string $secret = null) {
-
-        // Set secret
-        $this->secret = empty($secret) ? Base::ENV_STR("JWT_SECRET", null) : $secret;
-
-        // Throw exception if secret is not set
-        if (empty($this->secret)) {
-            throw new \Exception("JWT secret not set can't create AuthJWT object");
-        }
-
         // Create new JWTWrapper object if secret is set
-        $this->jwt = new JWT($this->secret);
+        $this->jwt = new JWT($secret);
     }
     /**
      * credentials - get credentials from request header
@@ -75,16 +71,16 @@ class AuthJWT implements AuthInterface {
      * override this method to add custom authorization logic (e.g. check if user is admin)
      * header format: Authorization: Bearer <JWT>
      * @param  string|array|null $credentials pass null we will get the credentials from the request
-     * @return array returned values [bool, data]
+     * @return array returned values [bool, data] // data is the data from the token or the error message
      */
     public function authorize(RequestInterface $request, string|array|null $credentials) : array {
         
         $data = $this->credentials($request);
-
+        
         if (is_array($data)) {
             return [true, $data];
+        } else {
+            return [false, $this->jwt->get_error()];
         }
-        return [false, []];
-        
     }
 }

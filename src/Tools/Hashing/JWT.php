@@ -16,25 +16,36 @@ use UnexpectedValueException;
 class JWT {
 
     // JWT secret key
+    public  static  ?string $global_secret = null;
     private string $secret;
 
     // JWT issuer
+    public  static ?string $global_issuer = null;
     private string $issuer;
     private const DEFAULT_ISSUER = "System";
 
     // JWT audience
+    public  static ?string $global_audience = null;
     private string $audience;
-    private const DEFAULT_AUDIENCE = "Audience";
+    private const DEFAULT_AUDIENCE = "Client";
     
+    // JWT client id
+    public  static ?string $global_subject = null;
+    private string $subject;
+    private const DEFAULT_SUBJECT = "Client";
+
     // JWT algorithm
+    public  static ?string $global_algorithm = null;
     private string $algorithm;
     private const DEFAULT_ALGORITHM = "HS256";
 
     // JWT expiration time in seconds
+    public  static ?int $global_expiration = null;
     private int $expiration;
     private const DEFAULT_EXPIRATION = 3600; // 1 hour in seconds
 
     // JWT not before time in seconds
+    public  static ?int $global_not_before = null;
     private int $not_before;
     private const DEFAULT_NOT_BEFORE = 60; // 1 minute in seconds  
 
@@ -57,18 +68,32 @@ class JWT {
     // JWT validation error:
     private ?string $error = null;
 
-    // Constructor
+    // Constructor    
+    /**
+     * __construct
+     * Creates a new JWTWrapper object
+     * @param  ?string $secret    JWT secret key (optional) null to use global value  will throw exception if no global value is set
+     * @param  ?string $issuer    JWT issuer (optional) null to use global value or default value
+     * @param  ?string $audience  JWT audience (optional) null to use global value or default value
+     * @param  ?string $subject   JWT subject (optional) null to use global value or default value
+     * @param  ?string $algorithm JWT algorithm (optional) null to use global value or default value
+     * @param  ?int $expiration  JWT expiration time in seconds (optional) null to use global value or default value
+     * @param  ?int $not_before  JWT not before time in seconds (optional) null to use global value or default value
+     * @return void
+     */
     public function __construct(
-        string $secret,
-        string $issuer      = self::DEFAULT_ISSUER,
-        string $audience    = self::DEFAULT_AUDIENCE,
-        string $algorithm   = self::DEFAULT_ALGORITHM,
-        int $expiration     = self::DEFAULT_EXPIRATION,
-        int $not_before     = self::DEFAULT_NOT_BEFORE
+        ?string $secret,
+        ?string $issuer      = null,
+        ?string $audience    = null,
+        ?string $subject     = null,
+        ?string $algorithm   = null,
+        ?int $expiration     = null,
+        ?int $not_before     = null
     ) {
         $this->set_secret($secret);
         $this->set_issuer($issuer);
         $this->set_audience($audience);
+        $this->set_subject($subject);
         $this->set_algorithm($algorithm);
         $this->set_expiration($expiration);
         $this->set_not_before($not_before);
@@ -77,40 +102,68 @@ class JWT {
     /**
      * set_secret
      * Sets the JWT secret key
-     * @param  string $secret JWT secret key
+     * @param  ?string $secret JWT secret key
      * @return void
      */
-    public function set_secret(string $secret) : void {
+    public function set_secret(?string $secret) : void {
+        if (empty($secret) && empty(self::$global_secret)) {
+            throw new \Exception("Secret key is required");
+        }
+        if (empty($secret)) {
+            $secret = self::$global_secret;
+        }
         $this->secret = $secret;
     }
 
     /**  
      * set_issuer
      * Sets the JWT issuer
-     * @param  string $issuer JWT issuer
+     * @param  ?string $issuer JWT issuer null to use global value or default value
      * @return void
      */
-    public function set_issuer(string $issuer) : void {
+    public function set_issuer(?string $issuer) : void {
+        if (is_null($issuer)) {
+            $issuer = self::$global_issuer ?? self::DEFAULT_ISSUER;
+        }
         $this->issuer = $issuer;
     }
  
     /**
      * set_audience
      * Sets the JWT audience
-     * @param  string $audience JWT audience
+     * @param  ?string $audience JWT audience null to use global value or default value
      * @return void
      */
-    public function set_audience(string $audience) : void {
+    public function set_audience(?string $audience) : void {
+        if (is_null($audience)) {
+            $audience = self::$global_audience ?? self::DEFAULT_AUDIENCE;
+        }
         $this->audience = $audience;
+    }
+
+    /**
+     * set_subject
+     * Sets the JWT subject
+     * @param  ?string $subject JWT subject null to use global value or default value
+     * @return void
+     */
+    public function set_subject(?string $subject) : void {
+        if (is_null($subject)) {
+            $subject = self::$global_subject ?? self::DEFAULT_SUBJECT;
+        }
+        $this->subject = $subject;
     }
 
     /**
      * set_algorithm
      * Sets the JWT algorithm must be one of the available algorithms 
-     * @param  string $algorithm JWT algorithm
+     * @param  ?string $algorithm JWT algorithm null to use global value or default value
      * @return void
      */
-    public function set_algorithm(string $algorithm) : void {
+    public function set_algorithm(?string $algorithm) : void {
+        if (is_null($algorithm)) {
+            $algorithm = self::$global_algorithm ?? self::DEFAULT_ALGORITHM;
+        } 
         if (!in_array($algorithm, self::AVAILABLE_ALGORITHM)) {
             throw new \Exception("Invalid algorithm");
         }
@@ -120,10 +173,13 @@ class JWT {
     /**
      * set_expiration
      * Sets the JWT expiration time in seconds greater than 0
-     * @param  int $expiration JWT expiration time in seconds
+     * @param  ?int $expiration JWT expiration time in seconds null to use global value or default value
      * @return void
      */
-    public function set_expiration(int $expiration) : void {
+    public function set_expiration(?int $expiration) : void {
+        if (is_null($expiration)) {
+            $expiration = self::$global_expiration ?? self::DEFAULT_EXPIRATION;
+        }
         if ($expiration < 0) {
             throw new \Exception("Expiration time must be greater than 0");
         } 
@@ -133,10 +189,13 @@ class JWT {
     /**
      * set_not_before
      * Sets the JWT not before time in seconds greater than 0
-     * @param  int $not_before JWT not before time in seconds
+     * @param  ?int $not_before JWT not before time in seconds null to use global value or default value
      * @return void
      */
-    public function set_not_before(int $not_before) : void {
+    public function set_not_before(?int $not_before) : void {
+        if (is_null($not_before)) {
+            $not_before = self::$global_not_before ?? self::DEFAULT_NOT_BEFORE;
+        }
         if ($not_before < 0) {
             throw new \Exception("Not before time must be greater than 0");
         } 
@@ -146,7 +205,7 @@ class JWT {
     /**
      * set_issued_at
      * Sets the JWT issued at time in seconds greater than 0
-     * @param  int $issued_at JWT issued at time in seconds
+     * @param  ?int $issued_at JWT issued at time in seconds null to use current time
      * @return void
      */
     public function set_issued_at(?int $issued_at = null) : void {
@@ -202,7 +261,15 @@ class JWT {
     public function get_token() : ?string {
         return $this->token;
     }
-
+    
+    /**
+     * get_expire_at
+     * Gets the JWT expiration time in seconds since the Unix Epoch
+     * @return int
+     */
+    public function get_expire_at() : int {
+        return $this->issued_at + $this->expiration;
+    }
     /**
      * generate_token
      */
@@ -220,13 +287,17 @@ class JWT {
             $this->set_data($data);
         }
 
+        $jti = bin2hex(random_bytes(16));
+
         // Generate token
         $token = [
             "iss"   => $this->issuer,
             "aud"   => $this->audience,
+            "sub"   => $this->subject,
             "iat"   => $this->issued_at,
             "nbf"   => $this->issued_at - $this->not_before,
-            "exp"   => $this->issued_at + $this->expiration,
+            "exp"   => $this->get_expire_at(),
+            "jti"   => $jti, 
             "data"  => $this->data
         ];
 
@@ -250,8 +321,22 @@ class JWT {
         try {
             $key = new Key($this->secret, $this->algorithm);
             $data = FirebaseJWT::decode($token, $key);
+
+            // Populate JWT object:
+            $this->issuer = $data->iss ?? "";
+            $this->audience = $data->aud ?? "";
+            $this->subject = $data->sub ?? "";
+            $this->issued_at = $data->iat;
+            $this->expiration = $data->exp - $data->iat;
+            $this->not_before = $data->iat - $data->nbf;
+            $this->token = $token;
+
+            // Populate data:
             $this->set_data(ArrayHelpers::to_array($data->data));
+
+            // Return true
             return true;
+
         } catch (InvalidArgumentException $e) {
             // provided key/key-array is empty or malformed.
             $this->error = $e->getMessage();
