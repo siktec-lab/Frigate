@@ -54,11 +54,13 @@ class Sanitize {
     }
 
     public static function integer(mixed $int, mixed $onerror = 0) : mixed {
-        return filter_var($int, FILTER_VALIDATE_INT) ?: $onerror;
+        $_int = filter_var($int, FILTER_VALIDATE_INT);
+        return $_int !== false ? $_int : $onerror;
     }
 
-    public static function float(mixed $int, mixed $onerror = 0.0) : mixed {
-        return filter_var($int, FILTER_VALIDATE_FLOAT) ?: $onerror;
+    public static function float(mixed $float, mixed $onerror = 0.0) : mixed {
+        $_float = filter_var($float, FILTER_VALIDATE_FLOAT);
+        return $_float !== false ? $_float : $onerror;
     }
 
     public static function boolean(mixed $bool, mixed $onerror = false) : mixed {
