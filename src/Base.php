@@ -7,11 +7,24 @@ use \Dotenv\Dotenv;
 
 class Base {
 
+    static public string $version = "1.0.0";
+
     static public ?Dotenv $env = null;
 
     static public ?MysqliDb $db = null;
 
-    public static function init(string $config, bool $connect = true, bool $session = true, bool $page_buffer = false) : void {
+    public static function init(
+        string $config, 
+        bool $connect = true, 
+        bool $session = true, 
+        bool $page_buffer = false,
+        ?bool $load_ini = true
+    ) : void {
+
+        if ($load_ini) {
+            self::load_ini();
+        }
+
         self::load_environment($config);
         
         //connect to database:
@@ -28,6 +41,32 @@ class Base {
         if ($page_buffer) {
             self::start_page_buffer();
         }
+    }
+
+    public static function load_ini() : void {
+        
+        // Application version:
+        if (!defined("APP_VERSION")) {
+            define("APP_VERSION", self::$version);
+        }
+        self::$version = APP_VERSION;
+
+        // Error log:
+        if (!defined("APP_ERROR_LOG")) {
+            define("APP_ERROR_LOG", false);
+        }
+        if (APP_ERROR_LOG) {
+            ini_set("log_errors", true);
+            ini_set("error_log", APP_ERROR_LOG);
+        }
+
+        // Error reporting:
+        if (!defined("SHOW_ERRORS")) {
+            define("SHOW_ERRORS", false);
+        }
+        
+        error_reporting(SHOW_ERRORS ? -1 : 0);
+        ini_set('display_errors', SHOW_ERRORS ? 'on' : 'off');
     }
 
     public static function start_session() : bool {
