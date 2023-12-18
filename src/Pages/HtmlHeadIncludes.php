@@ -10,6 +10,7 @@ class HtmlHeadIncludes implements Arrays\ToArrayAccess {
 
     public array $scripts   = [];
     public array $links     = [];
+    public array $css       = [];
 
     public function include_script(
         string  $src, 
