@@ -20,7 +20,7 @@
         "twig/twig": "^3.4",
         "vlucas/phpdotenv": "^5.4",
         "sabre/uri": "^2.3",
-        "zircote/swagger-php": "4.x-dev",
+        "zircote/swagger-php": "^4.8",
         "firebase/php-jwt": "dev-main"
     },
     "minimum-stability": "dev"
