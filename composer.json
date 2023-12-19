@@ -23,5 +23,6 @@
         "zircote/swagger-php": "^4.8",
         "firebase/php-jwt": "dev-main"
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
