@@ -13,6 +13,8 @@ class Base {
 
     static public ?MysqliDb $db = null;
 
+    static public array $globals = [];
+
     public static function init(
         string $config, 
         bool $connect = true, 
@@ -67,6 +69,11 @@ class Base {
         
         error_reporting(SHOW_ERRORS ? -1 : 0);
         ini_set('display_errors', SHOW_ERRORS ? 'on' : 'off');
+
+        // Save Globals:
+        self::$globals["APP_VERSION"]   = APP_VERSION;
+        self::$globals["APP_ERROR_LOG"] = APP_ERROR_LOG;
+        self::$globals["SHOW_ERRORS"]   = SHOW_ERRORS;
     }
 
     public static function start_session() : bool {
@@ -107,7 +114,14 @@ class Base {
             //join the app url with the base path to get the base url make sure no extra slashes are added
             define("APP_BASE_URL", $app_url . ltrim(APP_BASE_URL_PATH, " \n\t\r\0\x0B/\\"));
         }
-
+        
+        //Save Globals:
+        self::$globals["APP_ROOT"]         = APP_ROOT;
+        self::$globals["APP_VENDOR"]       = APP_VENDOR;
+        self::$globals["APP_BASE_OS_PATH"] = APP_BASE_OS_PATH;
+        self::$globals["APP_BASE_URL_PATH"]= APP_BASE_URL_PATH;
+        self::$globals["APP_BASE_URL"]     = APP_BASE_URL;
+        
     }
 
     static public function connect_database() {
