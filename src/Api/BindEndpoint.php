@@ -39,15 +39,27 @@ class BindEndpoint
      * get_instance
      * returns an instance of the endpoint class - this is a lazy load
      * @throws \Exception if the endpoint class could not be instantiated will trigger a 500 error
+     * 
+     * @param  ?bool $debug Override debug setting
+     * @param  ?bool $auth Override auth setting
+     * @param  mixed $auth_method Override auth method
      * @return EndPointInterface
      */
-    public function getInstance() : EndPointInterface
+    public function getInstance(
+        ?bool $debug = null,
+        ?bool $auth = null,
+        $auth_method = null
+    ) : EndPointInterface
     {   
         try {
             if ($this->endpoint === null) {
                 $this->endpoint = new \ReflectionClass($this->class);
             }
-            return $this->endpoint->newInstance($this->debug, $this->authorize, $this->authorize_method);
+            return $this->endpoint->newInstance(
+                is_null($debug) ? $this->debug : $debug, 
+                is_null($auth) ? $this->authorize : $auth,
+                is_null($auth_method) ? $this->authorize_method : $auth_method
+            );
         } catch (\ReflectionException $e) {
             throw new \Exception("Could not create endpoint instance: " . $e->getMessage(), 500);
         }
