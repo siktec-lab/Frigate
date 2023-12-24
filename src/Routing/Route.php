@@ -9,15 +9,26 @@ use \Siktec\Frigate\Api\BindEndpoint;
 class Route {
 
     public string    $path;
+    
     public array     $context = [];
+    
     private array    $returns = [
         "text/html",
         "application/json"
     ];
+    
     public Http\HTTP2    $http2;
+    
     public $func;
+    
     protected ?\ReflectionClass $request_mutator = null;
     
+    private array $override_params = [
+        "debug"         => null,
+        "auth"          => null,
+        "auth_method"   => null
+    ];
+
     public function __construct(string $path, array $context = [], array $returns = [], $func = null, \ReflectionClass|string|null $request_mutator = null) {
         $this->path = trim($path, "\t\n\r /\\");
         $this->context = $context;
@@ -77,7 +88,22 @@ class Route {
         return $request;
     }
 
-        
+    public function override_endpoint_params(
+        ?bool $debug = null,
+        ?bool $auth  = null,
+        $auth_method = null
+    ) : Route {
+        if (!is_null($debug)) {
+            $this->override_params["debug"] = $debug;
+        }
+        if (!is_null($auth)) {
+            $this->override_params["auth"] = $auth;
+        }
+        if (!is_null($auth_method)) {
+            $this->override_params["auth_method"] = $auth_method;
+        }
+        return $this;
+    }
     /**
      * exec
      * execute the route endpoint
@@ -96,7 +122,11 @@ class Route {
 
         // Lazy load the endpoint?
         if (is_object($this->func) && is_a($this->func, BindEndpoint::class)) {
-            $this->func = $this->func->getInstance(); // will build the endpoint only at this point
+            $this->func = $this->func->getInstance( // All overrides are passed to the endpoint
+                $this->override_params["debug"], 
+                $this->override_params["auth"],
+                $this->override_params["auth_method"]
+            ); // will build the endpoint only at this point
         }
 
         //Execute the route endpoint:
