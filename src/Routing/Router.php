@@ -33,25 +33,20 @@ class Router {
     /**
      * parse_request
      * load and parses the request uri
-     * @param  string $route or none for SERVER => REQUEST_URI
+     * @param  string $base or none for SERVER => REQUEST_URI
      * @return void
      */
     public static function parse_request(string $base = "/") : void {
 
-        $server_arr = $_SERVER;
-
-        if ('cli' === PHP_SAPI) {
-            // If we're running off the CLI, we're going to set some default settings.
-            $server_arr['REQUEST_URI'] = $_SERVER['REQUEST_URI'] ?? '/';
-            $server_arr['REQUEST_METHOD'] = $_SERVER['REQUEST_METHOD'] ?? 'CLI';
-        }
-
-        $got =  self::createFromServerArray($server_arr);
-        self::$request = new Http\RouteRequest($got);
-        self::$request->setBaseUrl($server_arr['BASE_URL'] ?? "");
-        self::$request->setBody(fopen('php://input', 'r'));
-        self::$request->setPostData($_POST);
-        self::$request->setBaseUrl($base);
+        self::$request = self::build_request(
+            server_arr : null, // Null for $_SERVER
+            base       : $base,
+            method     : null, // Method null for REQUEST_METHOD
+            uri        : null, // Uri override null for REQUEST_URI
+            query      : null, // Query override null for whatever is in the uri
+            body       : fopen('php://input', 'r'),
+            post       : $_POST
+        );
 
         Base::debug(self::class, "got request",     (string)self::$request);
         Base::debug(self::class, "request raw parts", [
@@ -60,7 +55,106 @@ class Router {
             "QUERY" => self::$request->getQueryParameters()
         ]);
     }
+
+    public static function request_for(
+        string $path, 
+        ?string $method = null, // Method null for REQUEST_METHOD
+        array $query = [], // Set the query parameters
+        $body = "", // Body of the request
+        array $post = [] // Post data override null for whatever is in the body
+
+    ) : Http\RouteRequest {
+
+        // TODO: Extend ServerArray with more options
+        // This is for setting the correct content type if body.
+        // Also for setting the correct content length if body is a string.
+
+        // path to uri:
+        $path = trim($path);
+        $path = ltrim($path, '/');
+        $path = Base::$globals["APP_BASE_URL_PATH"].$path;
+
+        return self::build_request(
+            server_arr : null, // Null for $_SERVER
+            base       : null,
+            method     : $method, // Method null for REQUEST_METHOD
+            uri        : $path, // Uri override null for REQUEST_URI
+            query      : $query, // Query override null for whatever is in the uri
+            body       : $body,
+            post       : $post
+        );
+
+    }
+    /**
+     * manual_request
+     * create a manual request for endpoint invocation with a custom context
+     * 
+     * @param  array|null $server_arr null for $_SERVER, REQUEST_URI and REQUEST_METHOD are required.
+     * @param  string|null $base Base url null for APP_BASE_URL_PATH
+     * @param  string|null $method Method null for REQUEST_METHOD
+     * @param  string|null $uri Uri override null for REQUEST_URI
+     * @param  array|null $query Query override null for whatever is in the uri
+     * @param  resource|string|callable $body the body of the request 
+     * @param  array $post Post data to add to the request
+     * @return Http\RequestInterface
+     */
+    private static function build_request(
+        ?array $server_arr = null, // Null for $_SERVER
+        ?string $base      = null, // Base url null for APP_BASE_URL_PATH
+        ?string $method    = null, // Method null for REQUEST_METHOD
+        ?string $uri       = "",   // Uri override null for REQUEST_URI
+        ?array $query      = null, // Query override null for whatever is in the uri
+        $body              = "",   // Body of the request
+        array $post        = []  // Post data override null for whatever is in the body
+    ) : Http\RequestInterface {
         
+        // If no server array is provided, we'll use the $_SERVER array.
+        if (is_null($server_arr)) {
+            $server_arr = $_SERVER;
+            if ('cli' === PHP_SAPI) {
+                // If we're running off the CLI, we're going to set some default settings.
+                $server_arr['REQUEST_URI'] = $_SERVER['REQUEST_URI'] ?? '/';
+                $server_arr['REQUEST_METHOD'] = $_SERVER['REQUEST_METHOD'] ?? 'CLI';
+            }
+        }
+
+        // If no base is provided, we'll use the APP_BASE_URL_PATH
+        if (is_null($base)) {
+            $base = Base::$globals["APP_BASE_URL_PATH"];
+        }
+
+        // If method is provided, we'll use it instead of REQUEST_METHOD
+        if (!empty($method)) {
+            $server_arr['REQUEST_METHOD'] = trim($method);
+        }
+
+        // If url is provided, we'll use it instead of REQUEST_URI
+        if (!empty($uri)) {
+            $server_arr['REQUEST_URI'] = trim($uri);
+        }
+
+        // If query is provided, we'll use it instead of the one in the uri
+        // If its an empty array, we'll remove the query from the uri
+        if (!is_null($query)) { 
+            // If we have a query string, we'll append it to the uri
+            $server_arr['REQUEST_URI'] = trim($server_arr['REQUEST_URI'], '?');
+            $server_arr['REQUEST_URI'] = strtok($server_arr['REQUEST_URI'], '?') ?: $server_arr['REQUEST_URI'];
+            // If we have a query string, we'll append it to the uri
+            if (!empty($query)) { 
+                $server_arr['QUERY_STRING'] = http_build_query($query); 
+                $server_arr['REQUEST_URI'] .= '?'.$server_arr['QUERY_STRING'];
+            }
+        }
+
+        $got =  self::createFromServerArray($server_arr);
+        $request = new Http\RouteRequest($got);
+        //$request->setBaseUrl($server_arr['BASE_URL'] ?? "");
+        $request->setBody($body);
+        $request->setPostData($post);
+        $request->setBaseUrl($base);
+        return $request;
+    } 
+
     /**
      * define_error
      * define an error route to be used when an error code is raised
@@ -118,15 +212,36 @@ class Router {
     
     /**
      * load
-     *
+     * load the current request
      * @param  ?RouteRequest $request null when current request should be used
      * @return Http\Response
      */
-    public static function load(?Http\RouteRequest $request = null) : Http\Response {
+    public static function load(
+        ?Http\RouteRequest $request = null
+    ) : Http\Response {
         $request = $request ?? self::$request;
+        return self::execute($request);
+    } 
+    
+    /**
+     * execute
+     *
+     * @param  Http\RouteRequest $request null when current request should be used
+     * @param  ?bool $debug Override debug setting
+     * @param  ?bool $auth Override auth setting
+     * @param  mixed $auth_method Override auth method
+     * @return Http\Response
+     */
+    public static function execute(
+        Http\RouteRequest $request,
+        ?bool $debug = null, // Override debug setting
+        ?bool $auth  = null, // Override auth setting
+        $auth_method = null // Override auth method
+    ) : Http\Response {
+        
         try {
             //Check that the method is supported:
-            $method = strtoupper($request->getMethod());
+            $method = $request->getMethod();
             if (!array_key_exists($method, self::$routes)) {
                 throw new \Exception("Request method not supported", 404);
             }
@@ -143,6 +258,13 @@ class Router {
             }
             //Merge context:
             $branch->exec->context = array_merge($branch->exec->context, $con);
+
+            //Is override?
+            if (!is_null($debug) || !is_null($auth) || !is_null($auth_method)) {
+                $branch->exec->override_endpoint_params(
+                    $debug, $auth, $auth_method
+                );
+            }
             //Execute the route:
             return $branch->exec->exec($request);
             
@@ -161,8 +283,8 @@ class Router {
                 trace   : $e->getTraceAsString()
             );
         }
-    } 
-        
+    }
+
     /**
      * error
      * handle an error and return a response for it
@@ -207,7 +329,6 @@ class Router {
             body : sprintf("Error %d: %s \nFile : %s \nLine : %d", $code, $message, $file, $line)
         );
     }
-
 
     /**
      * Sends the HTTP response back to a HTTP client.
@@ -370,7 +491,7 @@ class Router {
         if (null === $method) {
             throw new \InvalidArgumentException('The _SERVER array must have a REQUEST_METHOD key');
         }
-        $r = new Http\Request($method, $url, $headers);
+        $r = new Http\Request(strtoupper($method), $url, $headers);
         $r->setHttpVersion($httpVersion);
         $r->setRawServerData($serverArray);
         $r->setAbsoluteUrl($protocol.'://'.$hostName.$url);
