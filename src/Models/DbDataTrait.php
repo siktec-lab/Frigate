@@ -225,6 +225,9 @@ trait DbDataTrait
     /**
      * save_to_db
      * saves the data to the database - this will create a new record.
+     * @param  bool $auto_primary if true the primary key will be set to the id of the new record
+     * @param  array $apply_function db array func to apply to the data use the property name as key
+     * @param  array $args - additional arguments used for user overwrites
      * @return array[int, string] id if the data was created, >0 if not, error message if any
      */
     public function save_to_db(bool $auto_primary = true, array $apply_function = [], array ...$args) : array
@@ -247,9 +250,8 @@ trait DbDataTrait
         try {
             if ($this->_conn->insert($this->get_db_table(), $data)) {
                 $id = $this->_conn->getInsertId();
-
                 // Set primary key only if auto_primary is true:
-                if ($this->_db_data->primary) {
+                if ($this->_db_data->primary && $id && $auto_primary) {
                     $field = $this->_db_data->translate_column($this->_db_data->primary);
                     $this->{$field} = $id;
                 }
@@ -265,6 +267,7 @@ trait DbDataTrait
     /**
      * delete_from_db
      * deletes the data from the database - this must be primary key based
+     * @param  array $args - additional arguments used for user overwrites
      * @return array[int, string] 1 if the data was deleted, >=0 if not, error message if any
      */
     public function delete_from_db(array ...$args) : array
@@ -300,6 +303,7 @@ trait DbDataTrait
      * update_on_db
      * updates the data on the database - this must be primary key based
      * @param  array $apply_function db array func to apply to the data use the property name as key
+     * @param  array $args - additional arguments used for user overwrites
      * @return array[int, string] 1 if the data was updated, >=0 if not, error message if any
      */
     public function update_on_db(array $apply_function = [], array ...$args) : array
