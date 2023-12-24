@@ -240,9 +240,7 @@ trait DbDataTrait
         // apply functions:
         foreach ($apply_function as $property => $apply) {
             $column = $this->_db_data->translate_property($property);
-            if (array_key_exists($column, $data)) {
-                $data[$column] = $apply;
-            }
+            $data[$column] = $apply;
         }
 
         // Save data:
@@ -317,9 +315,7 @@ trait DbDataTrait
         // apply functions:
         foreach ($apply_function as $property => $apply) {
             $column = $this->_db_data->translate_property($property);
-            if (array_key_exists($column, $data)) {
-                $data[$column] = $apply;
-            }
+            $data[$column] = $apply;
         }
 
         // Prepare query:
