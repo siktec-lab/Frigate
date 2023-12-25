@@ -159,12 +159,33 @@ class Response extends Message implements ResponseInterface
         $this->statusText = $statusText;
     }
 
+    /**
+     * Sets the response body as a json string.
+     *
+     * @param array|string| $body if string, it will be used as-is, if array, it will be json encoded.
+     * @return void
+     */
     public function setBodyJson(array|string $body) : void {
         $this->setBody(
             is_array($body) ? json_encode($body) : $body
         );
     }
     
+    /** 
+     * Returns the body as an array.
+     * 
+     * @return array|null an array or null if conversion failed.
+     */
+    public function getBodyArray() : ?array {
+        // Get the body:
+        $body = $this->getBody();
+        // If the body is a string, try to decode it safely:
+        if (is_string($body)) {
+            $body = json_decode($body, true);
+        }
+        return is_array($body) ? $body : null;
+    }
+
     /**
      * Serializes the response object as a string.
      *
