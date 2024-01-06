@@ -163,11 +163,14 @@ class Response extends Message implements ResponseInterface
      * Sets the response body as a json string.
      *
      * @param array|string| $body if string, it will be used as-is, if array, it will be json encoded.
+     * @param bool $pretty if true, the json will be pretty formatted.
      * @return void
      */
-    public function setBodyJson(array|string $body) : void {
+    public function setBodyJson(array|string $body, bool $pretty = false) : void {
         $this->setBody(
-            is_array($body) ? json_encode($body) : $body
+            is_array($body) ? 
+                json_encode($body, $pretty ? JSON_PRETTY_PRINT : 0) :
+                $body
         );
     }
     
