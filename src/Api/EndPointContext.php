@@ -1,6 +1,6 @@
 <?php 
 
-namespace Siktec\Frigate\Api;
+namespace Frigate\Api;
 
 trait EndPointContext {
 

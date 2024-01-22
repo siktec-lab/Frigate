@@ -1,8 +1,8 @@
 <?php
 
-namespace Siktec\Frigate\Tools\FileSystem;
+namespace Frigate\Tools\FileSystem;
 
-use Siktec\Frigate\Tools\FileSystem\FilesHelper;
+use Frigate\Tools\FileSystem\FilesHelper;
 
 class ArchiveHelper {
 

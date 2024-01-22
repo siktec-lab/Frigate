@@ -7,14 +7,13 @@
  * depending on the request header. 
  * use this class to handle errors in your application - if you want you can use it as a template
  * to create your own error handling endpoint.
- * @package Siktec\Frigate\Api
  */
 
 declare(strict_types=1);
 
-namespace Siktec\Frigate\Api;
+namespace Frigate\Api;
 
-use \Siktec\Frigate\Routing\Http;
+use Frigate\Routing\Http;
 
 class ErrorEndPoint extends EndPoint { 
 

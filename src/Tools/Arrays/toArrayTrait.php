@@ -1,6 +1,6 @@
 <?php
 
-namespace Siktec\Frigate\Tools\Arrays;
+namespace Frigate\Tools\Arrays;
 
 trait toArrayTrait
 {

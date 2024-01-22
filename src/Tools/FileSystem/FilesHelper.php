@@ -1,6 +1,6 @@
 <?php
 
-namespace Siktec\Frigate\Tools\FileSystem;
+namespace Frigate\Tools\FileSystem;
 
 
 class FilesHelper {

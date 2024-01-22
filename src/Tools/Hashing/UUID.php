@@ -1,5 +1,5 @@
 <?php
-namespace Siktec\Frigate\Tools\Hashing;
+namespace Frigate\Tools\Hashing;
 
 
 /*

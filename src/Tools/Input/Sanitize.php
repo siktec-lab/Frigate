@@ -1,6 +1,6 @@
 <?php
 
-namespace Siktec\Frigate\Tools\Input;
+namespace Frigate\Tools\Input;
 
 
 class Sanitize {

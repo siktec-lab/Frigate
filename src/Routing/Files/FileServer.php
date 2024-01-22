@@ -1,12 +1,12 @@
 <?php 
 
-namespace Siktec\Frigate\Routing\Files;
+namespace Frigate\Routing\Files;
 
-use \Siktec\Frigate\Base;
-use \Siktec\Frigate\Api\EndPoint;
-use \Siktec\Frigate\Api\EndPointContext;
-use \Siktec\Frigate\Routing\Http;
-use \Siktec\Frigate\Routing\Files;
+use Frigate\Base;
+use Frigate\Api\EndPoint;
+use Frigate\Api\EndPointContext;
+use Frigate\Routing\Http;
+use Frigate\Routing\Files;
 
 class FileServer extends EndPoint { 
 

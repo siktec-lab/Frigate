@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Siktec\Frigate\Routing\Paths;
+namespace Frigate\Routing\Paths;
 
-use Siktec\Frigate\Routing\Paths\PathBranch;
+use Frigate\Routing\Paths\PathBranch;
 
 /**
  * PathTree

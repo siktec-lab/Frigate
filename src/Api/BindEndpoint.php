@@ -1,12 +1,11 @@
 <?php 
 
-namespace Siktec\Frigate\Api;
+namespace Frigate\Api;
 
 /**
  * api endpoint binding
  * this class is used to bind an endpoint class to a route
  * it is used to lazy load the endpoint class very performant in large applications
- * @package Siktec\Frigate\Api
  */
 
 class BindEndpoint

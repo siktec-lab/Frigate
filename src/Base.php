@@ -1,9 +1,9 @@
 <?php 
 
-namespace Siktec\Frigate;
+namespace Frigate;
 
-use \Siktec\Frigate\DataBase\MysqliDb;
-use \Dotenv\Dotenv;
+use Frigate\DataBase\MysqliDb;
+use Dotenv\Dotenv;
 
 class Base {
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Siktec\Frigate\Routing\Http;
+namespace Frigate\Routing\Http;
 /**
  * Part of PEAR HTTP2
  * https://github.com/pear/HTTP2

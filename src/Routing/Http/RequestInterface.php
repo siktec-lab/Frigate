@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Siktec\Frigate\Routing\Http;
+namespace Frigate\Routing\Http;
 
 /**
  * The RequestInterface represents a HTTP request.

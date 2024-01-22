@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Siktec\Frigate\Routing\Auth\AuthTraits;
+namespace Frigate\Routing\Auth\AuthTraits;
 
-use \Siktec\Frigate\Routing\Http\RequestInterface;
+use Frigate\Routing\Http\RequestInterface;
 
 /**
  * CookieCredentialsTrait

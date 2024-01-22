@@ -1,8 +1,8 @@
 <?php
 
-namespace Siktec\Frigate\Pages;
+namespace Frigate\Pages;
 
-use \Siktec\Frigate\Tools\Arrays;
+use Frigate\Tools\Arrays;
 
 class HtmlOpenGraphMeta implements Arrays\ToArrayAccess {
 

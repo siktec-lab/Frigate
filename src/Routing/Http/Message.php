@@ -1,6 +1,6 @@
 <?php
 
-namespace Siktec\Frigate\Routing\Http;
+namespace Frigate\Routing\Http;
 
 /**
  * This is the abstract base class for both the Request and Response objects.

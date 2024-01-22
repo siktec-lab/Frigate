@@ -1,10 +1,10 @@
 <?php 
 
-namespace Siktec\Frigate\Routing;
+namespace Frigate\Routing;
 
 use \Closure;
-use \Siktec\Frigate\Routing\Http;
-use \Siktec\Frigate\Api\BindEndpoint;
+use Frigate\Routing\Http;
+use Frigate\Api\BindEndpoint;
 
 class Route {
 

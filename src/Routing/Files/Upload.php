@@ -1,11 +1,11 @@
 <?php 
 
-namespace Siktec\Frigate\Routing\Files;
+namespace Frigate\Routing\Files;
 
-use \Siktec\Frigate\Tools\Hashing;
-use \Siktec\Frigate\Tools\Arrays\ArrayHelpers;
-use \Siktec\Frigate\Tools\FileSystem\DirectoryHelper;
-use \Siktec\Frigate\Tools\FileSystem\FilesHelper;
+use Frigate\Tools\Hashing;
+use Frigate\Tools\Arrays\ArrayHelpers;
+use Frigate\Tools\FileSystem\DirectoryHelper;
+use Frigate\Tools\FileSystem\FilesHelper;
 
 class Upload {
 

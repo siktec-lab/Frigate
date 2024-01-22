@@ -1,6 +1,6 @@
 <?php
 
-namespace Siktec\Frigate\Pages;
+namespace Frigate\Pages;
 
 class HtmlBodyIncludes extends HtmlHeadIncludes {
 

@@ -1,10 +1,10 @@
 <?php 
 
-namespace Siktec\Frigate\Routing;
+namespace Frigate\Routing;
 
-use \Siktec\Frigate\Base;
-use \Siktec\Frigate\Routing\Http;
-use \Siktec\Frigate\Routing\Paths\PathTree;
+use Frigate\Base;
+use Frigate\Routing\Http;
+use Frigate\Routing\Paths\PathTree;
 use \Throwable;
 
 class Router {

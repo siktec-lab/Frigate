@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Siktec\Frigate\Routing\Auth\BaseMethods;
+namespace Frigate\Routing\Auth\BaseMethods;
 
-use \Siktec\Frigate\Routing\Http\RequestInterface;
-use \Siktec\Frigate\Routing\Auth\AuthInterface;
-use \Siktec\Frigate\Routing\Auth\AuthTraits;
-use \Siktec\Frigate\Tools\Hashing\JWT;
+use Frigate\Routing\Http\RequestInterface;
+use Frigate\Routing\Auth\AuthInterface;
+use Frigate\Routing\Auth\AuthTraits;
+use Frigate\Tools\Hashing\JWT;
 
 class AuthJWT implements AuthInterface {
 

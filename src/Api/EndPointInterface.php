@@ -1,9 +1,9 @@
 <?php 
 
-namespace Siktec\Frigate\Api;
+namespace Frigate\Api;
 
-use \Siktec\Frigate\Routing\Http\RouteRequest;
-use \Siktec\Frigate\Routing\Http\Response;
+use Frigate\Routing\Http\RouteRequest;
+use Frigate\Routing\Http\Response;
 
 interface EndPointInterface
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace Siktec\Frigate\Routing\Http;
+namespace Frigate\Routing\Http;
 
-use \Siktec\Frigate\Routing\Auth\AuthFactory;
+use Frigate\Routing\Auth\AuthFactory;
 
 class RouteRequest extends RequestDecorator {
 

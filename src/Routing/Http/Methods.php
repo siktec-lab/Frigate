@@ -1,6 +1,6 @@
 <?php
 
-namespace Siktec\Frigate\Routing\Http;
+namespace Frigate\Routing\Http;
 
 class Methods {
 

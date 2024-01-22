@@ -1,9 +1,9 @@
 <?php 
 
-namespace Siktec\Frigate\Api;
+namespace Frigate\Api;
      
-use \Siktec\Frigate\Base;
-use \Siktec\Frigate\Routing\Http;
+use Frigate\Base;
+use Frigate\Routing\Http;
 
 abstract class EndPoint implements EndPointInterface 
 { 

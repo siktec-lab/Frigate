@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Siktec\Frigate\Routing\Http;
+namespace Frigate\Routing\Http;
 
 /**
  * This trait contains a bunch of methods, shared by both the RequestDecorator

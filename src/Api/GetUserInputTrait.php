@@ -1,8 +1,8 @@
 <?php
 
-namespace Siktec\Frigate\Api;
+namespace Frigate\Api;
 
-use \Siktec\Frigate\Routing\Http;
+use Frigate\Routing\Http;
 
 trait GetUserInputTrait
 {

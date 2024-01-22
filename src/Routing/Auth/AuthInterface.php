@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Siktec\Frigate\Routing\Auth;
+namespace Frigate\Routing\Auth;
 
-use \Siktec\Frigate\Routing\Http\RequestInterface;
+use Frigate\Routing\Http\RequestInterface;
 
 interface AuthInterface {
     

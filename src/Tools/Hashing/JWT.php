@@ -1,10 +1,10 @@
 <?php 
 
-namespace Siktec\Frigate\Tools\Hashing;
+namespace Frigate\Tools\Hashing;
 
 use \Firebase\JWT\JWT as FirebaseJWT;
 use \Firebase\JWT\Key;
-use \Siktec\Frigate\Tools\Arrays\ArrayHelpers;
+use \Frigate\Tools\Arrays\ArrayHelpers;
 use Firebase\JWT\SignatureInvalidException;
 use Firebase\JWT\BeforeValidException;
 use Firebase\JWT\ExpiredException;

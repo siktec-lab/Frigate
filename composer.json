@@ -11,7 +11,12 @@
     ],
     "autoload": {
         "psr-4" : {
-            "Siktec\\Frigate\\" : "src/"
+            "Frigate\\" : "src/"
+        }
+    },
+    "autoload-dev" : {
+        "psr-4" : {
+            "Frigate\\Tests" : "tests/"
         }
     },
     "require": {
@@ -24,5 +29,14 @@
         "firebase/php-jwt": "dev-main"
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "require-dev": {
+        "phpunit/phpunit": "^10.5"
+    },
+    "scripts" : {
+        "php-version"       : "php -v",
+        "test"              : "phpunit --configuration phpunit.xml",
+        "test-coverage"     : "phpunit --configuration phpunit.xml --coverage-html coverage",
+        "testdox"           : "phpunit --configuration phpunit.xml --testdox --colors=always"
+    }
 }

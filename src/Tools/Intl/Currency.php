@@ -1,6 +1,6 @@
 <?php
 
-namespace Siktec\Frigate\Tools\Intl;
+namespace Frigate\Tools\Intl;
 
 
 class Currency {

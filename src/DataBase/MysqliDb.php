@@ -1,6 +1,6 @@
 <?php
 
-namespace Siktec\Frigate\DataBase;
+namespace Frigate\DataBase;
 
 /**
  * MysqliDb Class

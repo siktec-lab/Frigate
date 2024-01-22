@@ -1,8 +1,8 @@
 <?php
 
-namespace Siktec\Frigate\Swagger\Page;
+namespace Frigate\Swagger\Page;
 
-use \Siktec\Frigate\Pages\Page as PageBuilder;
+use Frigate\Pages\Page as PageBuilder;
 
 class SwaggerUI extends PageBuilder {
 
