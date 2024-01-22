@@ -16,7 +16,7 @@
     },
     "autoload-dev" : {
         "psr-4" : {
-            "Frigate\\Tests" : "tests/"
+            "Frigate\\Tests\\" : "tests/"
         }
     },
     "require": {
