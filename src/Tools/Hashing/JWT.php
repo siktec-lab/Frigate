@@ -2,9 +2,9 @@
 
 namespace Frigate\Tools\Hashing;
 
-use \Firebase\JWT\JWT as FirebaseJWT;
-use \Firebase\JWT\Key;
-use \Frigate\Tools\Arrays\ArrayHelpers;
+use Firebase\JWT\JWT as FirebaseJWT;
+use Firebase\JWT\Key;
+use Frigate\Tools\Arrays\ArrayHelpers;
 use Firebase\JWT\SignatureInvalidException;
 use Firebase\JWT\BeforeValidException;
 use Firebase\JWT\ExpiredException;

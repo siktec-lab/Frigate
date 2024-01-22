@@ -16,8 +16,8 @@ namespace Frigate\DataBase;
  * @version   2.9.3
  */
 
- use \Exception;
- use \ReflectionClass;
+ use Exception;
+ use ReflectionClass;
 
 class MysqliDb
 {

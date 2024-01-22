@@ -5,7 +5,7 @@ namespace Frigate\Routing;
 use Frigate\Base;
 use Frigate\Routing\Http;
 use Frigate\Routing\Paths\PathTree;
-use \Throwable;
+use Throwable;
 
 class Router {
 

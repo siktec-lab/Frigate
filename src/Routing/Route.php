@@ -2,7 +2,7 @@
 
 namespace Frigate\Routing;
 
-use \Closure;
+use Closure;
 use Frigate\Routing\Http;
 use Frigate\Api\BindEndpoint;
 

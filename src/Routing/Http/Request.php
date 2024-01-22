@@ -2,7 +2,7 @@
 
 namespace Frigate\Routing\Http;
 
-use \Sabre\Uri;
+use Sabre\Uri;
 
 /**
  * The Request class represents a single HTTP request.
