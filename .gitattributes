@@ -1,0 +1,17 @@
+* text=auto
+*.php text eol=lf
+
+# Don't ship with:
+/.github export-ignore
+/.git export-ignore
+/.gitignore export-ignore
+/.vscode export-ignore
+/.gitattributes export-ignore
+/.devcontainer export-ignore
+/.phpunit.cache export-ignore
+/.phpunit.result.cache export-ignore
+/local export-ignore
+/node_modules export-ignore
+/phpunit.xml export-ignore
+/TODO.md export-ignore
+/tests export-ignore
