@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Siktec\Frigate\Routing\Http;
+namespace Frigate\Routing\Http;
 
 /**
  * This interface represents a HTTP response.
