@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Frigate\Routing\Paths;
 
@@ -30,9 +32,9 @@ class PathTree {
      * @return void
      */
     public function define(string $path, mixed $exec) : void {
-        $parts = $this->path_parts($path);
+        $parts = $this->pathPartsFrom($path);
         //Walk the tree:
-        [$branch, $parts] = $this->head->get_branch($parts);
+        [$branch, $parts] = $this->head->getBranch($parts);
         //if its allready registered throw an error:
         if (empty($parts) && $branch->exec !== null) {
             throw new \Exception("Path already registered");
@@ -43,7 +45,7 @@ class PathTree {
         }
         //Register the new branch:
         if (!empty($parts)) {
-            $branch->add_branch($parts, $exec);
+            $branch->addBranch($parts, $exec);
         }
     }
     
@@ -55,8 +57,8 @@ class PathTree {
      */
     public function get(string $path) : ?PathBranch {
         //Walk the tree:
-        $parts = $this->path_parts($path);
-        [$branch, $parts] = $this->head->get_branch($parts);
+        $parts = $this->pathPartsFrom($path);
+        [$branch, $parts] = $this->head->getBranch($parts);
         if (!empty($parts) || $branch->exec === null) {
             return null;
         }
@@ -71,10 +73,10 @@ class PathTree {
      * @return array[PathBranch|null, array] null if not found
      */
     public function eval(string $path, array $default_context = []) : array {
-        $parts = $this->path_parts($path);
+        $parts = $this->pathPartsFrom($path);
         $parts = array_map(function($v){ return trim($v, " {}"); }, $parts);
         $context = $default_context;
-        [$branch, $parts] = $this->head->eval_branch($parts, $context);
+        [$branch, $parts] = $this->head->evalBranch($parts, $context);
         if (!empty($parts) || $branch->exec === null) {
             return [null, $context];
         }
@@ -83,12 +85,11 @@ class PathTree {
 
         
     /**
-     * path_parts
      * get the path parts from a path string
-     * @param  string $path
-     * @return array
+     *
+     * @return array[string|int] array of path parts
      */
-    private function path_parts(string $path) : array {
+    private function pathPartsFrom(string $path) : array {
         $path = trim($path, " \n\t\r\0\x0B/\\");
         $parts = explode("/", $path);
         //normalize the parts:
@@ -110,8 +111,9 @@ class PathTree {
      * @return string
      */
     public function __toString() : string {
-        $this->head->print_tree();
-        return "";
+        $str = "";
+        $this->head->describeBranch($str);
+        return $str;
     }
 }
 
