@@ -15,3 +15,5 @@
 /phpunit.xml export-ignore
 /TODO.md export-ignore
 /tests export-ignore
+/docs export-ignore
+/mkdocs.yml export-ignore
