@@ -31,12 +31,15 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require-dev": {
-        "phpunit/phpunit": "^10.5"
+        "phpunit/phpunit": "^10.5",
+        "phpbench/phpbench": "^1.2"
     },
     "scripts" : {
         "php-version"       : "php -v",
         "test"              : "phpunit --configuration phpunit.xml",
         "test-coverage"     : "phpunit --configuration phpunit.xml --coverage-html coverage",
-        "testdox"           : "phpunit --configuration phpunit.xml --testdox --colors=always"
+        "testdox"           : "phpunit --configuration phpunit.xml --testdox --colors=always",
+        "bench"             : "phpbench run --report=default",
+        "bench-aggr"       : "phpbench run --report=aggregate"
     }
 }
