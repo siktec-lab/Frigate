@@ -18,7 +18,7 @@ Frigate is a lightweight web application framework. It is designed to be easy, a
 Install Frigate with composer:
 
 ```bash
-composer require siktec/qdm
+composer require siktec/frigate
 ```
 
 Use a bootstrap project to get started:

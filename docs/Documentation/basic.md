@@ -5,7 +5,7 @@
 Install Frigate with composer:
 
 ```bash
-composer require siktec/qdm
+composer require siktec/frigate
 ```
 
 ## Create a project
