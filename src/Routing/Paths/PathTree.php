@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Frigate\Routing\Paths;
 
 use Frigate\Routing\Paths\PathBranch;
-use Frigate\Exceptions\FrigatePathException;
+
 /**
  * PathTree
  */
@@ -31,15 +31,16 @@ class PathTree {
      */
     public function __construct() 
     {
-        $this->head = new PathBranch(name : self::PATH_SEPARATOR);
+        $this->head = new PathBranch(from_path : self::PATH_SEPARATOR);
     }
+    
     
     /**
      * define a new path in this tree
      *
      * @throws Frigate\Exceptions\FrigatePathException any path related error
      */
-    public function define(string|array $path, mixed $exec) : void 
+    public function define(string|array $path, object|array|string $exp) : void 
     {
         // if its a path macro:
         if (is_string($path) && str_contains($path, self::PATH_MACRO)) {
@@ -49,7 +50,7 @@ class PathTree {
         // if its an array of paths:
         if (is_array($path)) {
             foreach ($path as $p) {
-                $this->define($p, $exec);
+                $this->define($p, $exp);
             }
             return;
         }
@@ -57,37 +58,58 @@ class PathTree {
         // Process the string path:
         $parts = $this->pathPartsFrom($path);
 
-        //Walk the tree:
-        [$branch, $parts] = $this->head->getBranch($parts);
-        
-        //if its allready registered throw an error:
-        if (empty($parts) && $branch->exec !== null) {
-            throw new FrigatePathException(
-                FrigatePathException::CODE_FRIGATE_REDEFINE_PATH,
-                [$path]
-            );
+        // define the paths:
+        $current = $this->head;
+        while (!empty($parts)) {
+
+            // Walk the tree:
+            [$current, $parts] = $current->getBranch($parts);
+
+            //Its a shadow branch existing already so just add the expression:
+            if (!empty($parts) && $current->shadow_mode) {
+                $current->attachExpression($exp);
+                continue;
+            }
+            
+            // Add new branch:
+            if (!empty($parts)) {
+                $current->addBranch($parts[0]);
+            }
         }
 
-        //Register the new branch:
-        if (empty($parts)) {
-            $branch->exec = $exec;
-        }
-
-        //Register the new branch:
-        if (!empty($parts)) {
-            $branch->addBranch($parts, $exec);
-        }
+        // Attach the expression:
+        $current->attachExpression($exp);
     }
     
     /**
+     * remove special chars from a path
+     */
+    public static function removeSpecialChars(string $path) : string 
+    {
+        return str_replace(
+            [
+                self::PATH_MACRO, 
+                PathBranch::TOKEN_SHADOW_BRANCH,
+                PathBranch::ARG_NAME_START,
+                PathBranch::ARG_NAME_END,
+                PathBranch::ARG_NAME_TYPE_SEP,
+            ], 
+            "", 
+            $path
+        );
+    }
+
+    /**
      * get the branch of a given path
+     * only finite paths are returned
+     * a finite path is a path that has an expression 
+     * shadow expressions paths are not returned directly
      */
     public function get(string $path) : ?PathBranch 
     {
-        //Walk the tree:
-        $parts = $this->pathPartsFrom($path);
+        $parts = $this->pathPartsFrom(self::removeSpecialChars($path));
         [$branch, $parts] = $this->head->getBranch($parts);
-        if (!empty($parts) || $branch->exec === null) {
+        if (!empty($parts) || $branch->exp === null) {
             return null;
         }
         return $branch;
@@ -100,10 +122,10 @@ class PathTree {
      */
     public function eval(string $path, array $default_context = []) : array 
     {
-        $parts = $this->pathPartsFrom($path);
+        $parts = $this->pathPartsFrom(self::removeSpecialChars($path));
         // Eval and also mutate the context:
         [$branch, $parts] = $this->head->evalBranch($parts, $default_context);
-        if (!empty($parts) || $branch->exec === null) {
+        if (!empty($parts) || $branch->exp === null) {
             return [null, $default_context];
         }
         return [$branch, $default_context];
@@ -130,11 +152,9 @@ class PathTree {
      */
     private function pathPartsFrom(string $path) : array 
     {
-        $parts = explode(self::PATH_SEPARATOR, $path);
-
         return array_filter(array_map(function($v) {
             return trim(strtolower($v), " \n\t\r\0\x0B/\\");
-        }, $parts), 'strlen');
+        },  explode(self::PATH_SEPARATOR, $path)), 'strlen');
     }
  
     /**
