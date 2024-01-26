@@ -408,7 +408,7 @@ class PathBranch {
             )[0];
             $name = self::ARG_NAME_START.$name.self::ARG_NAME_END;
         }
-        return !empty($name) ? $name : "/"; // TODO: maybe this should be something else such as "::root"
+        return !empty($name) ? $name : "/";
     }
 
     /**
