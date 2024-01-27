@@ -31,7 +31,7 @@ html {
     color: #f06090
 }
 .md-typeset .highlight :is(.nx) { /* language types */
-    color: #d7b35d
+    color: #5ec0fb
 }
 .md-typeset .highlight :is(.nv,.vc,.vg,.vi) { /* variables */
     color: #e0e0e0
@@ -41,4 +41,19 @@ html {
 }
 .md-typeset .highlight :is(.nd) { /* attributes */
     color: #78d3f7
+}
+.md-typeset .highlight :is(.s2) { /* attributes */
+    color: #cddb5e
+}
+
+.md-typeset h2 {
+    color: var(--md-primary-fg-color--light);
+}
+
+.md-typeset h3 {
+    color: var(--md-code-hl-keyword-color);
+}
+
+.md-tooltip {
+    background-color: var(--md-footer-bg-color--dark);
 }

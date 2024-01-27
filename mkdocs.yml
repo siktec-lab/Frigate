@@ -21,6 +21,7 @@ theme:
     - content.code.copy
   language: en
   icon:
+    annotation: material/arrow-right-circle
     admonition:
       note: fontawesome/solid/note-sticky
       abstract: fontawesome/solid/book
@@ -34,7 +35,6 @@ theme:
       bug: fontawesome/solid/robot
       example: fontawesome/solid/flask
       quote: fontawesome/solid/quote-left
-    annotation: material/arrow-right-circle
 
   palette:
     - scheme: slate
