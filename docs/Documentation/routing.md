@@ -2,7 +2,7 @@
 
 ## Initialize the router
 
-After the frigate `Base` class has been initialized, the router can be initialized.
+After the frigate `FrigateApp` has been initialized, the router can be initialized.
 The router is initialized with the `init` method. The `init` method takes:
 - `debug` - a boolean value to enable debug mode for the router.
 
@@ -11,7 +11,7 @@ The router is initialized with the `init` method. The `init` method takes:
 
 // We use the Frigate Base class to help with environment variables.
 // This is not required but it is recommended.
-Router::init(debug : Base::ENV_BOOL("DEBUG_ROUTER"));
+Router::init(debug : FrigateApp::ENV_BOOL("DEBUG_ROUTER"));
 
 // That's it, the router is now initialized we can parse the request.
 Router::parse_request(APP_BASE_URL_PATH);
@@ -61,7 +61,7 @@ The way we define the type is by adding a colon `:` after the parameter name and
 - `#!js "users/{name:string}/{id:int}/{action}"` - we can mix types and non types.
 - `#!js "users/{storage:path}"` - storage will be a `string` containing the rest of the path.
 
-!!! warning
+??? warning "Exceptions and limitations"
     1. An exception will be thrown if the several path parameters are defined on the same level.
         - i.e. defining `#!js "users/{id:int}"` and `#!js "users/{name:string}"` will throw an exception.
     2. The `path` parameter cannot be extended with other parameters.
@@ -106,7 +106,7 @@ Default values are not supported in path parameters. They don't make sense in th
 The best way to handle this is to define several paths that point to the same route and have different levels of path parameters.
 This can be done easily with the variation macro `?` as [described above](#variation-macro).
 
-!!! note
+??? info "Why not???"
     The reason for this is that it is not clear what the default value should be. For example, if we have the following path: `#!js "users/{id:int}/{action}"` and we want to set the default value of `action` to `view`. What should happen if the path is `/users/1`? Should the default value be set to `view` or should the path not match? This is not clear and can lead to unexpected behavior.
 
 ### Shadow path markers

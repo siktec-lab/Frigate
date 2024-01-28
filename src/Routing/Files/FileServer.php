@@ -2,7 +2,7 @@
 
 namespace Frigate\Routing\Files;
 
-use Frigate\Base;
+use Frigate\FrigateApp;
 use Frigate\Api\EndPoint;
 use Frigate\Api\EndPointContext;
 use Frigate\Routing\Http;
@@ -76,7 +76,7 @@ class FileServer extends EndPoint {
 
         /** @var RouteRequest $request */ // we use this to force type hinting
         
-        Base::debug($this, "Execute endpoint - CreateProject\n".$request);
+        FrigateApp::debug($this, "Execute endpoint - CreateProject\n".$request);
         
         // 4 types of requests:
         // 1. GET:    Get a file

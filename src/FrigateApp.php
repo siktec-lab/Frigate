@@ -1,51 +1,83 @@
 <?php 
 
+declare(strict_types=1);
+
 namespace Frigate;
 
-use Frigate\DataBase\MysqliDb;
 use Dotenv\Dotenv;
+use Exception;
+use Frigate\Exceptions\FrigateException;
 
-class Base {
+class FrigateApp {
 
+    /** 
+     * Required environment variables
+    */
+    public const REQUIRED_ENV = [
+        'FRIGATE_ROOT_FOLDER'       => "string",
+        'FRIGATE_APP_DOMAIN'        => "not_empty",
+        'FRIGATE_APP_VERSION'       => "string",
+        'FRIGATE_DEBUG_ROUTER'      => "bool",
+        'FRIGATE_DEBUG_ENDPOINTS'   => "bool",
+        'FRIGATE_DEBUG_TO_FILE'     => "bool",
+        'FRIGATE_DEBUG_FILE_PATH'   => "string",
+        'FRIGATE_EXPOSE_ERRORS'     => "bool",
+        'FRIGATE_ERRORS_TO_FILE'    => "bool",
+        'FRIGATE_ERRORS_FILE_PATH'  => "string"
+    ];
+
+    /** 
+     * Implementation version:
+    */
     static public string $version = "1.0.0";
 
+    /** 
+     * Environment variables:
+     */
     static public ?Dotenv $env = null;
 
-    static public ?MysqliDb $db = null;
-
+    /** 
+     * Loaded globals:
+     */
     static public array $globals = [];
 
+    /**
+     * Initialize the application
+     * 
+     * @param string|array $env - path to config file or array of config values
+     * @param array $extra_env - extra environment variables
+     * @param bool $load_session - start session
+     * @param bool $start_page_buffer - start page buffer
+     * @param bool|null $adjust_ini - load ini configuration
+     * 
+     * @return void
+     */
     public static function init(
-        string $config, 
-        bool $connect = true, 
-        bool $session = true, 
-        bool $page_buffer = false,
-        ?bool $load_ini = true
+        string|array|null $env  = null,
+        array $extra_env        = [],
+        bool $load_session      = true, 
+        bool $start_page_buffer = false,
+        ?bool $adjust_ini       = true
     ) : void {
 
-        if ($load_ini) {
-            self::load_ini();
-        }
+        // Load environment variables:
+        self::loadEnvironment($env, $extra_env);
 
-        self::load_environment($config);
-        
-        //connect to database:
-        if ($connect) {
-            self::connect_database();
+        // Adjust ini settings:
+        if ($adjust_ini) {
+            self::adjustIni();
         }
-
         //start session:
-        if ($session) {
-            self::start_session();
+        if ($load_session) {
+            self::startSession();
         }
-
         //start page buffer:
-        if ($page_buffer) {
-            self::start_page_buffer();
+        if ($start_page_buffer) {
+            self::startPageBuffer();
         }
     }
 
-    public static function load_ini() : void {
+    public static function adjustIni() : void {
         
         // Application version:
         if (!defined("APP_VERSION")) {
@@ -76,14 +108,14 @@ class Base {
         self::$globals["SHOW_ERRORS"]   = SHOW_ERRORS;
     }
 
-    public static function start_session() : bool {
+    public static function startSession() : bool {
         if (session_status() === PHP_SESSION_NONE) {
             return session_start();
         }
         return true;
     }
 
-    public static function set_paths(string $root, string $base_path = "/", $app_url = "http://localhost/") : void {
+    public static function setPaths(string $root, string $base_path = "/", $app_url = "http://localhost/") : void {
 
         //Directory separator
         if (!defined("DS")) 
@@ -124,27 +156,11 @@ class Base {
         
     }
 
-    static public function connect_database() {
-        try {
-            self::$db = new MysqliDb(
-                $_ENV["DB_HOST"],
-                $_ENV["DB_USER"],
-                $_ENV["DB_PASS"],
-                $_ENV["DB_NAME"]
-            );
-            if (!self::$db->ping()) {
-                throw new \Exception("Cannot ping the database");
-            }
-        } catch (\Throwable $e) {
-            die($e->getMessage());
-        }
-    }
-
-    static public function start_page_buffer() : bool {
+    static public function startPageBuffer() : bool {
         return ob_start();
     }
 
-    static public function end_page_buffer() : string {
+    static public function endPageBuffer() : string {
         return ob_get_clean();
     }
 
@@ -165,26 +181,54 @@ class Base {
         }
     }
 
-    static public function load_environment(string $path = "") : bool {
+    static public function loadEnvironment(string|array|null $path = null, array $extra) : bool {
+
+        if (is_string($path)) {
+            $path = [ $path ];
+        }
+        if (is_null($path)) {
+            $path = [[]];
+        }
+
+        // Load environment variables:
         if (is_null(self::$env)) {
             try {
-                self::$env = Dotenv::createImmutable($path);
+                [$dirs, $files] = $path;
+                self::$env = Dotenv::createImmutable($dirs, $files, false);
                 self::$env->safeLoad();
-                self::$env->required([
-                    'ROOT_FOLDER',
-                    'DB_HOST', 
-                    'DB_NAME', 
-                    'DB_USER', 
-                    'DB_PASS', 
-                    'ADMIN_KEY',
-                    'DEBUG_ROUTER',
-                    'DEBUG_ENDPOINTS',
-                ]);
-                self::$env->required('DEBUG_ROUTER')->isBoolean();
-                self::$env->required('DEBUG_ENDPOINTS')->isBoolean();
 
-            } catch (\Throwable $e) {
-                die($e->getMessage());
+                // Load extra environment variables:
+                foreach ($extra as $key => $value) {
+                    $_ENV[strtoupper($key)] = $value;
+                    $_SERVER[strtoupper($key)] = $value;
+                }
+
+                // Validate required environment variables:
+                foreach (self::REQUIRED_ENV as $key => $type) {
+                    $validate = self::$env->required($key);
+                    switch ($type) {
+                        case "bool":
+                            $validate->isBoolean();
+                            break;
+                        case "string":
+                            $validate->required();
+                            break;
+                        case "int":
+                            $validate->isInteger();
+                            break;
+                        case "not-empty":
+                            $validate->notEmpty();
+                            break;
+                        default:
+                            $validate->required();
+                    }
+                }
+            } catch (Exception $e) {
+                throw new FrigateException(
+                    FrigateException::CODE_FRIGATE_ENV_ERROR,
+                    [$e->getMessage()],
+                    $e
+                );
             }
             return true;    
         }

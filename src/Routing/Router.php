@@ -2,7 +2,7 @@
 
 namespace Frigate\Routing;
 
-use Frigate\Base;
+use Frigate\FrigateApp;
 use Frigate\Routing\Http;
 use Frigate\Routing\Paths\PathTree;
 use Throwable;
@@ -48,8 +48,8 @@ class Router {
             post       : $_POST
         );
 
-        Base::debug(self::class, "got request",     (string)self::$request);
-        Base::debug(self::class, "request raw parts", [
+        FrigateApp::debug(self::class, "got request",     (string)self::$request);
+        FrigateApp::debug(self::class, "request raw parts", [
             "PATH"  => self::$request->getPath(),
             "POST"  => self::$request->getPostData(),
             "QUERY" => self::$request->getQueryParameters()
@@ -72,7 +72,7 @@ class Router {
         // path to uri:
         $path = trim($path);
         $path = ltrim($path, '/');
-        $path = Base::$globals["APP_BASE_URL_PATH"].$path;
+        $path = FrigateApp::$globals["APP_BASE_URL_PATH"].$path;
 
         return self::build_request(
             server_arr : null, // Null for $_SERVER
@@ -120,7 +120,7 @@ class Router {
 
         // If no base is provided, we'll use the APP_BASE_URL_PATH
         if (is_null($base)) {
-            $base = Base::$globals["APP_BASE_URL_PATH"];
+            $base = FrigateApp::$globals["APP_BASE_URL_PATH"];
         }
 
         // If method is provided, we'll use it instead of REQUEST_METHOD
@@ -251,22 +251,22 @@ class Router {
                 throw new \Exception("Not Found", 404);
             }
             //Negotiate the accept type:
-            $accept = self::negotiate_accept($branch->exec) ?? "";
+            $accept = self::negotiate_accept($branch->exp) ?? "";
             $request->expects = $accept;
             if (empty($accept)) {
                 throw new \Exception("No Supported Acceptable Content Type Found", 406);
             }
             //Merge context:
-            $branch->exec->context = array_merge($branch->exec->context, $con);
+            $branch->exp->context = array_merge($branch->exp->context, $con);
 
             //Is override?
             if (!is_null($debug) || !is_null($auth) || !is_null($auth_method)) {
-                $branch->exec->override_endpoint_params(
+                $branch->exp->override_endpoint_params(
                     $debug, $auth, $auth_method
                 );
             }
             //Execute the route:
-            return $branch->exec->exec($request);
+            return $branch->exp->exec($request);
             
         } catch(Throwable $e) {
             // Get code or default to 500:

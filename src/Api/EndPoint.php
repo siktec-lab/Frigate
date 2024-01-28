@@ -2,7 +2,7 @@
 
 namespace Frigate\Api;
      
-use Frigate\Base;
+use Frigate\Application;
 use Frigate\Routing\Http;
 
 abstract class EndPoint implements EndPointInterface 

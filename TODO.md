@@ -25,7 +25,6 @@
 - **General**:
     - [ ] Make all request no matter what redirect to index.php this will reduce the .htaccess dependency.
     - [ ] Authorization - Implement Basic, Bearer, JWT, OAuth, OAuth2, Session.
-    - [ ] Path args - Implement default value...
     - [ ] Implement static file loader - a folder is mapped to an endpoint optional php exec.
 
 - **Routing Paths**:
