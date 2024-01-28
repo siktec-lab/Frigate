@@ -16,7 +16,7 @@ class FrigateApp {
     */
     public const REQUIRED_ENV = [
         'FRIGATE_ROOT_FOLDER'       => "string",
-        'FRIGATE_APP_DOMAIN'        => "not-empty",
+        'FRIGATE_BASE_URL'          => "not-empty",
         'FRIGATE_APP_VERSION'       => "string",
         'FRIGATE_DEBUG_ROUTER'      => "bool",
         'FRIGATE_DEBUG_ENDPOINTS'   => "bool",
@@ -52,6 +52,7 @@ class FrigateApp {
     /**
      * Initialize the application
      * 
+     * @param string $root - application root path
      * @param string|array $env - path to config file or array of config values
      * @param array $extra_env - extra environment variables
      * @param bool $load_session - start session
@@ -61,6 +62,7 @@ class FrigateApp {
      * @return void
      */
     public static function init(
+        string $root,
         string|array|null $env  = null,
         array $extra_env        = [],
         bool $load_session      = true, 
@@ -69,7 +71,14 @@ class FrigateApp {
     ) : void {
 
         // Load environment variables:
-        self::loadEnvironment($env, $extra_env);
+        self::loadEnvironment($env ?? $root, $extra_env);
+
+        // Set paths:
+        self::setPaths(
+            root: $root,
+            base_path: $_ENV["FRIGATE_ROOT_FOLDER"] ?: "/",
+            app_url: $_ENV["FRIGATE_BASE_URL"]
+        );
 
         // Adjust ini settings:
         if ($adjust_ini) {
@@ -191,6 +200,7 @@ class FrigateApp {
 
     static public function loadEnvironment(string|array|null $path = null, array $extra) : bool {
 
+        
         if (is_string($path)) {
             $path = [ $path ];
         }
@@ -201,7 +211,8 @@ class FrigateApp {
         // Load environment variables:
         if (is_null(self::$env)) {
             try {
-                [$dirs, $files] = $path;
+                [$dirs, $files] = $path + [[], null];
+                var_dump($dirs, $files);
                 self::$env = Dotenv::createImmutable($dirs, $files, false);
                 self::$env->safeLoad();
 
