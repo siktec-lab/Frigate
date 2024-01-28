@@ -37,6 +37,7 @@ class AppEnvTest extends TestCase
         $this->unsetAllEnv();
 
         App::init(
+            root : __DIR__,
             env : [ self::ENV_FOLDER , ".env.test.working" ],
             extra_env : [],
             load_session : false,
@@ -49,11 +50,29 @@ class AppEnvTest extends TestCase
         }
     }
 
+    public function testEnvFromDefaultRoot() : void
+    {
+        $this->unsetAllEnv();
+
+        App::init(
+            root : self::ENV_FOLDER,
+            env : null,
+            extra_env : [],
+            load_session : false,
+            start_page_buffer : false,
+            adjust_ini : false
+        );
+        // Assert that all required environment variables are set:
+        foreach (App::REQUIRED_ENV as $key => $value) {
+            $this->assertArrayHasKey($key, $_ENV);
+        }
+    }
     public function testEnvFromMultipleFiles() : void
     {
         $this->unsetAllEnv();
 
         App::init(
+            root : __DIR__,
             env : [ self::ENV_FOLDER , [ ".env.test.working", ".env.test.extra" ] ],
             extra_env : [ "MANUALLY_ASSIGNED" => "yes" ],
             load_session : false,
@@ -74,6 +93,7 @@ class AppEnvTest extends TestCase
         $this->unsetAllEnv();
 
         App::init(
+            root : __DIR__,
             env : [ self::ENV_FOLDER , ".env.test.self_ref" ],
             extra_env : [],
             load_session : false,
@@ -92,6 +112,7 @@ class AppEnvTest extends TestCase
         $this->unsetAllEnv();
 
         App::init(
+            root : __DIR__,
             env : [ self::ENV_FOLDER , ".env.test.working" ],
             extra_env : [
                 "TRUE_YES" => "yes",
@@ -117,7 +138,7 @@ class AppEnvTest extends TestCase
         // All references should be resolved:
         $root = App::ENV_STR("FRIGATE_ROOT_FOLDER");
         $this->assertEquals("", $root);
-        $domain = App::ENV_STR("FRIGATE_APP_DOMAIN"); 
+        $domain = App::ENV_STR("FRIGATE_BASE_URL"); 
         $this->assertEquals("http://localhost/", $domain);
         $version = App::ENV_STR("FRIGATE_APP_VERSION");
         $this->assertEquals("1.0.0", $version);
@@ -164,6 +185,7 @@ class AppEnvTest extends TestCase
         ];
 
         App::init(
+            root: __DIR__,
             env : [ self::ENV_FOLDER , ".env.test.working" ],
             extra_env : $expected,
             load_session : false,
@@ -186,9 +208,10 @@ class AppEnvTest extends TestCase
 
         $this->expectException(FrigateException::class);
         $this->expectExceptionCode(FrigateException::CODE_FRIGATE_ENV_ERROR);
-        $this->expectExceptionMessageMatches("/FRIGATE_APP_DOMAIN/");
+        $this->expectExceptionMessageMatches("/FRIGATE_BASE_URL/");
 
         App::init(
+            root: __DIR__,
             env : [ self::ENV_FOLDER , ".env.test.empty_domain" ],
             extra_env : [],
             load_session : false,
@@ -206,6 +229,7 @@ class AppEnvTest extends TestCase
         $this->expectExceptionMessageMatches("/FRIGATE_DEBUG_ROUTER/");
 
         App::init(
+            root: __DIR__,
             env : [ self::ENV_FOLDER , ".env.test.missing_required" ],
             extra_env : [],
             load_session : false,
@@ -223,6 +247,7 @@ class AppEnvTest extends TestCase
         $this->expectExceptionMessageMatches("/FRIGATE_EXPOSE_ERRORS/");
 
         App::init(
+            root: __DIR__,
             env : [ self::ENV_FOLDER , ".env.test.not_bool" ],
             extra_env : [],
             load_session : false,
@@ -254,6 +279,7 @@ class AppEnvTest extends TestCase
         ];
 
         App::init(
+            root: __DIR__,
             env : [ self::ENV_FOLDER , ".env.test.working" ],
             extra_env : $expected,
             load_session : false,

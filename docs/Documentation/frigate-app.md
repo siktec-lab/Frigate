@@ -23,6 +23,7 @@ use Frigate\FrigateApp as App;
 
 // Initialize the application instance.
 App::init(
+    root              : __DIR__, // will set the root folder of the application. (string)
     env               : null,   // will load the environment variables from the .env file default is null. (array|string|null)
     extra_env         : [],     // will add additional environment variables to the application. (array)
     load_session      : true,   // will load the session if needed. (bool) default is true. 
@@ -47,7 +48,7 @@ Those are required for the application to work correctly and are loaded from the
     
     use Frigate\FrigateApp as App;
     // will load the environment variables from the .env file.
-    App::init( env: __DIR__ );
+    App::init( root : __DIR__, /* env: null */ ); // env is null by default. root will be used as the root folder.
     ```
 
 2. Load the environment variables from a specific file:
@@ -57,6 +58,7 @@ Those are required for the application to work correctly and are loaded from the
     use Frigate\FrigateApp as App;
     // will load the environment variables from the .env file.
     App::init(
+        root : __DIR__,
         env: [  __DIR__ . "/config/", ".env.local" ] // will load the .env and .env.local files from the config folder.
     );
     ```
@@ -67,6 +69,7 @@ Those are required for the application to work correctly and are loaded from the
     use Frigate\FrigateApp as App;
     // will load the environment variables from the .env file.
     App::init(
+        root : __DIR__,
         env: [ 
             [ __DIR__ . "/config/" ], // Directories to look in.
             [ ".env", ".env.local" ]  // files to load.
@@ -80,6 +83,7 @@ Those are required for the application to work correctly and are loaded from the
     use Frigate\FrigateApp as App;
     // will load the environment variables from the .env file and add the additional environment variables.
     App::init(
+        root : __DIR__,
         env: __DIR__,
         extra_env: [
             "MY_ENV_VAR" => "my value"
@@ -94,11 +98,11 @@ Those are required for the application to work correctly and are loaded from the
 
     1.  The root folder is the folder that contains the `index.php` in relation to the web root folder.
 
-- `#!js FRIGATE_APP_DOMAIN` *string* - the domain of the application. e.g. `#!js "http://example.com/"`. (1)
+- `#!js FRIGATE_BASE_URL` *string* - the base URL of the application. e.g. `#!js "http://example.com/"`. (1)
 { .annotate }
 
-    1.  The domain is used to generate the base url of the application. the domain should not include the URI path. 
-    for example, if the application is located at `http://example.com/my-app/` the domain should be `http://example.com/` and the root folder should be `my-app`. 
+    1.  The base URL is used to generate the URLs of the application. the base URL should not include the URI path. 
+    for example, if the application is located at `http://example.com/my-app/` the base URL should be `http://example.com/` and the root folder should be `my-app`. 
 
 - `#!js FRIGATE_APP_VERSION` *string* - the version of YOUR application.
 - `#!js FRIGATE_DEBUG_ROUTER` *boolean* - enable debug mode for the router.
@@ -132,7 +136,7 @@ For a convenient way to access the environment variables, the application instan
 
 use Frigate\FrigateApp as App;
 
-App::init( env: __DIR__ );
+App::init( root: __DIR__ );
 
 $root_folder = App::ENV_STR("FRIGATE_ROOT_FOLDER");
 $debug_router = App::ENV_BOOL("FRIGATE_DEBUG_ROUTER");
@@ -177,7 +181,7 @@ This can be achieved in to ways:
         // index.php
         use MyApplication as App;
 
-        App::init( env: __DIR__ ); // All New environment variables will be required and validated.
+        App::init( root: __DIR__ ); // All New environment variables will be required and validated.
     ```
 
 2. Adding the environment variables to the `application_env` array of the application instance.
@@ -194,7 +198,7 @@ This can be achieved in to ways:
             "MY_ENV_VAR4"   => "bool"
         ];
 
-        App::init( env: __DIR__ ); // All New environment variables will be required and validated.
+        App::init( root: __DIR__ ); // All New environment variables will be required and validated.
 
     ```
 
