@@ -144,6 +144,42 @@ class AppEnvTest extends TestCase
         $this->assertEquals(0.0, App::ENV_FLOAT("FLOAT_0"));
         $this->assertEquals(-1.1, App::ENV_FLOAT("FLOAT_NEG_1"));
     }
+
+    public function testEnvCustomRequiredArray() : void 
+    {
+        $this->unsetAllEnv();
+
+        App::$application_env = [
+            "MY_ENV_VAR"    => "not-empty",
+            "MY_ENV_VAR2"   => "string",
+            "MY_ENV_VAR3"   => "int",
+            "MY_ENV_VAR4"   => "bool"
+        ];
+
+        $expected = [
+            "MY_ENV_VAR"    => "I'm not empty",
+            "MY_ENV_VAR2"   => "I'm a string",
+            "MY_ENV_VAR3"   => "34",
+            "MY_ENV_VAR4"   => "true"
+        ];
+
+        App::init(
+            env : [ self::ENV_FOLDER , ".env.test.working" ],
+            extra_env : $expected,
+            load_session : false,
+            start_page_buffer : false,
+            adjust_ini : false
+        );
+
+        // Check that all required variables are set:
+        foreach ($expected as $key => $value) {
+            $this->assertArrayHasKey($key, $_ENV);
+            $this->assertEquals($value, $_ENV[$key]);
+            $this->assertArrayHasKey($key, $_SERVER);
+            $this->assertEquals($value, $_SERVER[$key]);
+        }
+
+    }
     public function testEnvEmptyEnvError() : void
     {
         $this->unsetAllEnv();
@@ -194,6 +230,38 @@ class AppEnvTest extends TestCase
             adjust_ini : false
         );
     }
+
+    public function testEnvInvalidValueApplicationEnvError() : void
+    {
+        $this->unsetAllEnv();
+
+        $this->expectException(FrigateException::class);
+        $this->expectExceptionCode(FrigateException::CODE_FRIGATE_ENV_ERROR);
+        $this->expectExceptionMessageMatches("/MY_ENV_VAR3/");
+
+        App::$application_env = [
+            "MY_ENV_VAR"    => "not-empty",
+            "MY_ENV_VAR2"   => "string",
+            "MY_ENV_VAR3"   => "int",
+            "MY_ENV_VAR4"   => "bool"
+        ];
+
+        $expected = [
+            "MY_ENV_VAR"    => "I'm not empty",
+            "MY_ENV_VAR2"   => "I'm a string",
+            "MY_ENV_VAR3"   => "should be an int", // This is the error
+            "MY_ENV_VAR4"   => "true"
+        ];
+
+        App::init(
+            env : [ self::ENV_FOLDER , ".env.test.working" ],
+            extra_env : $expected,
+            load_session : false,
+            start_page_buffer : false,
+            adjust_ini : false
+        );
+    }
+
     public static function setUpBeforeClass() : void
     {
         return;

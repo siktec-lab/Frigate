@@ -12,6 +12,7 @@ class FrigateApp {
 
     /** 
      * Required environment variables
+     * @var array<string,string>
     */
     public const REQUIRED_ENV = [
         'FRIGATE_ROOT_FOLDER'       => "string",
@@ -36,8 +37,15 @@ class FrigateApp {
      */
     static public ?Dotenv $env = null;
 
+    /**
+     * Application required environment variables:
+     * @var array<string,string>
+     */
+    public static array $application_env = [];
+
     /** 
      * Loaded globals:
+     * @var array<string,mixed>
      */
     static public array $globals = [];
 
@@ -204,25 +212,11 @@ class FrigateApp {
                 }
 
                 // Validate required environment variables:
-                foreach (self::REQUIRED_ENV as $key => $type) {
-                    $validate = self::$env->required($key);
-                    switch ($type) {
-                        case "bool":
-                            $validate->isBoolean();
-                            break;
-                        case "string":
-                            $validate->required();
-                            break;
-                        case "int":
-                            $validate->isInteger();
-                            break;
-                        case "not-empty":
-                            $validate->notEmpty();
-                            break;
-                        default:
-                            $validate->required();
-                    }
-                }
+                self::validateEnv(self::REQUIRED_ENV);
+
+                // Validate application environment variables:
+                self::validateEnv(self::$application_env);
+
             } catch (Exception $e) {
                 throw new FrigateException(
                     FrigateException::CODE_FRIGATE_ENV_ERROR,
@@ -233,6 +227,34 @@ class FrigateApp {
             return true;    
         }
         return false;
+    }
+    
+    /**
+     * Validate required environment variables
+     * 
+     * @param array<string,string> $rules
+     * @throws \Dotenv\Exception\ValidationException
+     */
+    static protected function validateEnv(array $rules) : void {
+        foreach ($rules as $key => $type) {
+            $validate = self::$env->required($key);
+            switch ($type) {
+                case "bool":
+                    $validate->isBoolean();
+                    break;
+                case "string":
+                    $validate->required();
+                    break;
+                case "int":
+                    $validate->isInteger();
+                    break;
+                case "not-empty":
+                    $validate->notEmpty();
+                    break;
+                default:
+                    $validate->required();
+            }
+        }
     }
 
     static public function ENV_BOOL(string $key, ?bool $default = null) : ?bool {
