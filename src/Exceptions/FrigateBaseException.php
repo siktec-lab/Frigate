@@ -9,7 +9,7 @@ use Exception;
 class FrigateBaseException extends Exception
 {
 
-    public const CODE_UNKNOWN_ERROR = 40;
+    public const CODE_UNKNOWN_ERROR = 600;
     
     protected const MESSAGE_UNKNOWN_ERROR = "Unknown error";
 

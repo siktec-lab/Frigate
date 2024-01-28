@@ -6,9 +6,9 @@ namespace Frigate\Exceptions;
 
 class FrigatePathException extends FrigateBaseException
 {
-    public const CODE_FRIGATE_PATH_GENERAL = 420;
-    public const CODE_FRIGATE_PATH_MULTIPLE_ARGS = 421;
-    public const CODE_FRIGATE_EXTRA_PATH_AFTER_PATH_TYPE = 422;
+    public const CODE_FRIGATE_PATH_GENERAL = 620;
+    public const CODE_FRIGATE_PATH_MULTIPLE_ARGS = 621;
+    public const CODE_FRIGATE_EXTRA_PATH_AFTER_PATH_TYPE = 622;
 
     protected array $messages = [
         self::CODE_FRIGATE_PATH_GENERAL => [
