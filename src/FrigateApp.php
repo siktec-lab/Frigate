@@ -15,7 +15,7 @@ class FrigateApp {
     */
     public const REQUIRED_ENV = [
         'FRIGATE_ROOT_FOLDER'       => "string",
-        'FRIGATE_APP_DOMAIN'        => "not_empty",
+        'FRIGATE_APP_DOMAIN'        => "not-empty",
         'FRIGATE_APP_VERSION'       => "string",
         'FRIGATE_DEBUG_ROUTER'      => "bool",
         'FRIGATE_DEBUG_ENDPOINTS'   => "bool",
