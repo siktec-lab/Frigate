@@ -209,17 +209,21 @@ This can be achieved in to ways:
 ## Frigate Constants
 
 After initializing the application instance, several constants are defined by the application instance and are available throughout the application.
+The constants are used around the application to make it easier to access some of the application configuration and paths. and are heavily used by Frigate core.
 
-Table:
+| Constant                  | Example                             | Description | 
+| :------------------------ | :---------------------------------- | :---------- |
+| `#!js APP_ROOT`           | `#!js /var/www/html/website`        | The full path to the root folder of the application without the trailing slash. |
+| `#!js APP_VENDOR`         | `#!js /var/www/html/website/vendor` | The vendor folder of the application. without the trailing slash.               |
+| `#!js APP_BASE_PATH`      | `#!js /website`                     | The base path of the application. which is the URI path of the<br/> application in relation to the web root folder. |
+| `#!js APP_BASE_URI`       | `#!js /website`                     | The base URI of the application. same as `APP_BASE_PATH` but<br/> with url encoding. without the trailing slash. |
+| `#!js APP_BASE_URL`       | `#!js http://example.com`           | The base URL of the application. without the trailing slash.                    |
+| `#!js APP_VERSION`        | `#!js 1.2.45`                       | The version of the application.                                                 |
+| `#!js APP_LOG_ERRORS`     | `#!js true`                         | Whether errors are logged to file or not.                                       |
+| `#!js APP_EXPOSE_ERRORS`  | `#!js true`                         | Whether errors are exposed to the client or not.                                |
 
-| Constant | Description |
-| -------- | ----------- |
-| `APP_ROOT_FOLDER` | The root folder of the application. |
-| `APP_BASE_URL_PATH` | The base url path of the application. |
-| `APP_BASE_URL` | The base url of the application. |
-| `APP_VERSION` | The version of the application. |
-| `APP_DEBUG_ROUTER` | The debug mode of the router. |
-| `APP_DEBUG_ENDPOINTS` | The debug mode of the endpoints. |
+!!! tip "Overriding the constants"
+    The constants are defined by the application instance after it is initialized. You can override the constants by defining them before initializing the application instance. This is useful if you want to quickly change ERROR logging for example. That said, it is recommended to use the environment variables to configure the application.
 
 ## PHP Configuration
 
