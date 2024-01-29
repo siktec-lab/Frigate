@@ -212,7 +212,6 @@ class FrigateApp {
         if (is_null(self::$env)) {
             try {
                 [$dirs, $files] = $path + [[], null];
-                var_dump($dirs, $files);
                 self::$env = Dotenv::createImmutable($dirs, $files, false);
                 self::$env->safeLoad();
 
