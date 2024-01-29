@@ -8,6 +8,9 @@ use PHPUnit\Framework\TestCase;
 use Frigate\FrigateApp as App;
 use Frigate\Exceptions\FrigateException;
 
+/**
+ * @runTestsInSeparateProcesses
+ */
 class AppConstantsTest extends TestCase
 {
 
@@ -32,21 +35,38 @@ class AppConstantsTest extends TestCase
         App::$env = null;
     }
 
-    public function testEnvFromFile() : void
+    public function testAppConstantsInit() : void
     {
         $this->unsetAllEnv();
 
         App::init(
             root : __DIR__,
-            env : [ self::ENV_FOLDER , ".env.test.working" ],
+            env : [ self::ENV_FOLDER , ".env.test.nested_root" ],
             extra_env : [],
             load_session : false,
             start_page_buffer : false,
             adjust_ini : false
         );
+
+        $expected = [
+            "APP_ROOT"          => __DIR__,
+            "APP_VENDOR"        => __DIR__ . DIRECTORY_SEPARATOR . "vendor",
+            "APP_BASE_PATH"     => DIRECTORY_SEPARATOR . "web" . DIRECTORY_SEPARATOR . "files",
+            "APP_BASE_URI"      => "/web/files",
+            "APP_BASE_URL"      => "http://localhost/web/files",
+            "APP_VERSION"       => "1.0.0",
+            "APP_LOG_ERRORS"    => true,
+            "APP_EXPOSE_ERRORS" => true,
+        ];
         // Assert that all required environment variables are set:
-        foreach (App::REQUIRED_ENV as $key => $value) {
-            $this->assertArrayHasKey($key, $_ENV);
+        foreach ($expected as $key => $value) {
+            $this->assertArrayHasKey($key, App::$globals);
+            $this->assertEquals($value, App::$globals[$key]);
+            if (defined($key)) {
+                $this->assertEquals($value, constant($key));
+            } else {
+                $this->fail("Constant $key is not defined");
+            }
         }
     }
 

@@ -84,45 +84,42 @@ class FrigateApp {
         if ($adjust_ini) {
             self::adjustIni();
         }
+
+        // TODO: load debug handler
+
         //start session:
         if ($load_session) {
             self::startSession();
         }
+        
         //start page buffer:
         if ($start_page_buffer) {
             self::startPageBuffer();
         }
     }
 
-    public static function adjustIni() : void {
-        
-        // Application version:
-        if (!defined("APP_VERSION")) {
-            define("APP_VERSION", self::$version);
-        }
-        self::$version = APP_VERSION;
-
-        // Error log:
-        if (!defined("APP_ERROR_LOG")) {
-            define("APP_ERROR_LOG", false);
-        }
-        if (APP_ERROR_LOG) {
-            ini_set("log_errors", true);
-            ini_set("error_log", APP_ERROR_LOG);
-        }
+    /**
+     * Adjust runtime ini settings
+     */
+    public static function adjustIni() : void 
+    {    
+        // Make sure constants are set:
+        self::setConstants();
 
         // Error reporting:
-        if (!defined("SHOW_ERRORS")) {
-            define("SHOW_ERRORS", false);
-        }
-        
-        error_reporting(SHOW_ERRORS ? -1 : 0);
-        ini_set('display_errors', SHOW_ERRORS ? 'on' : 'off');
+        error_reporting(APP_EXPOSE_ERRORS ? -1 : 0);
+        ini_set('display_errors', APP_EXPOSE_ERRORS ? 'on' : 'off');
 
-        // Save Globals:
-        self::$globals["APP_VERSION"]   = APP_VERSION;
-        self::$globals["APP_ERROR_LOG"] = APP_ERROR_LOG;
-        self::$globals["SHOW_ERRORS"]   = SHOW_ERRORS;
+        // Error log:
+        if (APP_LOG_ERRORS) {
+            ini_set("log_errors", APP_LOG_ERRORS);
+            ini_set("error_log", self::ENV_STR("FRIGATE_ERRORS_FILE_PATH"));
+        }
+
+        //TODO: Add more ini settings
+        // - lifetime
+        // - session handler
+        // - session name
     }
 
     public static function startSession() : bool {
@@ -135,41 +132,44 @@ class FrigateApp {
     public static function setPaths(string $root, string $base_path = "/", $app_url = "http://localhost/") : void {
 
         //Directory separator
-        if (!defined("DS")) 
+        if (!defined("DS")) {
             define("DS", DIRECTORY_SEPARATOR);
+        }
 
-        //Application root path
-        if (!defined("APP_ROOT")) 
-            define("APP_ROOT", $root);
-        
+        //Application root path - without trailing or leading slashes
+        if (!defined("APP_ROOT")) {
+            define("APP_ROOT", trim($root, " \n\t\r\0\x0B/\\"));
+        }
+
         //Application vendor path
-        if (!defined("APP_VENDOR")) 
+        if (!defined("APP_VENDOR")) {
             define("APP_VENDOR", APP_ROOT.DS."vendor");
-        
-        //Application base path - for applications that are not in the root directory
-        if (!defined("APP_BASE_OS_PATH")) 
-            define("APP_BASE_OS_PATH", $base_path);
+        }
 
-        //Application base url path - for applications that are not in the root directory        
-        if (!defined("APP_BASE_URL_PATH")) {
-            $base_path = trim(rtrim($base_path, " \n\t\r\0\x0B/\\")) . "/";
-            define("APP_BASE_URL_PATH", $base_path);
+        //Application base path - always starts with a slash and does not end with a slash
+        if (!defined("APP_BASE_PATH")) {
+            define("APP_BASE_PATH", DS . trim(str_replace(["/", "\\"], DS, $base_path), " \n\t\r\0\x0B/\\"));
+        }
+
+        //Application base url path - Same as base path but with DS replaced with slashes    
+        if (!defined("APP_BASE_URI")) {
+            define("APP_BASE_URI", rtrim(str_replace(DS, "/", APP_BASE_PATH), " \n\t\r\0\x0B/\\"));
         }
 
         //Application base url: domain + base url path
         if (!defined("APP_BASE_URL")) {
-            //normalize the app url make sure it ends with a slash
-            $app_url = trim(rtrim($app_url, " \n\t\r\0\x0B/\\")) . "/";
+            //normalize the app url make sure it does not end with a slash
+            $app_url = trim(rtrim($app_url, " \n\t\r\0\x0B/\\"));
             //join the app url with the base path to get the base url make sure no extra slashes are added
-            define("APP_BASE_URL", $app_url . ltrim(APP_BASE_URL_PATH, " \n\t\r\0\x0B/\\"));
+            define("APP_BASE_URL", $app_url . APP_BASE_URI);
         }
         
         //Save Globals:
-        self::$globals["APP_ROOT"]         = APP_ROOT;
-        self::$globals["APP_VENDOR"]       = APP_VENDOR;
-        self::$globals["APP_BASE_OS_PATH"] = APP_BASE_OS_PATH;
-        self::$globals["APP_BASE_URL_PATH"]= APP_BASE_URL_PATH;
-        self::$globals["APP_BASE_URL"]     = APP_BASE_URL;
+        self::$globals["APP_ROOT"]      = APP_ROOT;
+        self::$globals["APP_VENDOR"]    = APP_VENDOR;
+        self::$globals["APP_BASE_PATH"] = APP_BASE_PATH;
+        self::$globals["APP_BASE_URI"]  = APP_BASE_URI;
+        self::$globals["APP_BASE_URL"]  = APP_BASE_URL;
         
     }
 
@@ -198,7 +198,7 @@ class FrigateApp {
         }
     }
 
-    static public function loadEnvironment(string|array|null $path = null, array $extra) : bool {
+    static public function loadEnvironment(string|array|null $path = null, array $extra) : void {
 
         
         if (is_string($path)) {
@@ -234,9 +234,10 @@ class FrigateApp {
                     $e
                 );
             }
-            return true;    
         }
-        return false;
+
+        //Set Globals & constants:
+        self::setConstants();
     }
     
     /**
@@ -265,6 +266,28 @@ class FrigateApp {
                     $validate->required();
             }
         }
+    }
+
+    static protected function setConstants() : void {
+
+        // Version:
+        if (!defined("APP_VERSION")) {
+            define("APP_VERSION", self::ENV_STR("FRIGATE_APP_VERSION", self::$version));
+        }
+        self::$version = APP_VERSION;
+        self::$globals["APP_VERSION"] = APP_VERSION;
+
+        // Error log:
+        if (!defined("APP_LOG_ERRORS")) {
+            define("APP_LOG_ERRORS", self::ENV_BOOL("FRIGATE_ERRORS_TO_FILE", false));
+        }
+        self::$globals["APP_LOG_ERRORS"] = APP_LOG_ERRORS;
+
+        // Error log path:
+        if (!defined("APP_EXPOSE_ERRORS")) {
+            define("APP_EXPOSE_ERRORS", self::ENV_BOOL("FRIGATE_EXPOSE_ERRORS", false));
+        }
+        self::$globals["APP_EXPOSE_ERRORS"]   = APP_EXPOSE_ERRORS;
     }
 
     static public function ENV_BOOL(string $key, ?bool $default = null) : ?bool {

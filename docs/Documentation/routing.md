@@ -14,7 +14,7 @@ The router is initialized with the `init` method. The `init` method takes:
 Router::init(debug : FrigateApp::ENV_BOOL("DEBUG_ROUTER"));
 
 // That's it, the router is now initialized we can parse the request.
-Router::parse_request(APP_BASE_URL_PATH);
+Router::parse_request(APP_BASE_URI);
 
 ```
 

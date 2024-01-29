@@ -72,7 +72,7 @@ class Router {
         // path to uri:
         $path = trim($path);
         $path = ltrim($path, '/');
-        $path = FrigateApp::$globals["APP_BASE_URL_PATH"].$path;
+        $path = FrigateApp::$globals["APP_BASE_URI"].$path;
 
         return self::build_request(
             server_arr : null, // Null for $_SERVER
@@ -90,7 +90,7 @@ class Router {
      * create a manual request for endpoint invocation with a custom context
      * 
      * @param  array|null $server_arr null for $_SERVER, REQUEST_URI and REQUEST_METHOD are required.
-     * @param  string|null $base Base url null for APP_BASE_URL_PATH
+     * @param  string|null $base Base url null for APP_BASE_URI
      * @param  string|null $method Method null for REQUEST_METHOD
      * @param  string|null $uri Uri override null for REQUEST_URI
      * @param  array|null $query Query override null for whatever is in the uri
@@ -100,7 +100,7 @@ class Router {
      */
     private static function build_request(
         ?array $server_arr = null, // Null for $_SERVER
-        ?string $base      = null, // Base url null for APP_BASE_URL_PATH
+        ?string $base      = null, // Base url null for APP_BASE_URI
         ?string $method    = null, // Method null for REQUEST_METHOD
         ?string $uri       = "",   // Uri override null for REQUEST_URI
         ?array $query      = null, // Query override null for whatever is in the uri
@@ -118,9 +118,9 @@ class Router {
             }
         }
 
-        // If no base is provided, we'll use the APP_BASE_URL_PATH
+        // If no base is provided, we'll use the APP_BASE_URI
         if (is_null($base)) {
-            $base = FrigateApp::$globals["APP_BASE_URL_PATH"];
+            $base = FrigateApp::$globals["APP_BASE_URI"];
         }
 
         // If method is provided, we'll use it instead of REQUEST_METHOD
