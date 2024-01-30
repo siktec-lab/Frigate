@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace Frigate\Tests\Routing;
 
 use PHPUnit\Framework\TestCase;
-use Frigate\Routing;
+use Frigate\FrigateApp as App;
+use Frigate\Routing\Router;
+use Frigate\Routing\Route;
+use Frigate\Routing\Http\Methods;
 
 class RoutingInitTest extends TestCase
 {
@@ -19,11 +22,115 @@ class RoutingInitTest extends TestCase
         return;
     }
 
-    public function testRoutingBasic() : void
+    public function testRoutingDefaultDebug() : void
     {
+        
+        $this->unsetAllEnv();
+
+        App::init( 
+            root : __DIR__,
+            env : [ __DIR__ . "/../resources/env" , ".env.test.working" ],
+            extra_env: [ "FRIGATE_DEBUG_ROUTER" => "true" ],
+            load_session: false,
+            adjust_ini: false
+        );
+
+        Router::init(); // Should be in debug mode
+
+        $this->assertTrue( Router::isDebug() );
+
+        Router::init( debug: false ); // Should disable debug mode manually
+
+        $this->assertFalse( Router::isDebug() );
+
+        $this->unsetAllEnv();
+
+        App::init( 
+            root : __DIR__,
+            env : [ __DIR__ . "/../resources/env" , ".env.test.working" ],
+            extra_env: [ "FRIGATE_DEBUG_ROUTER" => "off" ], // Should disable debug mode
+            load_session: false,
+            adjust_ini: false
+        );
+
+        Router::init(); // Should not be in debug mode
+
+        $this->assertFalse( Router::isDebug() );
 
     }
 
+    public function testDefineRouteGet() : void 
+    {
+        $this->unsetAllEnv();
+        App::init( 
+            root : __DIR__,
+            env : [ __DIR__ . "/../resources/env" , ".env.test.working" ],
+            extra_env: [ "FRIGATE_DEBUG_ROUTER" => "true" ],
+            load_session: false,
+            adjust_ini: false
+        );
+
+        // Define a route
+        Router::define( "GET", new Route( 
+            path : "/test/{id:int}", 
+            exp  : function() { return "test"; } 
+        ));
+
+        // Get the route
+        $context = [];
+        $branch = Router::getRouteBranch( "GET", "/test/21", $context);
+
+        $this->assertNotNull( $branch );
+        $this->assertEquals( "{id}", $branch->name );
+        $this->assertEquals( 21, $context["id"] ?? null );
+
+        // Not existing route
+        $branch1 = Router::getRouteBranch( "GET", "/test/21/22");
+        $branch2 = Router::getRouteBranch( "POST", "/test/21");
+        $branch3 = Router::getRouteBranch( "GET", "/test/frigate");
+
+        $this->assertNull( $branch1 );
+        $this->assertNull( $branch2 );
+        $this->assertNull( $branch3 );
+
+    }
+
+    public function testDefineRoutePost() : void 
+    {
+        $this->unsetAllEnv();
+        App::init( 
+            root : __DIR__,
+            env : [ __DIR__ . "/../resources/env" , ".env.test.working" ],
+            extra_env: [ "FRIGATE_DEBUG_ROUTER" => "true" ],
+            load_session: false,
+            adjust_ini: false
+        );
+
+        // Define a route
+        Router::define(Methods::POST, new Route( 
+            path : "/{name:str}/{age:int}", 
+            exp  : function() { return "test"; } 
+        ));
+
+        // Get the route
+        $context = [];
+        $branch = Router::getRouteBranch(Methods::POST, "/test/32", $context);
+
+        $this->assertNotNull( $branch );
+        $this->assertEquals( "{age}", $branch->name );
+        $this->assertEquals( 32, $context["age"] ?? null );
+        $this->assertEquals( "test", $context["name"] ?? null );
+
+        // Not existing route
+        $branch1 = Router::getRouteBranch( "GET", "/test/21");
+        $branch2 = Router::getRouteBranch( "POST", "/test/more_strings");
+        $branch3 = Router::getRouteBranch( "POST", "/test/21/22");
+
+        $this->assertNull( $branch1 );
+        $this->assertNull( $branch2 );
+        $this->assertNull( $branch3 );
+
+    }
     public static function setUpBeforeClass() : void
     {
         return;
@@ -32,5 +139,13 @@ class RoutingInitTest extends TestCase
     public static function tearDownAfterClass() : void
     {
         return;
+    }
+
+    private function unsetAllEnv() : void
+    {
+        global $_ENV, $_SERVER;
+        $_ENV = [];
+        $_SERVER = [];
+        App::$env = null;
     }
 }

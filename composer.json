@@ -26,7 +26,8 @@
         "vlucas/phpdotenv": "^5.4",
         "sabre/uri": "^2.3",
         "zircote/swagger-php": "^4.8",
-        "firebase/php-jwt": "dev-main"
+        "firebase/php-jwt": "dev-main",
+        "siktec/just-cli": "^2.0"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
@@ -34,12 +35,16 @@
         "phpunit/phpunit": "^10.5",
         "phpbench/phpbench": "^1.2"
     },
+    "bin": [
+        "bin/frigate"
+    ],
     "scripts" : {
         "php-version"       : "php -v",
         "test"              : "phpunit --configuration phpunit.xml",
         "test-coverage"     : "phpunit --configuration phpunit.xml --coverage-html coverage",
         "testdox"           : "phpunit --configuration phpunit.xml --testdox --colors=always",
         "bench"             : "phpbench run --report=default",
-        "bench-aggr"       : "phpbench run --report=aggregate"
+        "bench-aggr"       : "phpbench run --report=aggregate",
+        "frigate"          : "php ./bin/frigate.php --help"
     }
 }
