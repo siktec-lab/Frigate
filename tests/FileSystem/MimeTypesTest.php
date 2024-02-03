@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace Frigate\Tests\FileSystem;
 
 use PHPUnit\Framework\TestCase;
-use Frigate\Tools\FileSystem\MimeTypes;
+use Frigate\Tools\MimeTypes\MimeHelper;
 
 class MimeTypesTest extends TestCase
 {
 
-    protected MimeTypes $mime;
+    protected MimeHelper $mime;
 
     protected function setUp() : void
     {
-        $this->mime = new MimeTypes(
+        $this->mime = new MimeHelper(
             mimes : [
                 'json'  => ['application/json'],
                 'jpeg'  => ['image/jpeg'],
@@ -78,7 +78,7 @@ class MimeTypesTest extends TestCase
      */
     public function testGetMimeType($expectedMimeType, $extension) : void
     {
-        $this->assertEquals($expectedMimeType, $this->mime->getExtMimeType($extension));
+        $this->assertEquals($expectedMimeType, $this->mime->getMimeTypeOf($extension));
     }
 
     /**
@@ -86,7 +86,7 @@ class MimeTypesTest extends TestCase
      */
     public function testGetExtension($expectedExtension, $mimeType) : void
     {
-        $this->assertEquals($expectedExtension, $this->mime->getMimeTypeExt($mimeType));
+        $this->assertEquals($expectedExtension, $this->mime->getExtensionOf($mimeType));
     }
 
     /**
@@ -94,7 +94,7 @@ class MimeTypesTest extends TestCase
      */
     public function testGetAllMimeTypes($expectedMimeTypes, $extension) : void
     {
-        $this->assertEquals($expectedMimeTypes, $this->mime->getExtMimeType($extension, true));
+        $this->assertEquals($expectedMimeTypes, $this->mime->getMimeTypeOf($extension, true));
     }
 
     /**
@@ -102,36 +102,36 @@ class MimeTypesTest extends TestCase
      */
     public function testGetAllExtensions($expectedExtensions, $mimeType) : void
     {
-        $this->assertEquals($expectedExtensions, $this->mime->getMimeTypeExt($mimeType, true));
+        $this->assertEquals($expectedExtensions, $this->mime->getExtensionOf($mimeType, true));
     }
 
     public function testGetMimeTypeUndefined() : void
     {
-        $this->assertNull($this->mime->getExtMimeType('undefined'));
+        $this->assertNull($this->mime->getMimeTypeOf('undefined'));
     }
 
     public function testGetExtensionUndefined() : void
     {
-        $this->assertNull($this->mime->getMimeTypeExt('undefined'));
+        $this->assertNull($this->mime->getExtensionOf('undefined'));
     }
 
     public function testGetAllMimeTypesUndefined() : void
     {
-        $this->assertNull($this->mime->getExtMimeType('undefined', true));
+        $this->assertNull($this->mime->getMimeTypeOf('undefined', true));
     }
 
     public function testGetAllExtensionsUndefined() : void
     {
-        $this->assertNull($this->mime->getMimeTypeExt('undefined', true));
+        $this->assertNull($this->mime->getExtensionOf('undefined', true));
     }
 
     public function testBuiltInMapping()
     {
-        $mime = new MimeTypes();
-        $this->assertEquals('json', $mime->getMimeTypeExt('application/json'));
-        $this->assertEquals('application/json', $mime->getExtMimeType('json'));
+        $mime = new MimeHelper();
+        $this->assertEquals('json', $mime->getExtensionOf('application/json'));
+        $this->assertEquals('application/json', $mime->getMimeTypeOf('json'));
 
         // Check with dots:
-        $this->assertEquals('application/json', $mime->getExtMimeType('.json'));
+        $this->assertEquals('application/json', $mime->getMimeTypeOf('.json'));
     }
 }

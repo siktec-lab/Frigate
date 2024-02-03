@@ -10,7 +10,7 @@ use Throwable;
 class Router {
 
 
-    public static bool $debug = false;
+    private static bool $debug = false;
 
     private static Http\RouteRequest $request;
 
@@ -27,9 +27,19 @@ class Router {
      * @return void
      */
     public static function init(bool $debug = false) : void {
-        self::$debug = $debug;
+        self::debug($debug);
     }
     
+    /**
+     * get / set the debug mode
+     */
+    public static function debug(?bool $enable = null) : bool {
+        if (!is_null($enable)) {
+            self::$debug = $enable;
+        }
+        return self::$debug;
+    }
+
     /**
      * parse_request
      * load and parses the request uri

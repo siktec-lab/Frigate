@@ -11,7 +11,8 @@
     ],
     "autoload": {
         "psr-4" : {
-            "Frigate\\" : "src/"
+            "Frigate\\" : "src/",
+            "FrigateBin\\" : "bin/"
         }
     },
     "autoload-dev" : {
@@ -45,6 +46,6 @@
         "testdox"           : "phpunit --configuration phpunit.xml --testdox --colors=always",
         "bench"             : "phpbench run --report=default",
         "bench-aggr"       : "phpbench run --report=aggregate",
-        "frigate"          : "php ./bin/frigate.php --help"
+        "frigate"          : "php ./bin/frigate.php "
     }
 }

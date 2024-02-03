@@ -118,7 +118,7 @@ class Upload {
         //Write meta data file to temp folder:
         $meta_data_file = $file_temp_folder . '/meta.json';
         $meta_data = json_encode($this->get_metadata());
-        FilesHelper::write_file($meta_data_file, $meta_data);
+        FilesHelper::writeFile($meta_data_file, $meta_data);
         
         $files = $this->get_files();
         //If its a chunked upload, stop here:

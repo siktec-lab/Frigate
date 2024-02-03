@@ -37,11 +37,11 @@ class RoutingInitTest extends TestCase
 
         Router::init(); // Should be in debug mode
 
-        $this->assertTrue( Router::isDebug() );
+        $this->assertTrue( Router::debug() );
 
         Router::init( debug: false ); // Should disable debug mode manually
 
-        $this->assertFalse( Router::isDebug() );
+        $this->assertFalse( Router::debug() );
 
         $this->unsetAllEnv();
 
@@ -55,7 +55,7 @@ class RoutingInitTest extends TestCase
 
         Router::init(); // Should not be in debug mode
 
-        $this->assertFalse( Router::isDebug() );
+        $this->assertFalse( Router::debug() );
 
     }
 

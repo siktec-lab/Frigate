@@ -1,28 +1,45 @@
 #!/usr/bin/env php
 <?php
 
-// Exit if not running from command line:
+//------------------------------------------------------------
+// Cli setup
+//------------------------------------------------------------
 if (php_sapi_name() !== 'cli') {
     exit;
 }
+// Ini settings:
+set_time_limit(0);
+ini_set('memory_limit', '128M');
 
-require_once $_composer_autoload_path ?? __DIR__ . '/../vendor/autoload.php';
-$vendor_bin = $_composer_bin_dir ?? __DIR__ . '/../vendor/bin';
-
+//------------------------------------------------------------
+// Composer autoload + constants
+//------------------------------------------------------------
 const DS = DIRECTORY_SEPARATOR;
 const FRIGATE_PATH = ["siktec", "frigate"];
+const CWD  = __DIR__ ;
+require_once $_composer_autoload_path ?? CWD . '/../vendor/autoload.php';
+$VENDOR_BIN = $_composer_bin_dir ?? CWD . '/../vendor/bin';
+$SOURCE     = isset($_composer_autoload_path) ? 
+                dirname($_composer_autoload_path).DS.implode(DS, FRIGATE_PATH) :
+                dirname(CWD);
 
-// Locate our package directory (which is our installation in vendor) we may be also runing directly from the package directory:
-function locate_frigate_source() : string
-{
-    if (isset($_composer_autoload_path)) {
-        return dirname($_composer_autoload_path).DS.implode(DS, FRIGATE_PATH);
-    }
-    return dirname(__DIR__);
-}
+//------------------------------------------------------------
+// Frigate CLI
+//------------------------------------------------------------
+use Frigate\Cli\CliApp;
+use Frigate\Tools\Paths\PathHelpers as Path;
 
-$source = locate_frigate_source();
+// Create the CLI application:
+$frigate_cli = new CliApp(
+    name    : FrigateBin\App\About::NAME,
+    version : FrigateBin\App\About::VERSION
+);
 
-use JCli\Application;
+// Add commands:
+$loaded = $frigate_cli->autoLoadCommands(
+    "FrigateBin\\App\\Commands", 
+    Path::path($SOURCE, "bin", "App", "Commands")
+);
 
-echo "Frigate source: $source\n";
+// Handle the CLI automatically:
+$frigate_cli->handle();
