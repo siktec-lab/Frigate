@@ -62,7 +62,7 @@ Options -ExecCGI -Indexes';
         $di = new \RecursiveDirectoryIterator($path_dir, \FilesystemIterator::SKIP_DOTS);
         $ri = new \RecursiveIteratorIterator($di, \RecursiveIteratorIterator::CHILD_FIRST);
         foreach ( $ri as $file ) {
-            $file->isDir() ?  self::rrmdir($file) : FilesHelper::delete_files($file);
+            $file->isDir() ?  self::rrmdir($file) : FilesHelper::deleteFiles($file);
         }
         if ($self) {
             rmdir($path_dir);
