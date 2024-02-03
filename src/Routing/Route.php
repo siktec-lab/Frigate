@@ -19,7 +19,7 @@ class Route {
     
     public Http\HTTP2    $http2;
     
-    public $func;
+    public object|array|string|null $exp;
     
     protected ?\ReflectionClass $request_mutator = null;
     
@@ -29,11 +29,17 @@ class Route {
         "auth_method"   => null
     ];
 
-    public function __construct(string $path, array $context = [], array $returns = [], $func = null, \ReflectionClass|string|null $request_mutator = null) {
+    public function __construct(
+        string $path, 
+        array $context = [], 
+        array $returns = [], 
+        $exp = null, 
+        \ReflectionClass|string|null $request_mutator = null
+    ) {
         $this->path = trim($path, "\t\n\r /\\");
         $this->context = $context;
         $this->http2 = new Http\HTTP2();
-        $this->func = $func;
+        $this->exp = $exp;
         if (!empty($returns)) {
             $this->set_returns(...$returns);
         }
@@ -121,8 +127,8 @@ class Route {
         }
 
         // Lazy load the endpoint?
-        if (is_object($this->func) && is_a($this->func, BindEndpoint::class)) {
-            $this->func = $this->func->getInstance( // All overrides are passed to the endpoint
+        if (is_object($this->exp) && is_a($this->exp, BindEndpoint::class)) {
+            $this->exp = $this->exp->getInstance( // All overrides are passed to the endpoint
                 $this->override_params["debug"], 
                 $this->override_params["auth"],
                 $this->override_params["auth_method"]
@@ -130,13 +136,14 @@ class Route {
         }
 
         //Execute the route endpoint:
-        if (is_object($this->func) && !$this->func instanceof Closure && method_exists($this->func, "call")) {
-            return $this->func->call($this->context, ...$args);
+        if (is_object($this->exp) && !$this->exp instanceof Closure && method_exists($this->exp, "call")) {
+            return $this->exp->call($this->context, ...$args);
         }
 
         // Execute the route function:
+        //TODO: Make this more modern.
         return call_user_func_array(
-            $this->func, 
+            $this->exp, 
             [$this->context, ...$args]
         );
     }

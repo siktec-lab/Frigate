@@ -1,9 +1,12 @@
 <?php 
 
+declare(strict_types=1);
+
 namespace Frigate\Routing;
 
 use Frigate\FrigateApp;
 use Frigate\Routing\Http;
+use Frigate\Routing\Paths\PathBranch;
 use Frigate\Routing\Paths\PathTree;
 use Throwable;
 
@@ -12,7 +15,7 @@ class Router {
 
     private static bool $debug = false;
 
-    private static Http\RouteRequest $request;
+    private static ?Http\RouteRequest $request = null;
 
     /** @var Route[] $errors*/
     private static array $errors  = [];
@@ -21,13 +24,17 @@ class Router {
     private static array $routes = [];
         
     /**
-     * init
      * initialize the router
-     * @param  bool $debug
-     * @return void
+     * @param ?bool $debug 
      */
-    public static function init(bool $debug = false) : void {
-        self::debug($debug);
+    public static function init(?bool $debug = null) : void {
+        self::debug($debug ?? FrigateApp::ENV_BOOL("FRIGATE_DEBUG_ROUTER", false));
+    }
+    
+    public static function reset() : void {
+        self::$routes = [];
+        self::$errors = [];
+        self::$request = null;
     }
     
     /**
@@ -64,6 +71,17 @@ class Router {
             "POST"  => self::$request->getPostData(),
             "QUERY" => self::$request->getQueryParameters()
         ]);
+    }
+
+    /**
+     * get the route branch for a given method and path
+     */
+    public static function getRouteBranch(string $method, string $path, array &$with_context = []) : ?PathBranch {
+        if (!array_key_exists($method, self::$routes)) {
+            return null;
+        }
+        [$branch, $with_context] = self::$routes[$method]->eval($path, $with_context);
+        return $branch;
     }
 
     public static function request_for(

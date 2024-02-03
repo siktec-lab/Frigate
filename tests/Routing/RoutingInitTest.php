@@ -71,6 +71,7 @@ class RoutingInitTest extends TestCase
         );
 
         // Define a route
+        Router::reset();
         Router::define( "GET", new Route( 
             path : "/test/{id:int}", 
             exp  : function() { return "test"; } 
@@ -107,6 +108,7 @@ class RoutingInitTest extends TestCase
         );
 
         // Define a route
+        Router::reset();
         Router::define(Methods::POST, new Route( 
             path : "/{name:str}/{age:int}", 
             exp  : function() { return "test"; } 
@@ -147,5 +149,6 @@ class RoutingInitTest extends TestCase
         $_ENV = [];
         $_SERVER = [];
         App::$env = null;
+        App::$application_env = [];
     }
 }
