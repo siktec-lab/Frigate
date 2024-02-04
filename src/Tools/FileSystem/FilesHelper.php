@@ -135,16 +135,16 @@ class FilesHelper {
     /**
      * read a file and returns the file contents
      */
-    final public static function readFileContents(string $path, bool $clear_stats_cache = false) : ?string 
+    final public static function readFileContent(string $path, ?int $length = null, bool $clear_stats_cache = false) : ?string 
     {
-        $file = self::readFile($path, $clear_stats_cache);
+        $file = self::readFile($path, $length, $clear_stats_cache);
         return $file ? $file['content'] : null;
     }
 
     /**
      * read a file and returns an array with the file info
      */
-    final public static function readFile(string $path, bool $clear_stats_cache = false) : ?array 
+    final public static function readFile(string $path, ?int $length = null, bool $clear_stats_cache = false) : ?array 
     {
         if (($file = self::file($path, 'r', true)) === null) {
             return null;
@@ -153,13 +153,14 @@ class FilesHelper {
             clearstatcache(true, $path);
         }
         $size = $file->getSize();
-        $content = self::readFileObject($file, null, true);
+        $content = self::readFileObject($file, $length, true);
         return $content === null ? null : [
             'tmp_name'  => $path,
             'name'      => basename($path),
             'content'   => $content,
             'type'      => mime_content_type($path),
-            'length'    => $size,
+            'length'    => $length ?? $size,
+            'size'      => $size,
             'error'     => 0
         ];
     }

@@ -2,14 +2,10 @@
 
 namespace FrigateBin\App\Commands;
 
-
 use JCli\IO\Interactor;
-use JCli\Input\Command;
-
+use Frigate\Cli\Commands\Command;
 use FrigateBin\App\About as FrigateBinAbout;
 use Frigate\About as FrigateAbout;
-
-
 
 class InfoCommand extends Command
 {
@@ -18,9 +14,11 @@ class InfoCommand extends Command
     public const ALIAS          = 'i';
     public const DEFAULT        = false;
 
-    public function __construct()
-    {
-        parent::__construct(self::COMMAND, self::DESCRIPTION);
+    public function __construct(
+        string $cwd      = null,
+        bool   $as_json  = false, // this will force the output as json
+    ) {
+        parent::__construct($this, $cwd, $as_json);
 
         $this->usage(
             // append details or explanation of given example with ` ## ` so they will be uniformly aligned when shown
@@ -28,14 +26,10 @@ class InfoCommand extends Command
         );
     }
 
-    // This method is auto called before `self::execute()`
-    public function interact(Interactor $io) : void
-    {
-
-    }
-
-    // When app->handle() locates `init` command it automatically calls `execute()`
-    public function execute()
+    /**
+     * Execute the command
+    */
+    public function execute() : int
     {
         /** @var Interactor $io */
         $io = $this->app()->io();
@@ -50,5 +44,7 @@ class InfoCommand extends Command
         foreach ($frigate as $key => $value) {
             $io->cyan(sprintf("%-15s:", $key))->write($value, true);
         }
+
+        return self::EXIT_CODES['done'];
     }
 }

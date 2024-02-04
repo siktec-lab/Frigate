@@ -80,6 +80,40 @@ class MimeHelper
     }
 
 	/**
+	 * Add a conversion.
+	 */
+	public function add(
+        string $mime, 
+        string $extension, 
+        bool   $default_extension = true,
+        bool   $default_mime = true
+    ) : self {
+		
+		$mime = self::normalize($mime);
+		$extension = self::normalize($extension);
+		
+		// Set the container if it doesn't exist:
+		if (!array_key_exists($mime, $this->mapping['extensions'][$mime])) {
+            $this->mapping['extensions'][$mime] = [];
+        }
+		if (!array_key_exists($extension, $this->mapping['mimes'][$extension])) {
+            $this->mapping['mimes'][$extension] = [];
+        }
+		// Append or prepend the new value:
+		if ($default_extension) {
+			array_unshift($this->mapping['extensions'][$mime], $extension);
+		} else {
+			$this->mapping['extensions'][$mime][] = $extension;
+		}
+		if ($default_mime) {
+			array_unshift($this->mapping['mimes'][$extension], $mime);
+		} else {
+			$this->mapping['mimes'][$extension][] = $mime;
+		}
+		return $this;
+	}
+
+	/**
 	 * Get the built-in mapping.
 	 */
 	protected static function getBuiltIn() : array

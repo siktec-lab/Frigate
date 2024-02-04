@@ -7,7 +7,6 @@
 if (php_sapi_name() !== 'cli') {
     exit;
 }
-// Ini settings:
 set_time_limit(0);
 ini_set('memory_limit', '128M');
 
@@ -15,13 +14,32 @@ ini_set('memory_limit', '128M');
 // Composer autoload + constants
 //------------------------------------------------------------
 const DS = DIRECTORY_SEPARATOR;
-const FRIGATE_PATH = ["siktec", "frigate"];
-const CWD  = __DIR__ ;
-require_once $_composer_autoload_path ?? CWD . '/../vendor/autoload.php';
-$VENDOR_BIN = $_composer_bin_dir ?? CWD . '/../vendor/bin';
-$SOURCE     = isset($_composer_autoload_path) ? 
-                dirname($_composer_autoload_path).DS.implode(DS, FRIGATE_PATH) :
-                dirname(CWD);
+$cwd  = getcwd() ?: __DIR__;
+$source = realpath(__DIR__ . DS . "..");
+// Composer autoload
+if (!isset($_composer_autoload_path)) {
+    // Main Project:
+    $path_autoload_main = __DIR__ . '/../vendor/autoload.php'; 
+    // Installed as a dependency:
+    $path_autoload_package = __DIR__ . '/../../../autoload.php';
+    // Check if the composer autoload file exists:
+    if (file_exists($path_autoload_main)) {
+        $_composer_autoload_path = $path_autoload_main;
+        $_composer_bin_dir = __DIR__ . '/../vendor/bin';
+    } elseif (file_exists($path_autoload_package)) {
+        $_composer_autoload_path = $path_autoload_package;
+        $_composer_bin_dir = __DIR__ . '/../../../bin';
+    } else {
+        throw new \Exception("Composer autoload file not found");
+    }
+}
+// Define the constants:
+define("CLI_VENDOR_BIN", $_composer_bin_dir);
+define("FRIGATE_SOURCE", $source);
+define("CLI_CWD", $cwd);
+
+// Load the composer autoload:
+require_once $_composer_autoload_path;
 
 //------------------------------------------------------------
 // Frigate CLI
@@ -37,8 +55,8 @@ $frigate_cli = new CliApp(
 
 // Add commands:
 $loaded = $frigate_cli->autoLoadCommands(
-    "FrigateBin\\App\\Commands", 
-    Path::path($SOURCE, "bin", "App", "Commands")
+    namespace: "FrigateBin\\App\\Commands", 
+    folder: Path::join($source, "bin", "App", "Commands")
 );
 
 // Handle the CLI automatically:
