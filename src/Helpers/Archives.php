@@ -1,28 +1,29 @@
 <?php
 
-namespace Frigate\Tools\FileSystem;
+namespace Frigate\Helpers;
 
-use Frigate\Tools\FileSystem\FilesHelper;
+class Archives {
 
-class ArchiveHelper {
+    public static function zipFile(
+        string $source, 
+        string $destination, 
+        array $exclude = [], 
+        $flag = ''
+    ) : bool {
 
-    public static function zipFile(string $source, string $destination, array $exclude = [], $flag = '') {
         if (!extension_loaded('zip') || !file_exists($source)) {
             return false;
         }
-
         $zip = new \ZipArchive();
         if (!$zip->open($destination, \ZIPARCHIVE::CREATE)) {
             return false;
         }
-
         $source = str_replace('\\', '/', realpath($source));
         if($flag)
         {
             $flag = basename($source) . '/';
             //$zip->addEmptyDir(basename($source) . '/');
         }
-
         if (is_dir($source) === true)
         {
             $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($source), \RecursiveIteratorIterator::SELF_FIRST);
@@ -44,7 +45,6 @@ class ArchiveHelper {
         {
             $zip->addFromString($flag.basename($source), file_get_contents($source));
         }
-
         return $zip->close();
     }
 }

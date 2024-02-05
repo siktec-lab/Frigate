@@ -6,8 +6,9 @@ namespace FrigateBin\App\Commands;
 
 use JCli\IO\Interactor;
 use Frigate\Cli\Commands\Command;
-use Frigate\Tools\Paths\PathHelpers as Path;
-use Frigate\Tools\MimeTypes\MimeTypesFileBuilder as MimeBuilder;
+use Frigate\Helpers\Paths;
+use Frigate\Helpers\MimeTypes;
+use Frigate\Helpers\MimeTypesFileBuilder as MimeBuilder;
 
 class UpdateMimesCommand extends Command
 {
@@ -60,7 +61,7 @@ class UpdateMimesCommand extends Command
         // Process the mime types file:
         $builder = new MimeBuilder();
         $builder->loadDefinition($mime_types);
-        $output = Path::join(__DIR__, "mime.types.php"); //TODO: should point to the frigate data directory
+        $output = MimeTypes::BUILT_IN_FILE;
         $saved = $builder->save($output);
 
         // If we failed return an error:
@@ -77,10 +78,10 @@ class UpdateMimesCommand extends Command
         $parsed = strlen($mime_types);
         $total_mimes = count($builder->getMapping()['mimes']);
         $template = <<<EOT
-        Finished updating mime types database:
-            - Generated: %s
-            - Total Parsed: %s
-            - Mime Types: %d
+        <greenBold>Finished updating mime types database:</end>
+            - <cyan>Generated:</end> <bold>%s</end>
+            - <cyan>Total Parsed:</end> <bold>%s</end>
+            - <cyan>Mime Types:</end> <bold>%d</end>
         EOT;
 
         // Return the response:

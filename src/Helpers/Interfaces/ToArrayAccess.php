@@ -1,6 +1,6 @@
 <?php
 
-namespace Frigate\Tools\Arrays;
+namespace Frigate\Helpers\Interfaces;
 
 interface ToArrayAccess
 {

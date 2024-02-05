@@ -1,16 +1,18 @@
 <?php 
 
-namespace Frigate\Tools\Hashing;
+declare(strict_types=1);
 
-use Firebase\JWT\JWT as FirebaseJWT;
-use Firebase\JWT\Key;
-use Frigate\Tools\Arrays\ArrayHelpers;
-use Firebase\JWT\SignatureInvalidException;
-use Firebase\JWT\BeforeValidException;
-use Firebase\JWT\ExpiredException;
+namespace Frigate\Helpers\Hashing;
+
 use DomainException;
 use InvalidArgumentException;
 use UnexpectedValueException;
+use Firebase\JWT\JWT as FirebaseJWT;
+use Firebase\JWT\Key;
+use Firebase\JWT\SignatureInvalidException;
+use Firebase\JWT\BeforeValidException;
+use Firebase\JWT\ExpiredException;
+use Frigate\Helpers\Arrays;
 
 // JWT wrapper class
 class JWT {
@@ -68,10 +70,9 @@ class JWT {
     // JWT validation error:
     private ?string $error = null;
 
-    // Constructor    
     /**
-     * __construct
      * Creates a new JWTWrapper object
+     *
      * @param  ?string $secret    JWT secret key (optional) null to use global value  will throw exception if no global value is set
      * @param  ?string $issuer    JWT issuer (optional) null to use global value or default value
      * @param  ?string $audience  JWT audience (optional) null to use global value or default value
@@ -79,7 +80,6 @@ class JWT {
      * @param  ?string $algorithm JWT algorithm (optional) null to use global value or default value
      * @param  ?int $expiration  JWT expiration time in seconds (optional) null to use global value or default value
      * @param  ?int $not_before  JWT not before time in seconds (optional) null to use global value or default value
-     * @return void
      */
     public function __construct(
         ?string $secret,
@@ -100,12 +100,12 @@ class JWT {
     }
     
     /**
-     * set_secret
      * Sets the JWT secret key
+     *
      * @param  ?string $secret JWT secret key
-     * @return void
      */
-    public function set_secret(?string $secret) : void {
+    public function set_secret(?string $secret) : void
+    {
         if (empty($secret) && empty(self::$global_secret)) {
             throw new \Exception("Secret key is required");
         }
@@ -116,12 +116,12 @@ class JWT {
     }
 
     /**  
-     * set_issuer
      * Sets the JWT issuer
+     *
      * @param  ?string $issuer JWT issuer null to use global value or default value
-     * @return void
      */
-    public function set_issuer(?string $issuer) : void {
+    public function set_issuer(?string $issuer) : void
+    {
         if (is_null($issuer)) {
             $issuer = self::$global_issuer ?? self::DEFAULT_ISSUER;
         }
@@ -129,12 +129,12 @@ class JWT {
     }
  
     /**
-     * set_audience
      * Sets the JWT audience
+     *
      * @param  ?string $audience JWT audience null to use global value or default value
-     * @return void
      */
-    public function set_audience(?string $audience) : void {
+    public function set_audience(?string $audience) : void
+    {
         if (is_null($audience)) {
             $audience = self::$global_audience ?? self::DEFAULT_AUDIENCE;
         }
@@ -142,12 +142,12 @@ class JWT {
     }
 
     /**
-     * set_subject
      * Sets the JWT subject
+     *
      * @param  ?string $subject JWT subject null to use global value or default value
-     * @return void
      */
-    public function set_subject(?string $subject) : void {
+    public function set_subject(?string $subject) : void
+    {
         if (is_null($subject)) {
             $subject = self::$global_subject ?? self::DEFAULT_SUBJECT;
         }
@@ -155,12 +155,12 @@ class JWT {
     }
 
     /**
-     * set_algorithm
-     * Sets the JWT algorithm must be one of the available algorithms 
+     * Sets the JWT algorithm must be one of the available algorithms
+     *
      * @param  ?string $algorithm JWT algorithm null to use global value or default value
-     * @return void
      */
-    public function set_algorithm(?string $algorithm) : void {
+    public function set_algorithm(?string $algorithm) : void
+    {
         if (is_null($algorithm)) {
             $algorithm = self::$global_algorithm ?? self::DEFAULT_ALGORITHM;
         } 
@@ -171,12 +171,12 @@ class JWT {
     }
 
     /**
-     * set_expiration
      * Sets the JWT expiration time in seconds greater than 0
+     *
      * @param  ?int $expiration JWT expiration time in seconds null to use global value or default value
-     * @return void
      */
-    public function set_expiration(?int $expiration) : void {
+    public function set_expiration(?int $expiration) : void
+    {
         if (is_null($expiration)) {
             $expiration = self::$global_expiration ?? self::DEFAULT_EXPIRATION;
         }
@@ -187,12 +187,12 @@ class JWT {
     }
 
     /**
-     * set_not_before
      * Sets the JWT not before time in seconds greater than 0
+     *
      * @param  ?int $not_before JWT not before time in seconds null to use global value or default value
-     * @return void
      */
-    public function set_not_before(?int $not_before) : void {
+    public function set_not_before(?int $not_before) : void
+    {
         if (is_null($not_before)) {
             $not_before = self::$global_not_before ?? self::DEFAULT_NOT_BEFORE;
         }
@@ -203,92 +203,86 @@ class JWT {
     }
 
     /**
-     * set_issued_at
      * Sets the JWT issued at time in seconds greater than 0
+     *
      * @param  ?int $issued_at JWT issued at time in seconds null to use current time
-     * @return void
      */
-    public function set_issued_at(?int $issued_at = null) : void {
+    public function set_issued_at(?int $issued_at = null) : void
+    {
         // If issued at time is not set, set it to current time
         if ($issued_at === null) {
             $issued_at = time();
         }
-
         // Check if issued at time is greater than 0
         if ($issued_at < 0) {
             throw new \Exception("Issued at time must be greater than 0");
         }
-
         // Set issued at time
         $this->issued_at = $issued_at;
     }
 
     /**
-     * set_data
      * Sets the JWT carried data as an array this will overwrite any existing data
+     *
      * @param  array $data JWT carried data
-     * @return void
      */
-    public function set_data(array $data) : void {
+    public function set_data(array $data) : void
+    {
         $this->data = $data;
     }
     
     /**
-     * add_to_data
      * Adds data to the JWT carried data
+     *
      * @param  string $key   Key of the data
      * @param  mixed $value Value of the data
-     * @return void
      */
-    public function add_to_data(string $key, mixed $value) : void {
+    public function add_to_data(string $key, mixed $value) : void
+    {
         $this->data[$key] = $value;
     }
     
     /**
-     * get_data
      * Gets the JWT carried data
+     *
      * @return array JWT carried data
      */
-    public function get_data() : array {
+    public function get_data() : array
+    {
         return $this->data;
     }
 
     /**
-     * get_token
      * Gets the JWT token
-     * @return ?string JWT token
      */
-    public function get_token() : ?string {
+    public function get_token() : ?string
+    {
         return $this->token;
     }
     
     /**
-     * get_expire_at
      * Gets the JWT expiration time in seconds since the Unix Epoch
-     * @return int
      */
-    public function get_expire_at() : int {
+    public function get_expire_at() : int
+    {
         return $this->issued_at + $this->expiration;
     }
+
     /**
      * generate_token
      */
-    public function generate_new_token(?array $data = null, ?int $issued_at = null) : string {
-
+    public function generate_new_token(?array $data = null, ?int $issued_at = null) : string
+    {
         // Reset token and error
         $this->token = null;
         $this->error = null;
-
         // Set issued at time
         $this->set_issued_at($issued_at);
-
         // Set data and generate token
         if ($data !== null) {
             $this->set_data($data);
         }
-
         $jti = bin2hex(random_bytes(16));
-
         // Generate token
         $token = [
             "iss"   => $this->issuer,
@@ -300,28 +294,21 @@ class JWT {
             "jti"   => $jti, 
             "data"  => $this->data
         ];
-
         $this->token = FirebaseJWT::encode($token, $this->secret, $this->algorithm);
 
         return $this->token;
-    
     }
 
     /**
-     * validate_token
      * Validates the JWT token
-     * @param  string $token JWT token
-     * @return bool
      */
-    public function validate_token(string $token) : bool {
-
+    public function validate_token(string $token) : bool
+    {
         // Reset error
         $this->error = null;
-
         try {
             $key = new Key($this->secret, $this->algorithm);
             $data = FirebaseJWT::decode($token, $key);
-
             // Populate JWT object:
             $this->issuer = $data->iss ?? "";
             $this->audience = $data->aud ?? "";
@@ -330,10 +317,8 @@ class JWT {
             $this->expiration = $data->exp - $data->iat;
             $this->not_before = $data->iat - $data->nbf;
             $this->token = $token;
-
             // Populate data:
-            $this->set_data(ArrayHelpers::to_array($data->data));
-
+            $this->set_data(Arrays::to_array($data->data));
             // Return true
             return true;
 
@@ -372,21 +357,25 @@ class JWT {
         return false;
     }
 
-    public function get_error() : ?string {
+    /**
+     * Gets the JWT validation error
+     */
+    public function get_error() : ?string
+    {
         return $this->error;
     }
+
     /**
-     * extend_token
-     * Extends the JWT token expiration time by the given time in seconds or adds the given time to the current expiration time
+     * Extends the JWT token expiration time by the given time in seconds or adds the 
+     * given time to the current expiration time
+     *
      * @param  int $time JWT token expiration time in seconds
      * @param  bool $add_to_current_time If true, adds the given time to the current expiration time
-     * @return string JWT token
      */
-    public function extend_token(?int $time = null, bool $add_to_current_time = false) : string {
-
+    public function extend_token(?int $time = null, bool $add_to_current_time = false) : string
+    {
         // Get current expiration time
         $current_expiration_time = $this->data["exp"];
-
         // If time is not set, set it to the default expiration time
         if ($time === null) {
             $time = $this->expiration;
@@ -395,12 +384,9 @@ class JWT {
         if ($add_to_current_time) {
             $current_expiration_time += $time;
         }
-
         // Set new expiration time
         $this->set_expiration($current_expiration_time - $this->issued_at);
-
         // Generate new token
         return $this->generate_new_token();
     }
-
 }

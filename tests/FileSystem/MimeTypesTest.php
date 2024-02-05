@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace Frigate\Tests\FileSystem;
 
 use PHPUnit\Framework\TestCase;
-use Frigate\Tools\MimeTypes\MimeHelper;
+use Frigate\Helpers\MimeTypes;
 
 class MimeTypesTest extends TestCase
 {
 
-    protected MimeHelper $mime;
+    protected MimeTypes $mime;
 
     protected function setUp() : void
     {
-        $this->mime = new MimeHelper(
+        $this->mime = new MimeTypes(
             mimes : [
                 'json'  => ['application/json'],
                 'jpeg'  => ['image/jpeg'],
@@ -127,7 +127,7 @@ class MimeTypesTest extends TestCase
 
     public function testBuiltInMapping()
     {
-        $mime = new MimeHelper();
+        $mime = new MimeTypes();
         $this->assertEquals('json', $mime->getExtensionOf('application/json'));
         $this->assertEquals('application/json', $mime->getMimeTypeOf('json'));
 

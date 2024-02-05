@@ -1,10 +1,13 @@
 <?php
 
-namespace Frigate\Tools\Intl;
+declare(strict_types=1);
 
+namespace Frigate\Helpers;
 
-class Currency {
+use NumberFormatter;
 
+class Currencies 
+{
     public const SYMBOLS = [
         'USD' => '$',  // US Dollar
     	'EUR' => '€',  // Euro
@@ -16,7 +19,7 @@ class Currency {
 	    'INR' => '₹',  // Indian Rupee
 	    'JPY' => '¥',  // Japanese Yen
         'CNY' => '¥',  // Chinese Yuan   
-        'HKD' => '$',  // Hong Kong Dollar 
+        'HKD' => '$',  // Hong Kong Dollar
         'SGD' => '$',  // Singapore Dollar
         'NZD' => '$',  // New Zealand Dollar
         'SEK' => 'kr',  // Swedish Krona
@@ -38,21 +41,29 @@ class Currency {
         'USDT'=> '₮',  // Tether
     ];
     
-    public static function has_symbol(string $cur_iso) : bool {
+    /**
+     * checks if a currency has a symbol
+     */
+    public static function has_symbol(string $cur_iso) : bool
+    {
         return array_key_exists(strtoupper($cur_iso), self::SYMBOLS);
     }
 
-    public static function get_symbol(string $cur_iso) : string {
+    /**
+     * gets the currency symbol
+     */
+    public static function get_symbol(string $cur_iso) : string
+    {
         $cur_iso = strtoupper($cur_iso);
-        return self::has_symbol($cur_iso) 
-        ? self::SYMBOLS[$cur_iso]
-                : $cur_iso;
+        return self::has_symbol($cur_iso) ? self::SYMBOLS[$cur_iso] : $cur_iso;
 	}
 
-    public static function format(float $value, string $cur_iso = "USD") : string {
-        $formatter = new \NumberFormatter("en_US", \NumberFormatter::CURRENCY);
+    /**
+     * formats a currency value to local currency
+     */
+    public static function format(float $value, string $cur_iso = "USD", string $locale = "en_US") : string
+    {
+        $formatter = new NumberFormatter($locale, NumberFormatter::CURRENCY);
         return $formatter->formatCurrency($value, strtoupper($cur_iso));
     }
-
-
 }

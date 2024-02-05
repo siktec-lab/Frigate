@@ -2,15 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Frigate\Tools\MimeTypes;
+namespace Frigate\Helpers;
 
 /**
  * A dictionary of MIME types and their associated file extensions.
  */
-class MimeHelper
+class MimeTypes
 {
-
-    private const BUILT_IN_FILE = __DIR__ . '/mime.types.php';
+    public const BUILT_IN_FILE = __DIR__ . '/mime.types.php';
 
 	/** The cached built-in mapping array. */
 	private static array $built_in = [];
@@ -54,7 +53,6 @@ class MimeHelper
 		}
     }
         
-
 	/**
 	 * Get the MIME type of the given file extension.
 	 */

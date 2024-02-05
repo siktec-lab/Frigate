@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Frigate\Tools\Strings;
+namespace Frigate\Helpers;
 
-class StringHelpers {
+class Strings {
     
     /** Regex patterns */
     public static $regex = [

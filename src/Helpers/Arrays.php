@@ -1,8 +1,10 @@
 <?php
 
-namespace Frigate\Tools\Arrays;
+declare(strict_types=1);
 
-class ArrayHelpers {
+namespace Frigate\Helpers;
+
+class Arrays {
     
     /**
      * is_associative_array
@@ -10,7 +12,8 @@ class ArrayHelpers {
      * @param  mixed $arr array to check
      * @return bool true if associative, false if not
      */
-    public static function is_associative_array(mixed $arr) : bool {
+    public static function is_associative_array(mixed $arr) : bool 
+    {
         return array_keys($arr) !== range(0, count($arr) - 1);
     }
         
@@ -22,7 +25,8 @@ class ArrayHelpers {
      * @return array array if successful, otherwise an empty array
      * @throws \Exception if $empty_on_error is false and the value cannot be converted to an array
      */
-    public static function to_array(mixed $value, bool $empty_on_error = true) : array {
+    public static function to_array(mixed $value, bool $empty_on_error = true) : array 
+    {
         // If the value is already an array, return it
         if (is_array($value)) {
             return $value;
@@ -58,7 +62,8 @@ class ArrayHelpers {
      * @param  mixed $obj stdClass object or array of stdClass objects
      * @return mixed array if successful, otherwise the value passed in
      */
-    public static function stdClass_to_array(mixed $obj) : mixed {
+    public static function stdClass_to_array(mixed $obj) : mixed 
+    {
         if (is_object($obj)) {
             $obj = get_object_vars($obj);
         }

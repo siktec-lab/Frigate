@@ -1,20 +1,27 @@
 <?php
-namespace Frigate\Tools\Hashing;
 
+declare(strict_types=1);
 
-/*
-// Usage
-// Named-based UUID.
+namespace Frigate\Helpers\Hashing;
 
-$v3uuid = UUID::v3('1546058f-5a25-4334-85ae-e68f2a44bbaf', 'SomeRandomString');
-$v5uuid = UUID::v5('1546058f-5a25-4334-85ae-e68f2a44bbaf', 'SomeRandomString');
-
-// Pseudo-random UUID
-
-$v4uuid = UUID::v4();
-*/
-
-class UUID {
+/**
+ * UUID
+ * 
+ * A simple UUID generator.
+ * 
+ * Usage:
+ * 
+ * Named-based UUID.
+ * 
+ * $v3uuid = UUID::v3('1546058f-5a25-4334-85ae-e68f2a44bbaf', 'SomeRandomString');
+ * $v5uuid = UUID::v5('1546058f-5a25-4334-85ae-e68f2a44bbaf', 'SomeRandomString');
+ * 
+ * Pseudo-random UUID
+ * 
+ * $v4uuid = UUID::v4();
+ */
+class UUID 
+{
 
   public static function v3($namespace, $name) {
     if(!self::is_valid($namespace)) return false;

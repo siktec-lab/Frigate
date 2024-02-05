@@ -2,36 +2,42 @@
 
 namespace Frigate\Routing\Files;
 
-use Frigate\Tools\Hashing;
-use Frigate\Tools\Arrays\ArrayHelpers;
-use Frigate\Tools\FileSystem\DirectoryHelper;
-use Frigate\Tools\FileSystem\FilesHelper;
+use Directory;
+use Frigate\Helpers\Hashing;
+use Frigate\Helpers\Arrays;
+use Frigate\Helpers\Directories;
+use Frigate\Helpers\Files;
 
-class Upload {
-
+class Upload 
+{
     private string $id;
     private $file = null;
     private array $chunks = [];
     private array $variants = [];
     private array $metadata = [];
     
-    public function __construct(?string $id = null) {
+    public function __construct(?string $id = null)
+    {
         $this->id = $id ?? Hashing\UUID::v4();
     }
 
-    public function get_id() : ?string {
+    public function get_id() : ?string
+    {
         return $this->id;
     }
 
-    public function get_metadata() : array {
+    public function get_metadata() : array
+    {
         return $this->metadata;
     }
 
-    public function get_chunks() : array {
+    public function get_chunks() : array
+    {
         return $this->chunks;
     }
 
-    public function get_files($mutator = null) {
+    public function get_files(mixed $mutator = null) : mixed
+    {
         if ($this->file === null) 
             return null;
         $files = array_merge(isset($this->file) ? [$this->file] : [], $this->variants);
@@ -39,20 +45,15 @@ class Upload {
     }
         
     /**
-     * restore
      * restore a transfer from a serialized state
-     * 
-     * @param  mixed $file
-     * @param  array $variants
-     * @param  array $chunks
-     * @param  array $metadata
-     * @return void
      */
-    public function restore($file, array $variants = [], array $chunks = [], array $metadata = []) : void {
+    public function restore($file, array $variants = [], array $chunks = [], array $metadata = []) : void
+    {
         $this->file     = $file;
         $this->variants = $variants;
         $this->chunks   = $chunks;
         $this->metadata = $metadata;
+        //TODO: What is THIS????????????????????
     }
     
     /**
@@ -61,28 +62,26 @@ class Upload {
      * @param  string $entry -> the files array key name (e.g. 'files')
      * @return void
      */
-    public function populate(string $entry) : void {
-
+    public function populate(string $entry) : void
+    {
         $files = isset($_FILES[$entry]) ? $this->to_array_of_files($_FILES[$entry]) : null;
-        $metadata = isset($_POST[$entry]) ? ArrayHelpers::to_array($_POST[$entry]) : [];
-
+        $metadata = isset($_POST[$entry]) ? Arrays::to_array($_POST[$entry]) : [];
         // parse metadata
         if (count($metadata)) {
             $this->metadata = @json_decode($metadata[0], true);
         }
-
         // no files
-        if ($files === null) 
+        if ($files === null) {
             return;
-
+        }
         // files should always be available, first file is always the main file
         $this->file = $files[0];
-        
         // if variants submitted, set to variants array
         $this->variants = array_slice($files, 1);
     }
 
-    private function to_array_of_files($value) : array {
+    private function to_array_of_files($value) : array
+    {
         if (is_array($value['tmp_name'])) {
             $results = [];
             foreach($value['tmp_name'] as $index => $tmpName ) {
@@ -97,28 +96,25 @@ class Upload {
             }
             return $results;
         }
-        return ArrayHelpers::to_array($value);
+        return Arrays::to_array($value);
     }
     
     /**
-     * store_in_temp
-     *
-     * @param  string $temp_folder
-     * @return array [boolean, message]
+     * store a file in a temp folder
+     * @return array{bool,string} returns a tuple with a boolean and a string
      */
-    public function store_in_temp(string $temp_folder) : array {
+    public function store_in_temp(string $temp_folder) : array
+    {
         $file_temp_folder = $temp_folder . '/' . $this->id;
-
         //Create temp folder:
-        $create_folder = DirectoryHelper::create_secure_directory($file_temp_folder, 0755, true);
+        $create_folder = Directories::createSecureDirectory($file_temp_folder, 0755, true);
         if (!$create_folder) {
             return [false, "Could not create temp folder"];
         }
-
         //Write meta data file to temp folder:
         $meta_data_file = $file_temp_folder . '/meta.json';
         $meta_data = json_encode($this->get_metadata());
-        FilesHelper::writeFile($meta_data_file, $meta_data);
+        Files::writeFile($meta_data_file, $meta_data);
         
         $files = $this->get_files();
         //If its a chunked upload, stop here:
@@ -134,7 +130,7 @@ class Upload {
         if (count($files) > 1) {
             $files = array_slice($files, 1);
             $variants_folder = $file_temp_folder . DIRECTORY_SEPARATOR . "variants";
-            $create_folder = DirectoryHelper::create_secure_directory($variants_folder, 0755, true);
+            $create_folder = Directories::createSecureDirectory($variants_folder, 0755, true);
             foreach($files as $file) {
                 self::move_file($file, $variants_folder);
             }
@@ -142,8 +138,12 @@ class Upload {
         return [true, "Uploaded to temp folder"];
     }
 
-    public static function head_temp_file(string $temp_folder, null|string $key) {
-        
+    /**
+     * store a file in a temp folder
+     * @return array{bool,string} returns a tuple with a boolean and a string
+     */
+    public static function head_temp_file(string $temp_folder, ?string $key) : array
+    {
         $file_temp_folder = $temp_folder . '/' . $key;
 
         if (!Hashing\UUID::is_valid($key ?? "")) {
@@ -175,8 +175,8 @@ class Upload {
         }
 
         return [true, $last_offset];
-
     }
+
     public static function patch_temp_file(
         string $temp_folder,
         null|string|int $offset, 
@@ -188,14 +188,16 @@ class Upload {
         // should be numeric values, else exit and required name + key
         $name = self::sanitize_filename($name);
         $file_temp_folder = $temp_folder . '/' . $key;
-
         if (
             !is_numeric($offset) || 
             !is_numeric($length) || 
             empty($name) || 
             !Hashing\UUID::is_valid($key ?? "")
         ) {
-            return [false, "missing or invalid headers - offset: $offset, length: $length, name: $name, key: $key"];
+            return [
+                false, 
+                "missing or invalid headers - offset: $offset, length: $length, name: $name, key: $key"
+            ];
         }
 
         // check if directory still exists:
@@ -246,27 +248,27 @@ class Upload {
         return [true, "done"];
     }
 
-
-
-    public static function delete_temp_file(string $temp_folder, string $key) : array {
-
+    public static function delete_temp_file(string $temp_folder, string $key) : array
+    {
         if (!Hashing\UUID::is_valid($key)) {
             return [false, "invalid key"];
         }
-
         $file_temp_folder = $temp_folder . '/' . $key;
-        DirectoryHelper::remove_directory($file_temp_folder.'/variants');
-        DirectoryHelper::remove_directory($file_temp_folder);
+        Directories::removeDirectory($file_temp_folder.'/variants');
+        Directories::removeDirectory($file_temp_folder);
         return [ true, "temp file deleted" ];
     }
 
-
-    public static function save_file_key(string $key, string $name, string $temp_folder, string $storage_folder) : array {
+    public static function save_file_key(
+        string $key, 
+        string $name, 
+        string $temp_folder, 
+        string $storage_folder
+    ) : array {
         $key = trim($key);
         $name = self::sanitize_filename($name);
         $temp_file_folder = $temp_folder . '/' . $key;
         $temp_file        = $temp_file_folder.'/'.$name;
-
         $return  = [
             "success"   => false,
             "message"   => "Could not save file",
@@ -275,45 +277,42 @@ class Upload {
             "mime_type" => null,
             "file_size" => null
         ];
-
         //check if key is valid:
         if (!Hashing\UUID::is_valid($key)) {
             $return["message"] = "Invalid key";
             return $return;
         }
-
         //check if temp folder exists:
-        if (!is_dir($temp_file_folder) || !is_file($temp_file) || !is_dir($storage_folder) ) {
+        if (!is_dir($temp_file_folder) || !is_file($temp_file) || !is_dir($storage_folder)) {
             $return["message"] = "Temp file or folder does not exist";
             return $return;
         }
-
         //set data: 
         $return["mime_type"] = mime_content_type($temp_file) ?: "application/octet-stream";
         $return["file_size"] = filesize($temp_file);
-
         //rename:
         $info = pathinfo($temp_file);
         $key_name = $key.'.'.$info['extension'];
-
         //Move file to storage folder:
         $storage_file = $storage_folder.'/'.$key_name;
         $return["file_path"] = $storage_file;
         if (!rename($temp_file, $storage_file)) {
             return $return;
         }
-        
         $return["success"] = true;
         $return["message"] = "File saved";
-
         //remove temp folder:
         self::delete_temp_file($temp_folder, $key);
 
         return $return;
     }
 
-    public static function move_temp_file($file, $path) {
-        move_uploaded_file($file['tmp_name'], $path . DIRECTORY_SEPARATOR . self::sanitize_filename($file['name']));
+    public static function move_temp_file(string $file, string $path) : bool
+    {
+        return move_uploaded_file(
+            $file['tmp_name'], 
+            $path . DIRECTORY_SEPARATOR . self::sanitize_filename($file['name'])
+        );
     }
     
     public static function move_file($file, $path) {

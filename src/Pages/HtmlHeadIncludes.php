@@ -2,11 +2,11 @@
 
 namespace Frigate\Pages;
 
-use Frigate\Tools\Arrays;
+use Frigate\Helpers;
 
-class HtmlHeadIncludes implements Arrays\ToArrayAccess {
+class HtmlHeadIncludes implements Helpers\Interfaces\ToArrayAccess {
     
-    use Arrays\toArrayTrait;
+    use Helpers\Traits\toArrayTrait;
 
     public array $scripts   = [];
     public array $links     = [];

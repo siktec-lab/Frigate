@@ -21,7 +21,6 @@ class InfoCommand extends Command
         parent::__construct($this, $cwd, $as_json);
 
         $this->usage(
-            // append details or explanation of given example with ` ## ` so they will be uniformly aligned when shown
             sprintf('<bold> %s</end><eol/>', self::COMMAND)
         );
     }

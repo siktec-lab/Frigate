@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Frigate\Tools\FileSystem;
+namespace Frigate\Helpers;
 
 use SplFileObject;
 
-class FilesHelper {
-
+class Files 
+{
     /**
      * create a file object in a specific mode
      * if an error occurs, null is returned

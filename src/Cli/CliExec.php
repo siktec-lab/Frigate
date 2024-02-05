@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Frigate\Cli;
 
-use Frigate\Tools\Json\JsonHelpers as Json;
+use Frigate\Helpers\Json;
 
 class CliExec {
 

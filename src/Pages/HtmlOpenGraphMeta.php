@@ -2,12 +2,12 @@
 
 namespace Frigate\Pages;
 
-use Frigate\Tools\Arrays;
+use Frigate\Helpers;
 
-class HtmlOpenGraphMeta implements Arrays\ToArrayAccess {
+class HtmlOpenGraphMeta implements Helpers\Interfaces\ToArrayAccess {
 
     /**
-     * @return array
+     * Convert the object to an array
      */
     public function to_array(string $prefix = "og:") : array {
         $values = [];

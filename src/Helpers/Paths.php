@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Frigate\Tools\Paths;
+namespace Frigate\Helpers;
 
-class PathHelpers {
+class Paths {
     
     /**
      * implodes an array to os based path

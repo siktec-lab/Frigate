@@ -45,7 +45,7 @@ require_once $_composer_autoload_path;
 // Frigate CLI
 //------------------------------------------------------------
 use Frigate\Cli\CliApp;
-use Frigate\Tools\Paths\PathHelpers as Path;
+use Frigate\Helpers\Paths;
 
 // Create the CLI application:
 $frigate_cli = new CliApp(
@@ -56,7 +56,7 @@ $frigate_cli = new CliApp(
 // Add commands:
 $loaded = $frigate_cli->autoLoadCommands(
     namespace: "FrigateBin\\App\\Commands", 
-    folder: Path::join($source, "bin", "App", "Commands")
+    folder: Paths::join($source, "bin", "App", "Commands")
 );
 
 // Handle the CLI automatically:

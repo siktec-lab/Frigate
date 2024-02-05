@@ -8,7 +8,6 @@ use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
 use JCli\Application;
 use JCli\Input\Command as CliCommand;
-use Frigate\Tools\Paths\PathHelpers as Path;
 
 class CliApp {
 

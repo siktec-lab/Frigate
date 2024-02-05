@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Frigate\Tools\Json;
+namespace Frigate\Helpers;
 
-use Frigate\Tools\Strings\StringHelpers as Str;
+use Frigate\Helpers\Strings;
 
-class JsonHelpers {
+class Json 
+{
     
     /**
      * validates a json string by safely parsing it
@@ -38,7 +39,7 @@ class JsonHelpers {
         bool $assoc      = true
     ) : mixed {
         $json = trim(
-            Str::stripComments($jsonc), 
+            Strings::stripComments($jsonc), 
             $remove_bom ? "\xEF\xBB\xBF \t\n\r\0\x0B" : " \t\n\r\0\x0B"
         );
         return json_decode($json, $assoc) ?? $onerror;

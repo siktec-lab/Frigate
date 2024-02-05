@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Frigate\Tools\MimeTypes;
+namespace Frigate\Helpers;
 
-use Frigate\Tools\FileSystem\FilesHelper as File;
+use Frigate\Helpers\Files;
 
 /**
  * A dictionary of MIME types and their associated file extensions.
@@ -90,7 +90,7 @@ class MimeTypesFileBuilder
 	 */
 	public function save(string $path) : bool
 	{
-		return File::writeFile($path, $this->compile());
+		return Files::writeFile($path, $this->compile());
 	}
 
 	/**
