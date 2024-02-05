@@ -6,7 +6,6 @@ namespace FrigateBin\App\Commands;
 
 use JCli\IO\Interactor;
 use Frigate\Cli\Commands\Command;
-use Frigate\Helpers\Paths;
 use Frigate\Helpers\MimeTypes;
 use Frigate\Helpers\MimeTypesFileBuilder as MimeBuilder;
 
@@ -20,6 +19,9 @@ class UpdateMimesCommand extends Command
 
     private const MIME_TYPES_URL = "https://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types";
 
+    /**
+     * UpdateMimesCommand constructor
+     */
     public function __construct(
         string $cwd      = null,
         bool   $as_json  = false
@@ -32,26 +34,27 @@ class UpdateMimesCommand extends Command
         );
     }
 
-    // This method is auto called before `self::execute()`
+    /**
+     * Before execute validate the command
+     */
     public function interact(Interactor $io) : void
     {
         parent::interact($io);
     }
 
-    // When app->handle() locates `init` command it automatically calls `execute()`
+    /**
+     * Execute the command
+     */
     public function execute() : int
     {
-        /** @var Interactor $io */
-        $io = $this->app()->io();
 
         // Download a file from the svn apache server
-        $io->info("Downloading file from the internet", true);
+        $this->jsonIo()?->info("Downloading file from the internet", true);
         $mime_types = file_get_contents(self::MIME_TYPES_URL);
 
         // Error on remote file download failure:
         if ($mime_types === false) {
             return $this->responseError(
-                io: $io,
                 message: "Failed to download mime.types file from apache svn",
                 args: [],
                 data: []
@@ -67,7 +70,6 @@ class UpdateMimesCommand extends Command
         // If we failed return an error:
         if (!$saved) {
             return $this->responseError(
-                io: $io,
                 message: "Failed to save mime.types.php file to disk",
                 args: [],
                 data: []
@@ -86,7 +88,6 @@ class UpdateMimesCommand extends Command
 
         // Return the response:
         return $this->responseColorized(
-            io: $io,
             message: $template,
             args: [ $output, $parsed, $total_mimes ],
             data: [

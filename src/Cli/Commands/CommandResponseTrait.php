@@ -27,9 +27,6 @@ trait CommandResponseTrait
     /** default exit code */
     const DEFAULT_EXIT_CODE = 3;
 
-    /** force json response */
-    public bool $force_json = false;
-
     /**
      * get the response code for the status
      */
@@ -66,7 +63,7 @@ trait CommandResponseTrait
         if ($this->force_json) {
             return json_encode([
                 'status'    => $status,
-                'message'   => $this->removeColorCodes($message),
+                'message'   => $this->flattenAndCleanMessage($message),
                 'data'      => $data
             ]);
         }
@@ -76,23 +73,25 @@ trait CommandResponseTrait
     /**
      * response error message
      *
-     * @param  Interactor $io the interactor
      * @param  string $message the message to display can contain placeholders
      * @param  array $args the arguments to pass to the message placeholders
      * @param  array $data the data to add to the response (json only)
      * @param  bool $new_line - add a new line after the message
+     * @param  ?Interactor $io the interactor
      * @param  bool $exit - exit the script
      * @param  int $exit_code - the exit code to use default is -1 which is automatic
      */
     public function responseError(
-        Interactor $io, 
         string $message, 
         array $args = [],
         array $data = [], 
         bool $new_line = true, 
+        ?Interactor $io = null,
         bool $exit = false,
         int $exit_code = -1 
     ) : int {
+
+        $io = $io ?? $this->io();
 
         $respose = $this->prepareResponse($message, $args, $data, self::JSON_STATUS_ERROR);
 
@@ -104,23 +103,25 @@ trait CommandResponseTrait
     /**
      * response success message
      *
-     * @param  Interactor $io the interactor
      * @param  string $message the message to display can contain placeholders
      * @param  array $args the arguments to pass to the message placeholders
      * @param  array $data the data to add to the response (json only)
      * @param  bool $new_line - add a new line after the message
+     * @param  ?Interactor $io the interactor
      * @param  bool $exit - exit the script
      * @param  int $exit_code - the exit code to use default is -1 which is automatic
      */
     public function responseSuccess(
-        Interactor $io, 
         string $message, 
         array $args = [],
         array $data = [], 
         bool $new_line = true, 
+        ?Interactor $io = null, 
         bool $exit = false,
         int $exit_code = -1 
     ) : int {
+
+        $io = $io ?? $this->io();
 
         $respose = $this->prepareResponse($message, $args, $data, self::JSON_STATUS_DONE);
 
@@ -132,23 +133,25 @@ trait CommandResponseTrait
     /**
      * response warning message
      *
-     * @param  Interactor $io the interactor
      * @param  string $message the message to display can contain placeholders
      * @param  array $args the arguments to pass to the message placeholders
      * @param  array $data the data to add to the response (json only)
      * @param  bool $new_line - add a new line after the message
+     * @param  ?Interactor $io the interactor
      * @param  bool $exit - exit the script
      * @param  int $exit_code - the exit code to use default is -1 which is automatic
      */
     public function responseWarning(
-        Interactor $io, 
         string $message, 
         array $args = [],
         array $data = [], 
         bool $new_line = true, 
+        ?Interactor $io = null, 
         bool $exit = false,
         int $exit_code = -1 
     ) : int {
+
+        $io = $io ?? $this->io();
 
         // Prepare response:
         $respose = $this->prepareResponse($message, $args, $data, self::JSON_STATUS_WARNING);
@@ -163,23 +166,25 @@ trait CommandResponseTrait
     /**
      * response warning message
      *
-     * @param  Interactor $io the interactor
      * @param  string $message the message to display can contain placeholders
      * @param  array $args the arguments to pass to the message placeholders
      * @param  array $data the data to add to the response (json only)
      * @param  bool $new_line - add a new line after the message
+     * @param  ?Interactor $io the interactor
      * @param  bool $exit - exit the script
      * @param  int $exit_code - the exit code to use default is -1 which is automatic
      */
     public function responseInfo(
-        Interactor $io, 
         string $message, 
         array $args = [],
         array $data = [], 
         bool $new_line = true, 
+        ?Interactor $io = null, 
         bool $exit = false,
         int $exit_code = -1 
     ) : int {
+
+        $io = $io ?? $this->io();
 
         $respose = $this->prepareResponse($message, $args, $data, self::JSON_STATUS_INFO);
 
@@ -191,23 +196,25 @@ trait CommandResponseTrait
     /**
      * response warning message
      *
-     * @param  Interactor $io the interactor
      * @param  string $message the message to display can contain placeholders
      * @param  array $args the arguments to pass to the message placeholders
      * @param  array $data the data to add to the response (json only)
      * @param  bool $new_line - add a new line after the message
+     * @param  ?Interactor $io the interactor
      * @param  bool $exit - exit the script
      * @param  int $exit_code - the exit code to use default is -1 which is automatic
      */
     public function responseAbort(
-        Interactor $io, 
         string $message, 
         array $args = [],
         array $data = [], 
         bool $new_line = true, 
+        ?Interactor $io = null, 
         bool $exit = false,
         int $exit_code = -1 
     ) : int {
+
+        $io = $io ?? $this->io();
 
         $respose = $this->prepareResponse($message, $args, $data, self::JSON_STATUS_ABORT);
 
@@ -219,26 +226,28 @@ trait CommandResponseTrait
     /**
      * response colorized message
      *
-     * @param  Interactor $io the interactor
      * @param  string $message the message to display can contain placeholders and color tags
      * @param  array $args the arguments to pass to the message placeholders
      * @param  array $data the data to add to the response (json only)
      * @param  string $status the status of the response (json only) - done, error, warning, abort, info
      * @param  bool $new_line - add a new line after the message
+     * @param  ?Interactor $io the interactor
      * @param  bool $exit - exit the script
      * @param  int $exit_code - the exit code to use default is -1 which is automatic
      */
     public function responseColorized(
-        Interactor $io, 
         string $message, 
         array $args = [],
         array $data = [], 
         string $status = "done",
         bool $new_line = true, 
+        ?Interactor $io = null, 
         bool $exit = false,
         int $exit_code = -1
     ) : int {
 
+        $io = $io ?? $this->io();
+        
         $respose = $this->prepareResponse($message, $args, $data, $status);
 
         $io->colors($respose, $new_line);
@@ -249,8 +258,16 @@ trait CommandResponseTrait
     /**
      * remove color codes from a string
      */
-    private function removeColorCodes(string $message) : string
+    private function flattenAndCleanMessage(string $message) : string
     {
-        return preg_replace("/\x1b\[[0-9;]*m/", "", $message);
+        return preg_replace(
+            [
+                "/\x1b\[[0-9;]*m/", // Remove color codes
+                "/\s+/",            // Replace any spaces with a single space even repeated ones
+                "/[\x00-\x1F\x7F]/",  // Remove control characters e.g. \r \t etc.
+                "/<[^>]*>/"        // Remove color tags - e.g. <red> <green> </end> </eol> etc.
+            ], 
+            [ "", "", "", "" ],
+        $message);
     }
 }
