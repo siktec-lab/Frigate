@@ -13,9 +13,8 @@ ini_set('memory_limit', '128M');
 //------------------------------------------------------------
 // Composer autoload + constants
 //------------------------------------------------------------
-const DS = DIRECTORY_SEPARATOR;
 $cwd  = getcwd() ?: __DIR__;
-$source = realpath(__DIR__ . DS . "..");
+$source = realpath(__DIR__ . DIRECTORY_SEPARATOR . "..");
 // Composer autoload
 if (!isset($_composer_autoload_path)) {
     // Main Project:
@@ -34,6 +33,7 @@ if (!isset($_composer_autoload_path)) {
     }
 }
 // Define the constants:
+define("DS", DIRECTORY_SEPARATOR);
 define("CLI_VENDOR_BIN", $_composer_bin_dir);
 define("FRIGATE_SOURCE", $source);
 define("CLI_CWD", $cwd);
