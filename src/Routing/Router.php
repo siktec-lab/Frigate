@@ -273,8 +273,8 @@ class Router {
         $request = new self::$use_request();
         $request->initFromServerArray($server_arr);
         $request->setBody($body);
-        $request->setPostData($post);
         $request->setBaseUrl($base);
+        $request->setPostData($post);
 
         return $request;
     } 

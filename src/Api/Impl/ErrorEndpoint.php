@@ -1,5 +1,13 @@
 <?php 
 
+declare(strict_types=1);
+
+namespace Frigate\Api\Impl;
+
+use Frigate\Api\EndPoint;
+use Frigate\Routing\Http\RequestInterface;
+use Frigate\Routing\Http\ResponseInterface;
+
 /**
  * ErrorEndPoint
  * this endpoint class implementation is used to handle errors
@@ -8,21 +16,18 @@
  * use this class to handle errors in your application - if you want you can use it as a template
  * to create your own error handling endpoint.
  */
-
-declare(strict_types=1);
-
-namespace Frigate\Api;
-
-use Frigate\Routing\Http;
-
 class ErrorEndPoint extends EndPoint { 
 
-    public function __construct(bool $debug = false, $auth = false, $auth_method = "basic")
+    public function __construct(bool $debug = false)
     {
-        parent::__construct($debug, $auth, $auth_method);
+        parent::__construct($debug);
     }
 
-    public function call(array $context, Http\RequestInterface $request) : Http\Response {
+    public function call(
+        array $context, 
+        RequestInterface $request, 
+        ResponseInterface $response
+    ) : ResponseInterface {
 
         //Check what is the expected data to be returned?
         $return_type = $request->expects;
@@ -88,11 +93,10 @@ class ErrorEndPoint extends EndPoint {
                 break;
         }
 
-        $response = new Http\Response(
-            status      : $json ? $code : 200,
-            headers     : [ "Content-Type" => $return_type ],
-            body        : $body
-        );
+        // Set the response:
+        $response->setHeader("Content-Type", $return_type);
+        $response->setStatus($code);
+        $response->setBody($body);
 
         return $response;
     }

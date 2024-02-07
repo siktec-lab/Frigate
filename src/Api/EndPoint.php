@@ -4,7 +4,7 @@ namespace Frigate\Api;
      
 use Frigate\FrigateApp;
 use Frigate\Routing\Http\RequestInterface;
-use Frigate\Routing\Http\Response;
+use Frigate\Routing\Http\ResponseInterface;
 
 abstract class EndPoint implements EndPointInterface 
 { 
@@ -33,6 +33,9 @@ abstract class EndPoint implements EndPointInterface
      * Call the endpoint.
      * The actual implementation of the endpoint logic.
      */
-    abstract public function call(array $context, RequestInterface $request, Response $response) : Response;
-
+    abstract public function call(
+        array $context, 
+        RequestInterface $request, 
+        ResponseInterface $response
+    ) : ResponseInterface;
 }

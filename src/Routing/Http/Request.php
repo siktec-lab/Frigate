@@ -21,6 +21,25 @@ class Request extends Message implements RequestInterface {
     protected string $url;
 
     /**
+     * Base url.
+     */
+    protected string $baseUrl = '/';
+
+    /**
+     * Equivalent of PHP's $_POST.
+     *
+     * @var array<string, string>
+     */
+    protected array $postData = [];
+
+    /**
+     * An array containing the raw _SERVER array.
+     *
+     * @var array<string, string>
+     */
+    protected array $rawServerData;
+
+    /**
      * Creates the request object.
      *
      * @param array<string, string>         $headers
@@ -55,9 +74,10 @@ class Request extends Message implements RequestInterface {
      * Sets the HTTP method.
      * @throws \InvalidArgumentException if the method is not a valid HTTP method.
      */
-    public function setMethod(string|Methods $method) : void
+    public function setMethod(string|Methods $method) : self
     {
         $this->method = is_string($method) ? Methods::fromString($method) : $method;
+        return $this;
     }
 
     /**
@@ -71,9 +91,10 @@ class Request extends Message implements RequestInterface {
     /**
      * Sets the request url.
      */
-    public function setUrl(string $url) : void
+    public function setUrl(string $url) : self
     {
         $this->url = $url;
+        return $this;
     }
 
     /**
@@ -100,9 +121,10 @@ class Request extends Message implements RequestInterface {
     /**
      * Sets the absolute url.
      */
-    public function setAbsoluteUrl(string $url) : void
+    public function setAbsoluteUrl(string $url) : self
     {
         $this->absoluteUrl = $url;
+        return $this;
     }
 
     /**
@@ -121,18 +143,14 @@ class Request extends Message implements RequestInterface {
     }
 
     /**
-     * Base url.
-     */
-    protected string $baseUrl = '/';
-
-    /**
      * Sets a base url.
      *
      * This url is used for relative path calculations.
      */
-    public function setBaseUrl(string $url) : void
+    public function setBaseUrl(string $url) : self
     {
         $this->baseUrl = $url;
+        return $this;
     }
 
     /**
@@ -183,13 +201,6 @@ class Request extends Message implements RequestInterface {
     }
 
     /**
-     * Equivalent of PHP's $_POST.
-     *
-     * @var array<string, string>
-     */
-    protected array $postData = [];
-
-    /**
      * Sets the post data.
      *
      * This is equivalent to PHP's $_POST superglobal.
@@ -199,9 +210,10 @@ class Request extends Message implements RequestInterface {
      *
      * @param array<string, string> $postData
      */
-    public function setPostData(array $postData) : void
+    public function setPostData(array $postData) : self
     {
         $this->postData = $postData;
+        return $this;
     }
 
     /**
@@ -215,13 +227,6 @@ class Request extends Message implements RequestInterface {
     {
         return $this->postData;
     }
-
-    /**
-     * An array containing the raw _SERVER array.
-     *
-     * @var array<string, string>
-     */
-    protected array $rawServerData;
 
     /**
      * Returns an item from the _SERVER array.
@@ -238,9 +243,10 @@ class Request extends Message implements RequestInterface {
      *
      * @param array<string, string> $data
      */
-    public function setRawServerData(array $data) : void
+    public function setRawServerData(array $data) : self
     {
         $this->rawServerData = $data;
+        return $this;
     }
 
     /**
@@ -346,23 +352,13 @@ class Request extends Message implements RequestInterface {
             throw new \InvalidArgumentException('The _SERVER array must have a REQUEST_METHOD key');
         }
 
-        // Set the method"
-        $this->setMethod($method);
-
-        // Set the url
-        $this->setUrl($url);
-
-        // Set the headers
-        $this->setHeaders($headers);
-
-        // Set the http version
-        $this->setHttpVersion($httpVersion);
-
-        // Set raw server data
-        $this->setRawServerData($serverArray);
-
-        // Set the absolute url
-        $this->setAbsoluteUrl($protocol.'://'.$hostName.$url);
+        $this->setMethod($method)
+                ->setUrl($url)
+                ->setHeaders($headers)
+                ->setHttpVersion($httpVersion);
+                
+        $this->setRawServerData($serverArray)
+             ->setAbsoluteUrl($protocol.'://'.$hostName.$url);
 
         return $this;
     }

@@ -24,7 +24,7 @@ interface RequestInterface extends MessageInterface
      * Sets the HTTP method.
      * @throws \InvalidArgumentException
      */
-    public function setMethod(string|Methods $method) : void;
+    public function setMethod(string|Methods $method) : RequestInterface;
 
     /**
      * Returns the request url.
@@ -34,7 +34,7 @@ interface RequestInterface extends MessageInterface
     /**
      * Sets the request url.
      */
-    public function setUrl(string $url) : void;
+    public function setUrl(string $url) : RequestInterface;
 
     /**
      * Returns the absolute url.
@@ -44,7 +44,7 @@ interface RequestInterface extends MessageInterface
     /**
      * Sets the absolute url.
      */
-    public function setAbsoluteUrl(string $url) : void;
+    public function setAbsoluteUrl(string $url) : RequestInterface;
 
     /**
      * Returns the current base url.
@@ -58,7 +58,7 @@ interface RequestInterface extends MessageInterface
      *
      * The base url should default to /
      */
-    public function setBaseUrl(string $url) : void;
+    public function setBaseUrl(string $url) : RequestInterface;
 
     /**
      * Returns the relative path.
@@ -105,7 +105,7 @@ interface RequestInterface extends MessageInterface
      *
      * @param array<string, string> $postData
      */
-    public function setPostData(array $postData) : void;
+    public function setPostData(array $postData) : RequestInterface;
 
     /**
      * Returns an item from the _SERVER array.
@@ -119,11 +119,11 @@ interface RequestInterface extends MessageInterface
      *
      * @param array<string, string> $data
      */
-    public function setRawServerData(array $data) : void;
+    public function setRawServerData(array $data) : RequestInterface;
 
     /**
      * Loads the request from the _SERVER array.
      */
-    public function initFromServerArray(array $serverArray) : self;
+    public function initFromServerArray(array $serverArray) : RequestInterface;
 
 }

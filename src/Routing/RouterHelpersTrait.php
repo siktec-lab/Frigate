@@ -6,6 +6,7 @@ use ReflectionClass;
 use Frigate\Routing\Http\Methods;
 use Frigate\Routing\Routes\Route;
 use Frigate\Routing\Router;
+use Frigate\Api\Impl\StaticEndpoint;
 
 trait RouterHelpersTrait
 {
@@ -101,9 +102,23 @@ trait RouterHelpersTrait
         );
     }
 
-    public static function static(string $path, string $dir) : void
+    public static function static(string $path, string $directory, array|string $types = "*/*") : void
     {
-        Router::define( Methods::GET, new Route( $path, [], [], new StaticRoute( $dir ) ) );
+        $path = trim($path, "\t\n\r /\\");
+        $path .= "/{serve:path}";
+
+        Router::define( Methods::GET, new Route( 
+            path: $path, 
+            context: [
+                "directory" => $directory,
+                "serve"      => null,
+            ], 
+            returns: [], 
+            exp: new StaticEndpoint(
+                directory: $directory, 
+                types: (array)$types
+            )
+        ));
     }
 
     /**

@@ -11,10 +11,10 @@ class Paths {
      * @param  array<string> ...$path
      */
     final public static function join(...$parts) : string {
+        // Remove trailing slashes and backslashes
+        $parts = array_map(fn($part) => rtrim($part, " \t\n\r\\/"), $parts);
         // remove empty strings and nulls
-        $parts = array_filter($parts, 
-            fn($v) => !empty($v) && is_string($v) && $v !== DIRECTORY_SEPARATOR 
-        );
+        $parts = array_filter($parts, fn($v) => !empty($v) && is_string($v) && $v !== DIRECTORY_SEPARATOR);
         return implode(DIRECTORY_SEPARATOR, $parts);
     }
     
@@ -55,4 +55,20 @@ class Paths {
         return file_exists($path) ? $path : false;
     }
 
+    /**
+     * Remove relative paths and special characters from the path
+     */
+    final public static function removePathRelative(string $path, string $trim = "/ \t\n\r\x0B") : string {
+        // Remove relative paths and special characters from the path:
+        return trim(preg_replace(
+            [
+                '/\\\\/m',
+                '/[~,;]/m', 
+                '/(\.\.\/|\/\.\.|\.\/|\/\.)/m',
+                "/(\/)+/m"
+            ],
+            ["/", "", "/", "/" ],
+            $path
+        ), $trim);
+    }
 }

@@ -1,14 +1,12 @@
 <?php
 
-namespace Frigate\Api;
+namespace Frigate\Api\Traits;
 
 use Frigate\Routing\Http;
 
-trait GetUserInputTrait
+trait UserInputHelpers
 {
-        
     /**
-     * get_json_or_post
      * Helper function to get the json body or post data from the request with
      * default values
      * 
@@ -17,7 +15,7 @@ trait GetUserInputTrait
      * @param  bool $only_default_keys If true only the keys in $defaults will be returned
      * @return array
      */
-    public function get_json_or_post(Http\RequestInterface $request, array $defaults = [], bool $only_default_keys = false) : array {
+    public function getJsonOrPost(Http\RequestInterface $request, array $defaults = [], bool $only_default_keys = false) : array {
 
         //Get user data - combination of post or json body:
         $data = $request->getPostData();

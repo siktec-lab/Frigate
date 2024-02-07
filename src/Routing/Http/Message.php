@@ -10,7 +10,7 @@ use Frigate\Routing\Http\HTTP2;
  *
  */
 abstract class Message implements MessageInterface {
-    
+
     /**
      * Request body.
      *
@@ -18,7 +18,7 @@ abstract class Message implements MessageInterface {
      *
      * @var resource|string|callable|null
      */
-    protected $body = null;
+    protected mixed $body = null;
 
     /**
      * Contains the list of HTTP headers.
@@ -35,7 +35,7 @@ abstract class Message implements MessageInterface {
     /**
      * The expected content type. after negotiation.
      */
-    public string  $expects = "text/plain";
+    public string $expects = "text/plain";
     
     /**
      * Returns the body as a readable stream resource.
@@ -45,7 +45,7 @@ abstract class Message implements MessageInterface {
      *
      * @return resource
      */
-    public function getBodyAsStream()
+    public function getBodyAsStream() : mixed
     {
         $body = $this->getBody();
         if (is_callable($this->body)) {
@@ -101,7 +101,7 @@ abstract class Message implements MessageInterface {
      *
      * @return resource|string|callable|null
      */
-    public function getBody()
+    public function getBody() : mixed
     {
         return $this->body;
     }
@@ -111,9 +111,10 @@ abstract class Message implements MessageInterface {
      *
      * @param resource|string|callable $body
      */
-    public function setBody($body) : void
+    public function setBody(mixed $body) : self
     {
         $this->body = $body;
+        return $this;
     }
 
     /**
@@ -195,9 +196,10 @@ abstract class Message implements MessageInterface {
      *
      * @param string|string[] $value
      */
-    public function setHeader(string $name, $value) : void
+    public function setHeader(string $name, array|string $value) : self
     {
         $this->headers[strtolower($name)] = [$name, (array) $value];
+        return $this;
     }
 
     /**
@@ -210,11 +212,12 @@ abstract class Message implements MessageInterface {
      *
      * @param array<string, mixed> $headers
      */
-    public function setHeaders(array $headers) : void
+    public function setHeaders(array $headers) : self
     {
         foreach ($headers as $name => $value) {
             $this->setHeader($name, $value);
         }
+        return $this;
     }
 
     /**
@@ -226,7 +229,7 @@ abstract class Message implements MessageInterface {
      *
      * @param mixed|mixed[] $value
      */
-    public function addHeader(string $name, $value) : void
+    public function addHeader(string $name, array|string $value) : self
     {
         $lName = strtolower($name);
         if (isset($this->headers[$lName])) {
@@ -240,6 +243,7 @@ abstract class Message implements MessageInterface {
                 (array) $value,
             ];
         }
+        return $this;
     }
 
     /**
@@ -249,11 +253,12 @@ abstract class Message implements MessageInterface {
      *
      * @param array<string, mixed> $headers
      */
-    public function addHeaders(array $headers) : void
+    public function addHeaders(array $headers) : self
     {
         foreach ($headers as $name => $value) {
             $this->addHeader($name, $value);
         }
+        return $this;
     }
 
     /**
@@ -263,7 +268,7 @@ abstract class Message implements MessageInterface {
      * This method should return true if the header was successfully deleted,
      * and false if the header did not exist.
      */
-    public function removeHeader(string $name) : bool
+    public function removeHeader(string $name) : self
     {
         $name = strtolower($name);
         if (!isset($this->headers[$name])) {
@@ -271,14 +276,15 @@ abstract class Message implements MessageInterface {
         }
         unset($this->headers[$name]);
 
-        return true;
+        return $this;
     }
 
     /**
      * Negotiates the content type to be returned.
      * Sets the expects property, and returns the negotiated content type.
     */
-    public function negotiateAccept(array $supported, ?string $default = null) : ?string {
+    public function negotiateAccept(array $supported, ?string $default = null) : ?string
+    {
         //TODO: test this...
         $this->expects = HTTP2::negotiateMimeType(
             $supported,
@@ -293,9 +299,10 @@ abstract class Message implements MessageInterface {
      *
      * Should be 1.0, 1.1 or 2.0.
      */
-    public function setHttpVersion(string $version) : void
+    public function setHttpVersion(string $version) : self
     {
         $this->httpVersion = $version;
+        return $this;
     }
 
     /**
