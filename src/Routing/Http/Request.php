@@ -9,10 +9,11 @@ use Sabre\Uri;
  * You can either simply construct the object from scratch, or if you need
  */
 class Request extends Message implements RequestInterface {
+
     /**
      * HTTP Method.
      */
-    protected string $method;
+    protected Methods $method;
 
     /**
      * Request Url.
@@ -24,8 +25,9 @@ class Request extends Message implements RequestInterface {
      *
      * @param array<string, string>         $headers
      * @param resource|callable|string|null $body
+     * @throws \InvalidArgumentException if the method is not a valid HTTP method.
      */
-    public function __construct(string $method, string $url, array $headers = [], $body = null)
+    public function __construct(string|Methods $method, string $url, array $headers = [], $body = null)
     {
         $this->setMethod($method);
         $this->setUrl($url);
@@ -34,19 +36,28 @@ class Request extends Message implements RequestInterface {
     }
 
     /**
+     * check if the request is a test request
+     * NOT IMPLEMENTED by default
+     */
+    public function isTest() : bool {
+        return false;
+    }
+
+    /**
      * Returns the current HTTP method.
      */
-    public function getMethod() : string
+    public function getMethod() : Methods
     {
         return $this->method;
     }
 
     /**
      * Sets the HTTP method.
+     * @throws \InvalidArgumentException if the method is not a valid HTTP method.
      */
-    public function setMethod(string $method) : void
+    public function setMethod(string|Methods $method) : void
     {
-        $this->method = $method;
+        $this->method = is_string($method) ? Methods::fromString($method) : $method;
     }
 
     /**
@@ -245,13 +256,125 @@ class Request extends Message implements RequestInterface {
     }
 
     /**
+     * This static method will create a new Request object, based on a PHP $_SERVER array.
+     * REQUEST_URI and REQUEST_METHOD are required.
+     *
+     * @param array<string, string> $serverArray
+     * @return self
+     * @throws \InvalidArgumentException if the _SERVER array is invalid.
+     */
+    public function initFromServerArray(array $serverArray) : self
+    {
+
+        $headers        = [];
+        $method         = null;
+        $url            = null;
+        $httpVersion    = '1.1';
+        $protocol       = 'http';
+        $hostName       = 'localhost';
+
+        foreach ($serverArray as $key => $value) {
+            $key = (string) $key;
+            switch ($key) {
+                case 'SERVER_PROTOCOL':
+                    if ('HTTP/1.0' === $value) {
+                        $httpVersion = '1.0';
+                    } elseif ('HTTP/2.0' === $value) {
+                        $httpVersion = '2.0';
+                    }
+                    break;
+                case 'REQUEST_METHOD':
+                    $method = $value;
+                    break;
+                case 'REQUEST_URI':
+                    $url = $value;
+                    break;
+                    // These sometimes show up without a HTTP_ prefix
+                case 'CONTENT_TYPE':
+                    $headers['Content-Type'] = $value;
+                    break;
+                case 'CONTENT_LENGTH':
+                    $headers['Content-Length'] = $value;
+                    break;
+                    // mod_php on apache will put credentials in these variables.
+                    // (fast)cgi does not usually do this, however.
+                case 'PHP_AUTH_USER':
+                    if (isset($serverArray['PHP_AUTH_PW'])) {
+                        $headers['Authorization'] = 'Basic '.base64_encode($value.':'.$serverArray['PHP_AUTH_PW']);
+                    }
+                    break;
+                    // Similarly, mod_php may also screw around with digest auth.
+                case 'PHP_AUTH_DIGEST':
+                    $headers['Authorization'] = 'Digest '.$value;
+                    break;
+                    // Apache may prefix the HTTP_AUTHORIZATION header with
+                    // REDIRECT_, if mod_rewrite was used.
+                case 'REDIRECT_HTTP_AUTHORIZATION':
+                    $headers['Authorization'] = $value;
+                    break;
+
+                case 'HTTP_HOST':
+                    $hostName = $value;
+                    $headers['Host'] = $value;
+                    break;
+                case 'HTTPS':
+                    if (!empty($value) && 'off' !== $value) {
+                        $protocol = 'https';
+                    }
+                    break;
+                default:
+                    if ('HTTP_' === substr($key, 0, 5)) {
+                        // It's a HTTP header
+                        // Normalizing it to be prettier
+                        $header = strtolower(substr($key, 5));
+                        // Transforming dashes into spaces, and upper-casing
+                        // every first letter.
+                        $header = ucwords(str_replace('_', ' ', $header));
+                        // Turning spaces into dashes.
+                        $header = str_replace(' ', '-', $header);
+                        $headers[$header] = $value;
+                    }
+                    break;
+            }
+        }
+
+        if (is_null($url)) {
+            throw new \InvalidArgumentException('The _SERVER array must have a REQUEST_URI key');
+        }
+
+        if (is_null($method)) {
+            throw new \InvalidArgumentException('The _SERVER array must have a REQUEST_METHOD key');
+        }
+
+        // Set the method"
+        $this->setMethod($method);
+
+        // Set the url
+        $this->setUrl($url);
+
+        // Set the headers
+        $this->setHeaders($headers);
+
+        // Set the http version
+        $this->setHttpVersion($httpVersion);
+
+        // Set raw server data
+        $this->setRawServerData($serverArray);
+
+        // Set the absolute url
+        $this->setAbsoluteUrl($protocol.'://'.$hostName.$url);
+
+        return $this;
+    }
+
+    /**
      * Serializes the request object as a string.
      *
      * This is useful for debugging purposes.
      */
     public function __toString() : string
     {
-        $out = $this->getMethod().' '.$this->getUrl().' HTTP/'.$this->getHttpVersion()."\r\n";
+        $out = $this->getMethod()->value.' '.$this->getUrl().' HTTP/'.$this->getHttpVersion()."\r\n";
 
         foreach ($this->getHeaders() as $key => $value) {
             foreach ($value as $v) {
@@ -268,4 +391,5 @@ class Request extends Message implements RequestInterface {
 
         return $out;
     }
+
 }

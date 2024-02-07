@@ -4,34 +4,119 @@ declare(strict_types=1);
 
 namespace Frigate\Routing;
 
+use Exception;
 use Frigate\FrigateApp;
-use Frigate\Routing\Http;
+// use Frigate\Routing\Http;
+use Frigate\Routing\Http\RequestInterface;
+use Frigate\Routing\Http\ResponseInterface;
+use Frigate\Routing\Http\Response;
+use Frigate\Routing\Http\RouteRequest;
+use Frigate\Routing\Http\Methods;
 use Frigate\Routing\Paths\PathBranch;
 use Frigate\Routing\Paths\PathTree;
-use Throwable;
+use Frigate\Routing\Routes\Route;
 
 class Router {
 
+    use RouterHelpersTrait;
 
     private static bool $debug = false;
 
-    private static ?Http\RouteRequest $request = null;
+    private static ?RequestInterface $request = null;
 
     /** @var Route[] $errors*/
     private static array $errors  = [];
 
     /** @var PathTree[] $routes */
     private static array $routes = [];
-        
+    
+    /** The request class to use for building requests */
+    public const DEFAULT_REQUEST_CLASS = RouteRequest::class;
+    private static string $use_request = self::DEFAULT_REQUEST_CLASS;
+
+    /** The response class to use for building responses */
+    public const DEFAULT_RESPONSE_CLASS = Response::class;
+    private static string $use_response = self::DEFAULT_RESPONSE_CLASS;
+
     /**
      * initialize the router
+     * @param bool $load_request
      * @param ?bool $debug 
+     * @param ?string $use_request
+     * @param ?string $use_response
+     * 
+     * @throws Exception when the request or response class is not found or does not implement the correct interface
      */
-    public static function init(?bool $debug = null) : void {
+    public static function init(
+        bool $load_request = true, 
+        ?bool $debug = null, 
+        ?string $use_request = null,
+        ?string $use_response = null
+    ) : void {
+
+        // Set request and response classes:
+        self::setRequestClass($use_request);
+        self::setResponseClass($use_response);
+        
+        // Set the debug mode:
         self::debug($debug ?? FrigateApp::ENV_BOOL("FRIGATE_DEBUG_ROUTER", false));
+
+        // Load the request:
+        if ($load_request) {
+            self::loadRequest();
+        }
     }
     
-    public static function reset() : void {
+    /**
+     * set the request class to use for building requests
+     * @param ?string $request_class null to reset to the default
+     * @throws Exception when the request class is not found or does not implement RequestInterface
+     */
+    public static function setRequestClass(?string $request_class = null) : void {
+        // Set the request class if needed:
+        if (!is_null($request_class)) {
+            //TODO: make those exceptions FrigateExceptions
+            // Validate the request class:
+            if (!class_exists($request_class)) {
+                throw new Exception("Request class not found", 1);
+            }
+            if (!is_subclass_of($request_class, RequestInterface::class)) {
+                throw new Exception("Request class does not implement RequestInterface", 1);
+            }
+            self::$use_request = $request_class;
+        } else {
+            self::$use_request = self::DEFAULT_REQUEST_CLASS;
+        }
+    }
+
+    /**
+     * set the response class to use for building responses
+     * @param ?string $response_class null to reset to the default
+     * @throws Exception when the response class is not found or does not implement ResponseInterface
+     */
+    public static function setResponseClass(?string $response_class = null) : void {
+        // Set the response class if needed:
+        if (!is_null($response_class)) {
+            //TODO: make those exceptions FrigateExceptions
+            // Validate the response class:
+            if (!class_exists($response_class)) {
+                throw new Exception("Response class not found", 1);
+            }
+            if (!is_subclass_of($response_class, ResponseInterface::class)) {
+                throw new Exception("Response class does not implement ResponseInterface", 1);
+            }
+            self::$use_response = $response_class;
+        } else {
+            self::$use_response = self::DEFAULT_RESPONSE_CLASS;
+        }
+    }
+
+    /**
+     * reset the router
+     * will remove all routes and handlers
+     */
+    public static function reset() : void 
+    {
         self::$routes = [];
         self::$errors = [];
         self::$request = null;
@@ -40,7 +125,8 @@ class Router {
     /**
      * get / set the debug mode
      */
-    public static function debug(?bool $enable = null) : bool {
+    public static function debug(?bool $enable = null) : bool 
+    {
         if (!is_null($enable)) {
             self::$debug = $enable;
         }
@@ -48,14 +134,16 @@ class Router {
     }
 
     /**
-     * parse_request
-     * load and parses the request uri
-     * @param  string $base or none for SERVER => REQUEST_URI
-     * @return void
+     * load and parses the request
+     * If no base is provided, we'll use the APP_BASE_URI
      */
-    public static function parse_request(string $base = "/") : void {
+    public static function loadRequest(?string $base = null) : void 
+    {
+        // If no base is provided, we'll use the APP_BASE_URI
+        $base = $base ?? FrigateApp::$globals["APP_BASE_URI"];
 
-        self::$request = self::build_request(
+        // Build the request:
+        self::$request = self::buildRequest(
             server_arr : null, // Null for $_SERVER
             base       : $base,
             method     : null, // Method null for REQUEST_METHOD
@@ -65,7 +153,8 @@ class Router {
             post       : $_POST
         );
 
-        FrigateApp::debug(self::class, "got request",     (string)self::$request);
+        // Debug the request:
+        FrigateApp::debug(self::class, "got request", (string)self::$request);
         FrigateApp::debug(self::class, "request raw parts", [
             "PATH"  => self::$request->getPath(),
             "POST"  => self::$request->getPostData(),
@@ -75,34 +164,40 @@ class Router {
 
     /**
      * get the route branch for a given method and path
+     * @throws Exception when the method is invalid
      */
-    public static function getRouteBranch(string $method, string $path, array &$with_context = []) : ?PathBranch {
-        if (!array_key_exists($method, self::$routes)) {
+    public static function getRouteBranch(
+        Methods|string $method, 
+        string $path, 
+        array &$with_context = []
+    ) : ?PathBranch {
+        $method = is_string($method) ? Methods::fromString($method) : $method;
+        if (!array_key_exists($method->value, self::$routes)) {
             return null;
         }
-        [$branch, $with_context] = self::$routes[$method]->eval($path, $with_context);
+        [$branch, $with_context] = self::$routes[$method->value]->eval($path, $with_context);
         return $branch;
     }
 
-    public static function request_for(
+    /**
+     * create a request for endpoint invocation
+     */
+    public static function requestFor(
         string $path, 
-        ?string $method = null, // Method null for REQUEST_METHOD
-        array $query = [], // Set the query parameters
-        $body = "", // Body of the request
-        array $post = [] // Post data override null for whatever is in the body
-
-    ) : Http\RouteRequest {
+        Methods|string|null $method  = null, // Method null for REQUEST_METHOD
+        array $query                 = [],   // Set the query parameters
+        $body                        = "",   // Body of the request
+        array $post                  = []    // Post data override null for whatever is in the body
+    ) : RequestInterface {
 
         // TODO: Extend ServerArray with more options
-        // This is for setting the correct content type if body.
-        // Also for setting the correct content length if body is a string.
 
         // path to uri:
         $path = trim($path);
         $path = ltrim($path, '/');
         $path = FrigateApp::$globals["APP_BASE_URI"].$path;
 
-        return self::build_request(
+        return self::buildRequest(
             server_arr : null, // Null for $_SERVER
             base       : null,
             method     : $method, // Method null for REQUEST_METHOD
@@ -114,27 +209,26 @@ class Router {
 
     }
     /**
-     * manual_request
-     * create a manual request for endpoint invocation with a custom context
+     * build a request object for passing to the route handler
      * 
      * @param  array|null $server_arr null for $_SERVER, REQUEST_URI and REQUEST_METHOD are required.
      * @param  string|null $base Base url null for APP_BASE_URI
-     * @param  string|null $method Method null for REQUEST_METHOD
+     * @param  Methods|string|null $method Method null for REQUEST_METHOD
      * @param  string|null $uri Uri override null for REQUEST_URI
      * @param  array|null $query Query override null for whatever is in the uri
      * @param  resource|string|callable $body the body of the request 
      * @param  array $post Post data to add to the request
-     * @return Http\RequestInterface
+     * @throws Exception when the request can't be built
      */
-    private static function build_request(
-        ?array $server_arr = null, // Null for $_SERVER
-        ?string $base      = null, // Base url null for APP_BASE_URI
-        ?string $method    = null, // Method null for REQUEST_METHOD
-        ?string $uri       = "",   // Uri override null for REQUEST_URI
-        ?array $query      = null, // Query override null for whatever is in the uri
-        $body              = "",   // Body of the request
-        array $post        = []  // Post data override null for whatever is in the body
-    ) : Http\RequestInterface {
+    private static function buildRequest(
+        ?array $server_arr          = null, // Null for $_SERVER
+        ?string $base               = null, // Base url null for APP_BASE_URI
+        Methods|string|null $method = null, // Method null for REQUEST_METHOD
+        ?string $uri                = "",   // Uri override null for REQUEST_URI
+        ?array $query               = null, // Query override null for whatever is in the uri
+        mixed  $body                = "",   // Body of the request
+        array  $post                = []    // Post data override null for whatever is in the body
+    ) : RequestInterface {
         
         // If no server array is provided, we'll use the $_SERVER array.
         if (is_null($server_arr)) {
@@ -152,6 +246,7 @@ class Router {
         }
 
         // If method is provided, we'll use it instead of REQUEST_METHOD
+        $method = !is_string($method) && !is_null($method) ? $method->value : $method;
         if (!empty($method)) {
             $server_arr['REQUEST_METHOD'] = trim($method);
         }
@@ -174,137 +269,157 @@ class Router {
             }
         }
 
-        $got =  self::createFromServerArray($server_arr);
-        $request = new Http\RouteRequest($got);
-        //$request->setBaseUrl($server_arr['BASE_URL'] ?? "");
+        /** @var RequestInterface $request */
+        $request = new self::$use_request();
+        $request->initFromServerArray($server_arr);
         $request->setBody($body);
         $request->setPostData($post);
         $request->setBaseUrl($base);
+
         return $request;
     } 
 
     /**
-     * define_error
-     * define an error route to be used when an error code is raised
-     * @param  int|string $code 'any' for any error
-     * @param  Route $route the route to be used
-     * @return void
-     */
-    public static function define_error(int|string $code, Route $route) : void {
-        self::$errors[$code] = $route;
-    }
-    
-    /**
-     * define
      * define a route to be used when a request matches the route and the method
-     * @param  string|array $method
+     *
+     * @param  Methods|string|array $method the method or an array of methods
      * @param  Route $route
      * @throws Exception when the route allready exists or can't be parsed properly
-     * @return void
+     * @throws InvalidArgumentException when the method is not supported
      */
-    public static function define(string|array $method, Route $route) : void {
+    public static function define(Methods|string|array $method, Route $route) : void 
+    {
         $methods = is_array($method) ? $method : [$method];
         // Initialize a new PathTree if it doesn't exist for this method:
         foreach ($methods as $m) {
-            $m = strtoupper($m);
-            if (!array_key_exists($m, self::$routes)) {
-                self::$routes[$m] = new PathTree();
+            
+            // Validate the method:
+            $m = is_string($m) ? Methods::fromString($m) : $m;
+
+            // Check if the method needs to be defined:
+            if (!array_key_exists($m->value, self::$routes)) {
+                self::$routes[$m->value] = new PathTree();
             }
             // Register the route:
-            self::$routes[$m]->define($route->path, $route);
+            self::$routes[$m->value]->define($route->path, $route);
         }
     }
     
     /**
-     * dump_routes
-     * dump the defined routes trees for debugging
-     * @return void
+     * define an error route to be used when an error code is raised
+     *
+     * @param  int|string $code 'any' for any error
+     * @param  Route $route the route to be used
      */
-    public static function dump_routes() : void {
-        foreach (self::$routes as $method => $tree) {
-            print PHP_EOL."Method: ".$method;
-            print PHP_EOL.str_repeat("-", 80).PHP_EOL;
-            print $tree.PHP_EOL;
-        }
+    public static function error(int|string $code, Route $route) : void 
+    {
+        self::$errors[$code] = $route;
     }
-    
-    /**
-     * negotiate_accept
-     * negotiate the accept header
-     * @param  Route $route
-     * @return ?string null if no match
-     */
-    private static function negotiate_accept(Route $route) : ?string {
-        return $route->negotiate_accept();
-    }
-    
+
     /**
      * load
      * load the current request
      * @param  ?RouteRequest $request null when current request should be used
      * @return Http\Response
      */
-    public static function load(
-        ?Http\RouteRequest $request = null
-    ) : Http\Response {
+    public static function load(?Http\RequestInterface $request = null) : Http\Response 
+    {
         $request = $request ?? self::$request;
         return self::execute($request);
-    } 
+    }
+
+    /**
+     * serve the current request
+     * will load the current request and send the response
+     * returns any unexpected output
+     * same as Router::load() + FrigateApp::endPageBuffer() + Router::sendResponse()
+     */
+    public static function serve() : string
+    {
+        $response   = Router::load();
+        $unexpected = FrigateApp::endPageBuffer();  
+        self::sendResponse($response);
+        return $unexpected;
+    }
     
     /**
      * execute
      *
-     * @param  Http\RouteRequest $request null when current request should be used
+     * @param  RequestInterface $request null when current request should be used
      * @param  ?bool $debug Override debug setting
      * @param  ?bool $auth Override auth setting
      * @param  mixed $auth_method Override auth method
-     * @return Http\Response
+     * @return ResponseInterface
+     * @throws Exception when the request can't be executed
      */
     public static function execute(
-        Http\RouteRequest $request,
+        RequestInterface $request,
         ?bool $debug = null, // Override debug setting
         ?bool $auth  = null, // Override auth setting
         $auth_method = null // Override auth method
-    ) : Http\Response {
+    ) : ResponseInterface {
+        
+        //Get the Request method:
+        $method = $request->getMethod();
+
+        // Prepare the response:
+        /** @var ResponseInterface $response */
+        $response = new self::$use_response(
+            status: 200, 
+            headers: [
+                "X-Perform"    => $request->isTest() ? "Test" : "Live"
+            ]
+        );
         
         try {
+            
             //Check that the method is supported:
-            $method = $request->getMethod();
-            if (!array_key_exists($method, self::$routes)) {
-                throw new \Exception("Request method not supported", 404);
+            if (!array_key_exists($method->value, self::$routes)) {
+                throw new \Exception("Request method '{$method->value}' is not supported", 404);
             }
             //Get the route & evaluate it:
-            [$branch, $con] = self::$routes[$method]->eval($request->getPath());
+            [$branch, $con] = self::$routes[$method->value]->eval($request->getPath());
             if (is_null($branch)) {
                 throw new \Exception("Not Found", 404);
             }
-            //Negotiate the accept type:
-            $accept = self::negotiate_accept($branch->exp) ?? "";
-            $request->expects = $accept;
+
+            // Prepare the request:
+            // TODO: this might be an expression, not a route so wrap it in a requests
+            $accept = $request->negotiateAccept(
+                $branch->exp->getSupportedReturnTypes(), 
+                $branch->exp->getDefaultReturn()
+            );
+
+            // Return an error if the accept header is not supported:
             if (empty($accept)) {
-                throw new \Exception("No Supported Acceptable Content Type Found", 406);
+                throw new \Exception("Accept header not supported", 406);
             }
-            //Merge context:
-            $branch->exp->context = array_merge($branch->exp->context, $con);
+
+            $response->setHeader("Content-Type", $accept);
+
+            // TODO: apply middlewares here:
+
+            //Apply the context:
+            $branch->exp->applyContext($con);
 
             //Is override?
             if (!is_null($debug) || !is_null($auth) || !is_null($auth_method)) {
-                $branch->exp->override_endpoint_params(
+                $branch->exp->overrideEndpointParams(
                     $debug, $auth, $auth_method
                 );
             }
+
             //Execute the route:
-            return $branch->exp->exec($request);
+            //TODO: this might be an expression, not a route so wrap it in a response
+            return $branch->exp->exec($request, $response);
             
-        } catch(Throwable $e) {
-            // Get code or default to 500:
-            $code = $e->getCode();
-            if ($code < 100 || $code > 599) {
-                $code = 500;
-            }
-            return self::error(
+        } catch(Exception $e) {
+
+            // Return the error response:
+            return self::handleError(
                 request : $request, 
-                code    : $code, 
+                response: $response,
+                code    : $e->getCode(), 
                 message : $e->getMessage(),
                 line    : $e->getLine(),
                 file    : $e->getFile(), 
@@ -314,57 +429,13 @@ class Router {
     }
 
     /**
-     * error
-     * handle an error and return a response for it
-     * @param  Http\RouteRequest $request
-     * @param  int $code
-     * @param  string $message
-     * @param  string $trace
-     * @return Http\Response
-     */
-    public static function error(
-        Http\RouteRequest $request, 
-        int     $code, 
-        string  $message    = "",
-        int     $line       = 0,
-        string  $file       = "",  
-        string  $trace      = ""
-    ) : Http\Response {
-
-        if (array_key_exists($code, self::$errors)) {
-            self::$errors[$code]->context["code"] = $code;
-            self::$errors[$code]->context["line"] = $line;
-            self::$errors[$code]->context["file"] = $file;
-            self::$errors[$code]->context["message"] = $message;
-            self::$errors[$code]->context["trace"] = $trace;
-            $request->expects = self::negotiate_accept(self::$errors[$code], $request) ?? self::$errors[$code]->get_default_return();
-            return self::$errors[$code]->exec($request);
-        }
-        if (array_key_exists("any", self::$errors)) {
-            self::$errors["any"]->context["code"] = $code;
-            self::$errors["any"]->context["line"] = $line;
-            self::$errors["any"]->context["file"] = $file;
-            self::$errors["any"]->context["message"] = $message;
-            self::$errors["any"]->context["trace"] = $trace;
-            $request->expects = self::negotiate_accept(self::$errors["any"], $request) ?? self::$errors["any"]->get_default_return();
-            return self::$errors["any"]->exec($request);
-        }
-
-        //Default error handler:
-        return new Http\Response(
-            status :    $code, 
-            headers :   [], 
-            body : sprintf("Error %d: %s \nFile : %s \nLine : %d", $code, $message, $file, $line)
-        );
-    }
-
-    /**
      * Sends the HTTP response back to a HTTP client.
      *
      * This calls php's header() function and streams the body to php://output.
      * inspired by => https://github.com/sabre-io/http/blob/master/lib/Sapi.php
      */
-    public static function send_response(Http\Response $response): void {
+    public static function sendResponse(ResponseInterface $response): void 
+    {
         header('HTTP/'.$response->getHttpVersion().' '.$response->getStatus().' '.$response->getStatusText());
         foreach ($response->getHeaders() as $key => $value) {
             foreach ($value as $k => $v) {
@@ -432,98 +503,84 @@ class Router {
     }
 
     /**
-     * This static method will create a new Request object, based on a PHP
-     * $_SERVER array.
-     * REQUEST_URI and REQUEST_METHOD are required.
-     * @param array<string, string> $serverArray
+     * get the defined routes as a tree
+     * @return array<string,PathTree>
      */
-    public static function createFromServerArray(array $serverArray) : Http\Request
-    {
+    public static function getRoutesTree() : array {
+        return self::$routes;
+    }
+    /**
+     * handle an error and return a response for it
+     *
+     * @param  Http\RouteRequest $request
+     * @param  int $code
+     * @param  string $message
+     * @param  string $trace
+     */
+    protected static function handleError(
+        RequestInterface $request,
+        ResponseInterface $response,
+        int     $code, 
+        string  $message    = "",
+        int     $line       = 0,
+        string  $file       = "",  
+        string  $trace      = ""
+    ) : ResponseInterface {
 
-        $headers        = [];
-        $method         = null;
-        $url            = null;
-        $httpVersion    = '1.1';
-        $protocol       = 'http';
-        $hostName       = 'localhost';
+        $is_defined = array_key_exists($code, self::$errors);
 
-        foreach ($serverArray as $key => $value) {
-            $key = (string) $key;
-            switch ($key) {
-                case 'SERVER_PROTOCOL':
-                    if ('HTTP/1.0' === $value) {
-                        $httpVersion = '1.0';
-                    } elseif ('HTTP/2.0' === $value) {
-                        $httpVersion = '2.0';
-                    }
-                    break;
-                case 'REQUEST_METHOD':
-                    $method = $value;
-                    break;
-                case 'REQUEST_URI':
-                    $url = $value;
-                    break;
-                    // These sometimes show up without a HTTP_ prefix
-                case 'CONTENT_TYPE':
-                    $headers['Content-Type'] = $value;
-                    break;
-                case 'CONTENT_LENGTH':
-                    $headers['Content-Length'] = $value;
-                    break;
-                    // mod_php on apache will put credentials in these variables.
-                    // (fast)cgi does not usually do this, however.
-                case 'PHP_AUTH_USER':
-                    if (isset($serverArray['PHP_AUTH_PW'])) {
-                        $headers['Authorization'] = 'Basic '.base64_encode($value.':'.$serverArray['PHP_AUTH_PW']);
-                    }
-                    break;
-                    // Similarly, mod_php may also screw around with digest auth.
-                case 'PHP_AUTH_DIGEST':
-                    $headers['Authorization'] = 'Digest '.$value;
-                    break;
-                    // Apache may prefix the HTTP_AUTHORIZATION header with
-                    // REDIRECT_, if mod_rewrite was used.
-                case 'REDIRECT_HTTP_AUTHORIZATION':
-                    $headers['Authorization'] = $value;
-                    break;
-
-                case 'HTTP_HOST':
-                    $hostName = $value;
-                    $headers['Host'] = $value;
-                    break;
-                case 'HTTPS':
-                    if (!empty($value) && 'off' !== $value) {
-                        $protocol = 'https';
-                    }
-                    break;
-                default:
-                    if ('HTTP_' === substr($key, 0, 5)) {
-                        // It's a HTTP header
-                        // Normalizing it to be prettier
-                        $header = strtolower(substr($key, 5));
-                        // Transforming dashes into spaces, and upper-casing
-                        // every first letter.
-                        $header = ucwords(str_replace('_', ' ', $header));
-                        // Turning spaces into dashes.
-                        $header = str_replace(' ', '-', $header);
-                        $headers[$header] = $value;
-                    }
-                    break;
-            }
+        // Get code or default to 500:
+        if ($code < 100 || $code > 599) {
+            $code = 500;
         }
 
-        if (null === $url) {
-            throw new \InvalidArgumentException('The _SERVER array must have a REQUEST_URI key');
+        // Update the response:
+        $response->setStatus($code);
+        if (is_null($response->getHeader("Content-Type"))) {
+            $returns = [ "text/html", "application/json" ];
+            $default = "text/html";
+            $expects = $request->negotiateAccept(
+                $is_defined ? self::$errors[$code]->getSupportedReturnTypes() : $returns, 
+                $is_defined ? self::$errors[$code]->getDefaultReturn() : $default
+            );
+            $response->setHeader("Content-Type", $expects);
         }
 
-        if (null === $method) {
-            throw new \InvalidArgumentException('The _SERVER array must have a REQUEST_METHOD key');
+        // Data for the error route:
+        $apply_ctx = [
+            "code"      => $code,
+            "line"      => $line,
+            "file"      => $file,
+            "message"   => $message,
+            "trace"     => $trace
+        ];
+        
+        // First priority is the error code:
+        if (array_key_exists($code, self::$errors)) {
+            self::$errors[$code]->applyContext($apply_ctx);            
+            return self::$errors[$code]->exec($request, $response);
         }
-        $r = new Http\Request(strtoupper($method), $url, $headers);
-        $r->setHttpVersion($httpVersion);
-        $r->setRawServerData($serverArray);
-        $r->setAbsoluteUrl($protocol.'://'.$hostName.$url);
+        
+        // Second priority is the any error:
+        if (array_key_exists("any", self::$errors)) {
+            self::$errors[$code]->applyContext($apply_ctx);
+            return self::$errors["any"]->exec($request, $response);
+        }
 
-        return $r;
+        //Finally, return a default error response:
+        if ($response->getHeader("Content-Type") === "application/json") {
+            $response->setBodyJson([
+                "error" => [
+                    "code"      => $code,
+                    "message"   => $message,
+                    "file"      => $file,
+                    "line"      => $line,
+                    "trace"     => $trace
+                ]
+            ]);
+        } else {
+            $response->setBody(sprintf("Error %d: %s \nFile : %s \nLine : %d", $code, $message, $file, $line));
+        }
+        return $response;
     }
 }

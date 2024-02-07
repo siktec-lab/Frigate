@@ -2,30 +2,37 @@
 
 namespace Frigate\Routing\Http;
 
+
 use Frigate\Routing\Auth\AuthFactory;
 
-class RouteRequest extends RequestDecorator {
+class RouteRequest extends Request 
+{
 
-    private string $method = "";
-    public string  $expects = "text/plain";
+    public function __construct(
+        ?RequestInterface $from = null, 
+        string|Methods $method = Methods::GET, 
+        string $url = "", 
+        array $headers = [], 
+        $body = null
+    ) {
+        if ($from) {
+            $method  = $from->getMethod();
+            $url     = $from->getUrl();
+            $headers = $from->getHeaders();
+            $body    = $from->getBody();
+        }
 
+        parent::__construct($method, $url, $headers, $body);
+    }
+
+    /**
+     * check if the request is a test request
+     * Based on the X-Perform header
+     */
     public function isTest() : bool {
         return strtolower($this->getHeader('X-Perform') ?? "") === "test";
     }
 
-    // get the accepted content type from the request
-    public function getAccept() : array {
-        $accept = $this->getHeader('Accept');
-        if (empty($accept)) {
-            return [];
-        }
-        $accept = preg_replace("/;.*$/", "", $accept); //remove the q=1.0 from the accept header and the charset
-        $accept = explode(",", $accept);
-        $accept = array_map("trim", $accept);
-        $accept = array_map("strtolower", $accept);
-        return $accept;
-    }
-        
     /**
      * getPatchData
      * return the patch data as passed in the body -> json or string 
@@ -61,7 +68,7 @@ class RouteRequest extends RequestDecorator {
                 throw new \Exception("Unsupported authorization method: {$method}");
             }
             $auth = AuthFactory::get($method);
-            $authorized = $auth->authorize($this, $manual_credentials); // Authrization is the first array element returned
+            $authorized = $auth->authorize($this, $manual_credentials); // Authorization is the first array element returned
             if ($authorized[0]) {
                 return $authorized;
             }

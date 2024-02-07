@@ -138,6 +138,11 @@ interface MessageInterface {
     public function removeHeader(string $name) : bool;
 
     /**
+     * Negotiates the accept header.
+     */
+    public function negotiateAccept(array $supported, ?string $default = null) : ?string;
+    
+    /**
      * Sets the HTTP version.
      *
      * Should be 1.0, 1.1 or 2.0.

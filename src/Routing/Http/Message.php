@@ -2,6 +2,7 @@
 
 namespace Frigate\Routing\Http;
 
+use Frigate\Routing\Http\HTTP2;
 /**
  * This is the abstract base class for both the Request and Response objects.
  *
@@ -9,6 +10,7 @@ namespace Frigate\Routing\Http;
  *
  */
 abstract class Message implements MessageInterface {
+    
     /**
      * Request body.
      *
@@ -30,6 +32,11 @@ abstract class Message implements MessageInterface {
      */
     protected string $httpVersion = '1.1';
 
+    /**
+     * The expected content type. after negotiation.
+     */
+    public string  $expects = "text/plain";
+    
     /**
      * Returns the body as a readable stream resource.
      *
@@ -265,6 +272,20 @@ abstract class Message implements MessageInterface {
         unset($this->headers[$name]);
 
         return true;
+    }
+
+    /**
+     * Negotiates the content type to be returned.
+     * Sets the expects property, and returns the negotiated content type.
+    */
+    public function negotiateAccept(array $supported, ?string $default = null) : ?string {
+        //TODO: test this...
+        $this->expects = HTTP2::negotiateMimeType(
+            $supported,
+            $this->getHeader("accept"),
+            $default
+        );
+        return $this->expects;
     }
 
     /**

@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Frigate;
 
-use Dotenv\Dotenv;
 use Exception;
+use ReflectionMethod;
+use Dotenv\Dotenv;
 use Frigate\Exceptions\FrigateException;
+use ReflectionClass;
 
 class FrigateApp {
 
@@ -181,21 +183,33 @@ class FrigateApp {
         return ob_get_clean();
     }
 
-    static public function debug(mixed $from, string $message, mixed $variable = null) {
-        if (
-            ( is_string($from) && class_exists($from) && property_exists($from, 'debug') && $from::$debug)
-            ||
-            ( is_object($from) && property_exists($from, 'debug') && $from->debug )
-        ) {
-            $name = is_object($from) ? get_class($from) : $from;
-            print "****************************************".PHP_EOL;
-            print "- FROM : {$name}".PHP_EOL;
-            print "----------------------------------------".PHP_EOL;
-            print "- {$message}".PHP_EOL;
-            print "----------------------------------------".PHP_EOL;
-            print_r($variable);
-            print PHP_EOL."****************************************".PHP_EOL;
+    static public function debug(object|string $from, string $message, mixed $variable = null) : void {
+
+        //TODO: I don't like this implementation, it's not very efficient
+        // Every time we call debug, we have to check if the object has a debug method
+        // Must be a better way to do this
+        $debug = false;
+        if (method_exists($from, "debug")) {
+            if (is_object($from)) {
+                $debug = (bool)$from->debug();
+            } else {
+                $debug_call = new ReflectionMethod($from, "debug");
+                if ($debug_call->isPublic()) {
+                    $debug = (bool)$debug_call->invoke(new ReflectionClass($from));
+                }
+            }
         }
+        if (!$debug) {
+            return;
+        }
+        $name = is_object($from) ? get_class($from) : $from;
+        print "****************************************".PHP_EOL;
+        print "- FROM : {$name}".PHP_EOL;
+        print "----------------------------------------".PHP_EOL;
+        print "- {$message}".PHP_EOL;
+        print "----------------------------------------".PHP_EOL;
+        print_r($variable);
+        print PHP_EOL."****************************************".PHP_EOL;
     }
 
     static public function loadEnvironment(string|array|null $path = null, array $extra) : void {

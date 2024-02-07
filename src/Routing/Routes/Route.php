@@ -1,6 +1,8 @@
 <?php 
 
-namespace Frigate\Routing;
+declare(strict_types=1);
+
+namespace Frigate\Routing\Routes;
 
 use Closure;
 use Frigate\Routing\Http;
@@ -8,40 +10,42 @@ use Frigate\Api\BindEndpoint;
 
 class Route {
 
-    public string    $path;
+    public const DEFAULT_RETURN = "application/json";
+
+    public string $path;
     
-    public array     $context = [];
+    public array $context = [];
     
-    private array    $returns = [
-        "text/html",
-        "application/json"
+    private array $returns = [
+        "application/json",
+        "text/html"
     ];
-    
-    public Http\HTTP2    $http2;
     
     public object|array|string|null $exp;
     
     protected ?\ReflectionClass $request_mutator = null;
     
-    private array $override_params = [
+    private array $override_params = [ //TODO: do we need this????
         "debug"         => null,
         "auth"          => null,
         "auth_method"   => null
     ];
 
+    /**
+     * construct a new route
+     */
     public function __construct(
         string $path, 
         array $context = [], 
         array $returns = [], 
-        $exp = null, 
+        object|array|string|null $exp = null, 
         \ReflectionClass|string|null $request_mutator = null
     ) {
         $this->path = trim($path, "\t\n\r /\\");
         $this->context = $context;
-        $this->http2 = new Http\HTTP2();
         $this->exp = $exp;
         if (!empty($returns)) {
-            $this->set_returns(...$returns);
+            $this->setSupportedReturnTypes(...$returns);
         }
         // set the request mutator:
         if (is_string($request_mutator)) {
@@ -54,47 +58,39 @@ class Route {
 
         
     /**
-     * returns
      * set return types for this route which are the accepted content types
-     * @param  array $returns
-     * @return Route
      */
-    public function set_returns(...$returns) : Route {
-        $returns = array_map("trim", $returns);
-        $returns = array_map("strtolower", $returns);
-        $returns = array_unique($returns);
-        $this->returns = $returns;
+    public function setSupportedReturnTypes(...$returns) : Route
+    {
+        $this->returns = array_unique(array_filter(array_map(function($v) {
+            return is_string($v) ? strtolower(trim($v)) : null;
+        }, $returns)));
         return $this;
     }
     
-    /**
-     * supports_accept
-     * checks if requested content type is supported in the route 
-     * @param  string $accept
-     * @return ?string
-     */
-    public function negotiate_accept(?string $default = null) : ?string {
-        return $this->http2->negotiateMimeType(
-            $this->returns,
-            null,
-            null
-        );
+    public function getSupportedReturnTypes() : array {
+        return $this->returns;
     }
-    
+
     //method that return the first supported content type
-    public function get_default_return() : string {
-        return $this->returns[0] ?? "text/plain";
+    public function getDefaultReturn() : string {
+        return $this->returns[0] ?? self::DEFAULT_RETURN;
+    }
+
+    public function applyContext(array $context) : Route {
+        $this->context = array_merge($this->context, $context);
+        return $this;
     }
 
     //Mutate request:
-    public function mutate_request(Http\RequestInterface $request) : Http\RequestInterface {
+    public function mutateRequest(Http\RequestInterface $request) : Http\RequestInterface {
         if ($this->request_mutator !== null) {
             $request = $this->request_mutator->newInstance($request);
         }
         return $request;
     }
 
-    public function override_endpoint_params(
+    public function overrideEndpointParams(
         ?bool $debug = null,
         ?bool $auth  = null,
         $auth_method = null
@@ -110,21 +106,33 @@ class Route {
         }
         return $this;
     }
+
     /**
      * exec
      * execute the route endpoint
      * @param  array $args packed arguments
      * @return Http\Response
      */
-    public function exec(...$args) : Http\Response {
+    public function exec(Http\RequestInterface $request, Http\Response $response) : Http\Response {
 
+        //TODO: clean this up:
         //loop through the arguments and add find the request mutate and add it to the context:
-        foreach ($args as &$arg) {
-            if ($arg instanceof Http\RequestInterface) {
-                $arg = $this->mutate_request($arg);
-                break;
-            }
-        }
+        // foreach ($args as &$arg) {
+        //     if ($arg instanceof Http\RequestInterface) {
+        //         // Mutate the request:
+        //         $arg = $this->mutate_request($arg);
+        //         break;
+        //     }
+        // }
+
+        // Negotiate the accept header:
+        // $request->expects = $this->negotiateAccept($request, $this->getDefaultReturn());
+        
+        // Mutate the request:
+        // $request = $this->mutateRequest($request);
+
+        // Set the context:
+        // $this->context = array_merge($this->context, $context); // TODO: check this one.
 
         // Lazy load the endpoint?
         if (is_object($this->exp) && is_a($this->exp, BindEndpoint::class)) {
@@ -137,14 +145,14 @@ class Route {
 
         //Execute the route endpoint:
         if (is_object($this->exp) && !$this->exp instanceof Closure && method_exists($this->exp, "call")) {
-            return $this->exp->call($this->context, ...$args);
+            return $this->exp->call($this->context, $request, $response);
         }
 
         // Execute the route function:
         //TODO: Make this more modern.
         return call_user_func_array(
             $this->exp, 
-            [$this->context, ...$args]
+            [$this->context, $request, $response]
         );
     }
 

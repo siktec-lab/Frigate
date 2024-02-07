@@ -2,22 +2,37 @@
 
 namespace Frigate\Api;
      
-use Frigate\Application;
-use Frigate\Routing\Http;
+use Frigate\FrigateApp;
+use Frigate\Routing\Http\RequestInterface;
+use Frigate\Routing\Http\Response;
 
 abstract class EndPoint implements EndPointInterface 
 { 
-    public bool $debug                  = false;
-    protected bool $authorize             = false;
-    protected string $authorize_method    = "basic";
+    /**
+     * Debug mode flag.
+     */
+    public bool $debug = false;
 
-    public function __construct(bool $debug = false, $auth = false, $auth_method = "basic")
+    /**
+     * Construct a new endpoint
+     */
+    public function __construct(?bool $debug = null)
     {
-        $this->debug = $debug;
-        $this->authorize = $auth;
-        $this->authorize_method = $auth_method;
+        $this->debug = $debug ?? FrigateApp::ENV_BOOL("FRIGATE_DEBUG_ENDPOINTS", false);
     }
 
-    abstract public function call(array $context, Http\RequestInterface $request) : Http\Response;
+    /**
+     * Get the debug mode flag.
+     * Its an interface method which must be implemented.
+     */
+    public function debug() : bool {
+        return $this->debug;
+    }
+
+    /**
+     * Call the endpoint.
+     * The actual implementation of the endpoint logic.
+     */
+    abstract public function call(array $context, RequestInterface $request, Response $response) : Response;
 
 }

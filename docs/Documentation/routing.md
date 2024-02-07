@@ -11,10 +11,10 @@ The router is initialized with the `init` method. The `init` method takes:
 
 // We use the Frigate Base class to help with environment variables.
 // This is not required but it is recommended.
-Router::init(debug : FrigateApp::ENV_BOOL("DEBUG_ROUTER"));
+Router::init();
 
 // That's it, the router is now initialized we can parse the request.
-Router::parse_request(APP_BASE_URI);
+Router::loadRequest();
 
 ```
 

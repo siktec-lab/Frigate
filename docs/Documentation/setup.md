@@ -97,8 +97,8 @@ Options -Indexes
     RewriteCond %{HTTP:Authorization} ^(.+)$
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
-    # RewriteRule to redirect all requests to index.php
-    RewriteBase /
+    # Optional: Set the base path to the public folder
+    # RewriteBase / 
     RewriteRule . index.php [QSA,L]
 
 </IfModule>
@@ -164,15 +164,14 @@ server {
     server_name example.com www.example.com;
 
     # Block access to environment files (just in case)
-    location ~ /\.env {
+    location ~ /\.env { 
         deny all;
     }
 
-    # Route all requests to index.php even if its a static file or a directory or the file does not exist:
+    # Route all requests to index.php 
     location / {
         try_files /index.php?$query_string;
     }
-
 
     location ~ \.php$ {
         include snippets/fastcgi-php.conf;

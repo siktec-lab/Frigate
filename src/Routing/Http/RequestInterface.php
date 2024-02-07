@@ -9,15 +9,22 @@ namespace Frigate\Routing\Http;
  */
 interface RequestInterface extends MessageInterface
 {
+
+    /**
+     * Whether the request is a test request.
+     */
+    public function isTest() : bool;
+
     /**
      * Returns the current HTTP method.
      */
-    public function getMethod() : string;
+    public function getMethod() : Methods;
 
     /**
      * Sets the HTTP method.
+     * @throws \InvalidArgumentException
      */
-    public function setMethod(string $method) : void;
+    public function setMethod(string|Methods $method) : void;
 
     /**
      * Returns the request url.
@@ -113,4 +120,10 @@ interface RequestInterface extends MessageInterface
      * @param array<string, string> $data
      */
     public function setRawServerData(array $data) : void;
+
+    /**
+     * Loads the request from the _SERVER array.
+     */
+    public function initFromServerArray(array $serverArray) : self;
+
 }

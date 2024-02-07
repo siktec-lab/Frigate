@@ -7,7 +7,7 @@ namespace Frigate\Tests\Routing;
 use PHPUnit\Framework\TestCase;
 use Frigate\FrigateApp as App;
 use Frigate\Routing\Router;
-use Frigate\Routing\Route;
+use Frigate\Routing\Routes\Route;
 use Frigate\Routing\Http\Methods;
 
 class RoutingInitTest extends TestCase
@@ -35,11 +35,11 @@ class RoutingInitTest extends TestCase
             adjust_ini: false
         );
 
-        Router::init(); // Should be in debug mode
+        Router::init( load_request: false); // Should be in debug mode
 
         $this->assertTrue( Router::debug() );
 
-        Router::init( debug: false ); // Should disable debug mode manually
+        Router::init( load_request: false, debug: false ); // Should disable debug mode manually
 
         $this->assertFalse( Router::debug() );
 
@@ -53,7 +53,7 @@ class RoutingInitTest extends TestCase
             adjust_ini: false
         );
 
-        Router::init(); // Should not be in debug mode
+        Router::init(load_request: false); // Should not be in debug mode
 
         $this->assertFalse( Router::debug() );
 

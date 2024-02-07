@@ -35,4 +35,14 @@ interface ResponseInterface extends MessageInterface
      * @throws \InvalidArgumentException
      */
     public function setStatus($status) : void;
+
+    /**
+     * Sets the body to a JSON string.
+     */
+    public function setBodyJson(array|string $body, bool $pretty = false) : void;
+
+    /**
+     * Returns the body as an array.
+     */
+    public function getBodyArray() : ?array;
 }
