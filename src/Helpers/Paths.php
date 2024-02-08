@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Frigate\Helpers;
 
-class Paths {
-    
+class Paths 
+{    
     /**
      * implodes an array to os based path
      * @param  array<string> ...$path
