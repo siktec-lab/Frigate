@@ -18,7 +18,7 @@ use Frigate\Routing\Http\ResponseInterface;
  */
 class ErrorEndPoint extends EndPoint { 
 
-    public function __construct(bool $debug = false)
+    public function __construct(?bool $debug = null)
     {
         parent::__construct($debug);
     }

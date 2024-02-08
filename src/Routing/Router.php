@@ -6,12 +6,12 @@ namespace Frigate\Routing;
 
 use Exception;
 use Frigate\FrigateApp;
-// use Frigate\Routing\Http;
 use Frigate\Routing\Http\RequestInterface;
 use Frigate\Routing\Http\ResponseInterface;
 use Frigate\Routing\Http\Response;
 use Frigate\Routing\Http\RouteRequest;
 use Frigate\Routing\Http\Methods;
+use Frigate\Api\EndPointInterface;
 use Frigate\Routing\Paths\PathBranch;
 use Frigate\Routing\Paths\PathTree;
 use Frigate\Routing\Routes\Route;
@@ -309,11 +309,11 @@ class Router {
      * define an error route to be used when an error code is raised
      *
      * @param  int|string $code 'any' for any error
-     * @param  Route $route the route to be used
+     * @param  EndPointInterface $endpoint the endpoint to use
      */
-    public static function error(int|string $code, Route $route) : void 
+    public static function error(int|string $code, EndPointInterface $endpoint) : void 
     {
-        self::$errors[$code] = $route;
+        self::$errors[$code] = new Route(path: "/", exp: $endpoint);
     }
 
     /**
@@ -322,7 +322,7 @@ class Router {
      * @param  ?RouteRequest $request null when current request should be used
      * @return Http\Response
      */
-    public static function load(?Http\RequestInterface $request = null) : Http\Response 
+    public static function load(?Http\RequestInterface $request = null) : ResponseInterface
     {
         $request = $request ?? self::$request;
         return self::execute($request);
@@ -527,11 +527,17 @@ class Router {
         string  $trace      = ""
     ) : ResponseInterface {
 
-        $is_defined = array_key_exists($code, self::$errors);
-
         // Get code or default to 500:
         if ($code < 100 || $code > 599) {
             $code = 500;
+        }
+
+        // Get the error handler:
+        $handler = null;
+        if (array_key_exists($code, self::$errors)) {
+            $handler = self::$errors[$code];
+        } else if (array_key_exists("any", self::$errors)) {
+            $handler = self::$errors["any"];
         }
 
         // Update the response:
@@ -540,8 +546,8 @@ class Router {
             $returns = [ "text/html", "application/json" ];
             $default = "text/html";
             $expects = $request->negotiateAccept(
-                $is_defined ? self::$errors[$code]->getSupportedReturnTypes() : $returns, 
-                $is_defined ? self::$errors[$code]->getDefaultReturn() : $default
+                ($handler?->getSupportedReturnTypes() ?? $returns), 
+                ($handler?->getDefaultReturn() ?? $default)
             );
             $response->setHeader("Content-Type", $expects);
         }
@@ -554,20 +560,14 @@ class Router {
             "message"   => $message,
             "trace"     => $trace
         ];
-        
-        // First priority is the error code:
-        if (array_key_exists($code, self::$errors)) {
-            self::$errors[$code]->applyContext($apply_ctx);            
-            return self::$errors[$code]->exec($request, $response);
-        }
-        
-        // Second priority is the any error:
-        if (array_key_exists("any", self::$errors)) {
-            self::$errors[$code]->applyContext($apply_ctx);
-            return self::$errors["any"]->exec($request, $response);
+
+        // Execute the error route:
+        if ($handler) {
+            $handler->applyContext($apply_ctx);            
+            return $handler->exec($request, $response);
         }
 
-        //Finally, return a default error response:
+        //No error handler, return the default response:
         if ($response->getHeader("Content-Type") === "application/json") {
             $response->setBodyJson([
                 "error" => [
