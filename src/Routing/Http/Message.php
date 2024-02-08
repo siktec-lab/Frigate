@@ -9,7 +9,8 @@ use Frigate\Routing\Http\HTTP2;
  * This object contains a few simple methods that are shared by both.
  *
  */
-abstract class Message implements MessageInterface {
+abstract class Message implements MessageInterface
+{
 
     /**
      * Request body.
@@ -23,7 +24,7 @@ abstract class Message implements MessageInterface {
     /**
      * Contains the list of HTTP headers.
      *
-     * @var array<string, mixed>
+     * @var array<string,mixed>
      */
     protected array $headers = [];
 
@@ -122,7 +123,7 @@ abstract class Message implements MessageInterface {
      *
      * Every header is returned as an array, with one or more values.
      *
-     * @return array<string, mixed>
+     * @return array<string,mixed>
      */
     public function getHeaders() : array
     {
@@ -174,7 +175,7 @@ abstract class Message implements MessageInterface {
      *
      * If the header did not exist, this method will return an empty array.
      *
-     * @return string[]
+     * @return array<string>
      */
     public function getHeaderAsArray(string $name) : array
     {
@@ -194,7 +195,8 @@ abstract class Message implements MessageInterface {
      *
      * If the header already existed, it will be overwritten.
      *
-     * @param string|string[] $value
+     * @param string $name The name of the header.
+     * @param string|array<string> $value
      */
     public function setHeader(string $name, array|string $value) : self
     {
@@ -210,7 +212,7 @@ abstract class Message implements MessageInterface {
      *
      * Any header that already existed will be overwritten.
      *
-     * @param array<string, mixed> $headers
+     * @param array<string,mixed> $headers
      */
     public function setHeaders(array $headers) : self
     {
@@ -227,7 +229,8 @@ abstract class Message implements MessageInterface {
      * another value. Individual values can be retrieved with
      * getHeadersAsArray.
      *
-     * @param mixed|mixed[] $value
+     * @param string $name The name of the header.
+     * @param string|array<string> $value
      */
     public function addHeader(string $name, array|string $value) : self
     {
@@ -251,7 +254,7 @@ abstract class Message implements MessageInterface {
      *
      * Any existing headers will not be overwritten.
      *
-     * @param array<string, mixed> $headers
+     * @param array<string,mixed> $headers
      */
     public function addHeaders(array $headers) : self
     {
