@@ -6,6 +6,7 @@ namespace Frigate\Helpers;
 
 use Frigate\Helpers\Arrays;
 use Frigate\Routing\Http\HTTP2;
+
 /**
  * A dictionary of MIME types and their associated file extensions.
  */
