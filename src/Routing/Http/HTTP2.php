@@ -227,7 +227,7 @@ class HTTP2
      * @param string $header    The HTTP "Accept" header to parse
      * @param array  $supported A list of supported values
      */
-    protected static function matchAccept(string $header, array $supported) : ?string
+    public static function matchAccept(string $header, array $supported) : ?string
     {
         $matches = self::sortAccept($header);
         foreach ($matches as $key => $q) {
@@ -248,7 +248,7 @@ class HTTP2
      * @param string $header The HTTP "Accept" header to parse
      * @return array Sorted list of "accept" options
      */
-    protected static function sortAccept(string $header) : array
+    public static function sortAccept(string $header) : array
     {
         $matches = array();
         foreach (explode(',', $header) as $option) {

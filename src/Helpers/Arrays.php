@@ -73,4 +73,12 @@ class Arrays {
         return $obj;
     }
 
+    public static function arrayFlipPreserve(array $arr) : array
+    {
+        return array_reduce(array_keys($arr), function ($carry, $key) use (&$arr) {
+            $carry[$arr[$key]] ??= [];
+            $carry[$arr[$key]][] = $key;
+            return $carry;
+        }, []);
+    }
 }

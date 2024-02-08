@@ -6,8 +6,8 @@ namespace FrigateBin\App\Commands;
 
 use JCli\IO\Interactor;
 use Frigate\Cli\Commands\Command;
-use Frigate\Helpers\MimeTypes;
-use Frigate\Helpers\MimeTypesFileBuilder as MimeBuilder;
+use FrigateBin\App\Logic\MimeTypesBuilder;
+use Frigate\Helpers\MimeType;
 
 class UpdateMimesCommand extends Command
 {
@@ -53,7 +53,7 @@ class UpdateMimesCommand extends Command
         $mime_types = file_get_contents(self::MIME_TYPES_URL);
 
         // Error on remote file download failure:
-        if ($mime_types === false) {
+        if (!$mime_types) {
             return $this->responseError(
                 message: "Failed to download mime.types file from apache svn",
                 args: [],
@@ -62,15 +62,16 @@ class UpdateMimesCommand extends Command
         }
 
         // Process the mime types file:
-        $builder = new MimeBuilder();
+        $builder = new MimeTypesBuilder();
         $builder->loadDefinition($mime_types);
-        $output = MimeTypes::BUILT_IN_FILE;
-        $saved = $builder->save($output);
+        $source = MimeType::UPDATE_FILE;
+        // $source = __DIR__ . DIRECTORY_SEPARATOR . "MimeType.php";
+        $saved = $builder->save($source);
 
         // If we failed return an error:
-        if (!$saved) {
+        if ($saved !== true) {
             return $this->responseError(
-                message: "Failed to save mime.types.php file to disk",
+                message: $saved,
                 args: [],
                 data: []
             );
@@ -89,9 +90,9 @@ class UpdateMimesCommand extends Command
         // Return the response:
         return $this->responseColorized(
             message: $template,
-            args: [ $output, $parsed, $total_mimes ],
+            args: [ $source, $parsed, $total_mimes ],
             data: [
-                "file"         => $output,
+                "file"         => $source,
                 "total_parsed" => $parsed,
                 "mime_types"   => $total_mimes
             ],

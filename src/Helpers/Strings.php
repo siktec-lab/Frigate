@@ -82,4 +82,13 @@ class Strings {
             '/(?:(?:\/\*(?:[^*]|(?:\*+[^*\/]))*\*+\/)|(?:(?<!\:|\\\|\'|\")\/\/.*))/', '', $str
         ) ?? "";
 	}
+
+    /**
+     * Split lines into an array
+     * A better version of explode("\n", $str) which works on all line endings.
+     */
+    public static function splitLines(string $str, string $pattern = "/\r\n|\n|\r/") : array
+    {
+        return preg_split($pattern, $str);
+    }
 }

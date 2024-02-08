@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Frigate\Tests\FileSystem;
+namespace Frigate\Tests\Helpers;
 
 use PHPUnit\Framework\TestCase;
 use Frigate\Helpers\MimeTypes;

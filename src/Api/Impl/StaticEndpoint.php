@@ -11,7 +11,7 @@ use Frigate\Routing\Http\RequestInterface;
 use Frigate\Routing\Http\ResponseInterface;
 use Frigate\Helpers\Paths;
 use Frigate\Helpers\Files;
-use GuzzleHttp\Psr7\MimeType;
+use Frigate\Helpers\MimeType;
 
 /**
  * StaticEndpoint
@@ -21,13 +21,20 @@ class StaticEndpoint extends EndPoint {
 
     use ContextHelpers;
 
+    protected array $types = ["*/*" => "inline"];
+
+    public const DISPOSE_INLINE     = "inline";    
+    public const DISPOSE_ATTACHMENT = "attachment";
+
     public function __construct(
         protected string $directory, 
-        protected array $types = ["*/*"], 
-        protected array $extensions = [],
+        array $types = ["*/*" => "inline"],
         ?bool $debug = null
     ) {
         parent::__construct($debug);
+
+        // Initialize the mime types:
+        $this->initMimeTypes($types);
 
         // Set the directory:
         $dir_path = realpath($directory);
@@ -40,9 +47,30 @@ class StaticEndpoint extends EndPoint {
     /**
      * Initialize the mime types
      */
-    protected function initMimeTypes() : void 
+    protected function initMimeTypes(array $types) : void 
     {
-        return;
+        if (empty($types)) {
+            return;
+        }
+        foreach ($types as $type => $disposition) {
+            $mime = is_string($type) ? $type : $disposition;
+            $disp = is_string($type) ? $disposition : "inline";
+            
+            // If the mime type is an extension:
+            if ($mime == "*/*" || MimeType::isExtension($mime)) {
+                $mime = MimeType::fromExtension($mime);
+            } elseif (!MimeType::isMimeType($mime)) {
+                continue;
+            }
+
+            //Validate the disposition:
+            if ($disp !== self::DISPOSE_INLINE && $disp !== self::DISPOSE_ATTACHMENT) {
+                continue;
+            }
+
+            // Save it:
+            $this->types[$mime] = $disp;
+        }
     }
 
     protected function validatePath(string $path) : ?SplFileObject
@@ -84,6 +112,10 @@ class StaticEndpoint extends EndPoint {
             : (MimeType::fromFilename($file->getRealPath()) ?? "application/octet-stream");
         $size = $file->getSize();
 
+        // Is supported?
+        $disposition = $this->types[$mime] ?? "inline";
+
+        // Check if the file
         $headers = [
             "Content-Length"                => $size,
             "Content-Type"                  => $mime,
