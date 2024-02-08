@@ -10,11 +10,11 @@ use Dotenv\Dotenv;
 use Frigate\Exceptions\FrigateException;
 use ReflectionClass;
 
-class FrigateApp {
-
+class FrigateApp
+{
     /** 
      * Required environment variables
-     * @var array<string,string>
+     * @var array<string,string> environment variable name => type
     */
     public const REQUIRED_ENV = [
         'FRIGATE_ROOT_FOLDER'       => "string",
@@ -35,7 +35,7 @@ class FrigateApp {
     static public string $version = "1.0.0";
 
     /** 
-     * Environment variables:
+     * Environment variables container
      */
     static public ?Dotenv $env = null;
 
