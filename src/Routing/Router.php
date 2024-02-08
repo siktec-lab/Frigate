@@ -16,8 +16,8 @@ use Frigate\Routing\Paths\PathBranch;
 use Frigate\Routing\Paths\PathTree;
 use Frigate\Routing\Routes\Route;
 
-class Router {
-
+class Router 
+{
     use RouterHelpersTrait;
 
     private static bool $debug = false;
@@ -72,7 +72,8 @@ class Router {
      * @param ?string $request_class null to reset to the default
      * @throws Exception when the request class is not found or does not implement RequestInterface
      */
-    public static function setRequestClass(?string $request_class = null) : void {
+    public static function setRequestClass(?string $request_class = null) : void 
+    {
         // Set the request class if needed:
         if (!is_null($request_class)) {
             //TODO: make those exceptions FrigateExceptions
@@ -94,7 +95,8 @@ class Router {
      * @param ?string $response_class null to reset to the default
      * @throws Exception when the response class is not found or does not implement ResponseInterface
      */
-    public static function setResponseClass(?string $response_class = null) : void {
+    public static function setResponseClass(?string $response_class = null) : void 
+    {
         // Set the response class if needed:
         if (!is_null($response_class)) {
             //TODO: make those exceptions FrigateExceptions
@@ -506,9 +508,11 @@ class Router {
      * get the defined routes as a tree
      * @return array<string,PathTree>
      */
-    public static function getRoutesTree() : array {
+    public static function getRoutesTree() : array 
+    {
         return self::$routes;
     }
+
     /**
      * handle an error and return a response for it
      *
@@ -581,6 +585,7 @@ class Router {
         } else {
             $response->setBody(sprintf("Error %d: %s \nFile : %s \nLine : %d", $code, $message, $file, $line));
         }
+        
         return $response;
     }
 }
