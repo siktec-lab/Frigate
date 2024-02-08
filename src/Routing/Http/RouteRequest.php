@@ -1,19 +1,30 @@
 <?php
 
-namespace Frigate\Routing\Http;
+declare(strict_types=1);
 
+namespace Frigate\Routing\Http;
 
 use Frigate\Routing\Auth\AuthFactory;
 
 class RouteRequest extends Request 
 {
 
+    /**
+     * The main request implementation used in the routing system as a default request object
+     * 
+     * @param RequestInterface|null $from - a request to copy from, all other parameters will be ignored
+     * @param string|Methods $method - the request method
+     * @param string $url - the request url
+     * @param array $headers - the request headers
+     * @param resource|string|callable|null $body - the request body
+     * @throws \Exception - if the method is not supported
+     */
     public function __construct(
         ?RequestInterface $from = null, 
         string|Methods $method = Methods::GET, 
         string $url = "", 
         array $headers = [], 
-        $body = null
+        mixed $body = null
     ) {
         if ($from) {
             $method  = $from->getMethod();
@@ -21,7 +32,6 @@ class RouteRequest extends Request
             $headers = $from->getHeaders();
             $body    = $from->getBody();
         }
-
         parent::__construct($method, $url, $headers, $body);
     }
 
@@ -29,7 +39,8 @@ class RouteRequest extends Request
      * check if the request is a test request
      * Based on the X-Perform header
      */
-    public function isTest() : bool {
+    public function isTest() : bool
+    {
         return strtolower($this->getHeader('X-Perform') ?? "") === "test";
     }
 
@@ -39,7 +50,8 @@ class RouteRequest extends Request
      * this will destroy teh input.
      * @return array
      */
-    public function getPatchData() : array {
+    public function getPatchData() : array
+    {
         $data = [];
         $str = $this->getBodyAsString();
         //check is $str is json:
@@ -54,7 +66,12 @@ class RouteRequest extends Request
         return $data;
     }
 
-    public function authorize(string|array $methods, array|null $manual_credentials = null, bool $throw = true) : array {
+    //TODO: All of authorization should be moved to a middleware
+    public function authorize(
+        string|array $methods, 
+        array|null $manual_credentials = null, 
+        bool $throw = true
+    ) : array {
 
         if (is_string($methods)) {
             $methods = explode("|", trim($methods));
@@ -81,7 +98,9 @@ class RouteRequest extends Request
         return [false, null, null]; // we return minimal data here, so that the user can check if the request was authorized
     }
     
-    public function getCredentials(string $from = "header") : ?array {
+    //TODO: All of authorization should be moved to a middleware
+    public function getCredentials(string $from = "header") : ?array 
+    {
         $auth = "xxxx";
         switch ($from) {
             case "header": 
@@ -107,7 +126,9 @@ class RouteRequest extends Request
         return $credentials;
     }
 
-    public function requireAuthorization(string $method, bool $throw = true) : string|bool {
+    //TODO: All of authorization should be moved to a middleware
+    public function requireAuthorization(string $method, bool $throw = true) : string|bool 
+    {
 
         $methods = explode("|", trim($method));
         $authorized = false;
@@ -152,5 +173,4 @@ class RouteRequest extends Request
         }
         return $authorized === true ? $user : false;
     }
-
 }

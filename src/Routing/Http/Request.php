@@ -46,7 +46,7 @@ class Request extends Message implements RequestInterface {
      * @param resource|callable|string|null $body
      * @throws \InvalidArgumentException if the method is not a valid HTTP method.
      */
-    public function __construct(string|Methods $method, string $url, array $headers = [], $body = null)
+    public function __construct(string|Methods $method, string $url, array $headers = [], mixed $body = null)
     {
         $this->setMethod($method);
         $this->setUrl($url);
