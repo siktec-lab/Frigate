@@ -65,7 +65,7 @@ class Upload
     public function populate(string $entry) : void
     {
         $files = isset($_FILES[$entry]) ? $this->to_array_of_files($_FILES[$entry]) : null;
-        $metadata = isset($_POST[$entry]) ? Arrays::to_array($_POST[$entry]) : [];
+        $metadata = isset($_POST[$entry]) ? Arrays::toArray($_POST[$entry]) : [];
         // parse metadata
         if (count($metadata)) {
             $this->metadata = @json_decode($metadata[0], true);
@@ -96,7 +96,7 @@ class Upload
             }
             return $results;
         }
-        return Arrays::to_array($value);
+        return Arrays::toArray($value);
     }
     
     /**

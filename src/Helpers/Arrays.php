@@ -4,28 +4,40 @@ declare(strict_types=1);
 
 namespace Frigate\Helpers;
 
-class Arrays {
-    
+class Arrays 
+{    
     /**
-     * is_associative_array
      * Checks if an array is associative or not
+     *
      * @param  mixed $arr array to check
-     * @return bool true if associative, false if not
      */
-    public static function is_associative_array(mixed $arr) : bool 
+    public static function isAssoc(mixed $arr) : bool 
     {
-        return array_keys($arr) !== range(0, count($arr) - 1);
+        return !array_is_list($arr);
+    }
+
+    /**
+     * Checks if an array is a list or not
+     *
+     * @param  mixed $arr array to check
+     */
+    public static function isList(mixed $arr) : bool 
+    {
+        return array_is_list($arr);
     }
         
     /**
-     * to_array
      * Converts a value to an array
+     *
+     * Unlike (array) $value, this method will convert objects to arrays and strings to arrays treating them as 
+     * comma separated lists
+     *
      * @param  mixed $value
      * @param  bool $empty_on_error if true, returns an empty array if the value cannot be converted to an array
      * @return array array if successful, otherwise an empty array
      * @throws \Exception if $empty_on_error is false and the value cannot be converted to an array
      */
-    public static function to_array(mixed $value, bool $empty_on_error = true) : array 
+    public static function toArray(mixed $value, bool $empty_on_error = true) : array 
     {
         // If the value is already an array, return it
         if (is_array($value)) {
@@ -33,7 +45,7 @@ class Arrays {
         }
         // If its an object, convert it to an array:
         if (is_object($value)) {
-            return self::stdClass_to_array($value);
+            return self::stdClassToArray($value);
         }
         // If its a string, convert it to an array assume it is a comma separated list:
         if (is_string($value)) {
@@ -52,17 +64,17 @@ class Arrays {
             return [];
         }
         //throw an error:
+        //TODO: Add a custom exception class
         throw new \Exception("Could not convert value to array");
     }
     
     /**
-     * stdClass_to_array
      * Converts a stdClass object to an array recursively
      * 
      * @param  mixed $obj stdClass object or array of stdClass objects
      * @return mixed array if successful, otherwise the value passed in
      */
-    public static function stdClass_to_array(mixed $obj) : mixed 
+    public static function stdClassToArray(mixed $obj) : mixed 
     {
         if (is_object($obj)) {
             $obj = get_object_vars($obj);
@@ -73,6 +85,13 @@ class Arrays {
         return $obj;
     }
 
+    /**
+     * Flips the keys and values of an array, preserving duplicate values
+     * Unlike array_flip, this method will return an array of arrays without overwriting duplicate values
+     *
+     * @param  array $arr the array to flip
+     * @return array<int|string,array<int|string>> the flipped array
+     */
     public static function arrayFlipPreserve(array $arr) : array
     {
         return array_reduce(array_keys($arr), function ($carry, $key) use (&$arr) {

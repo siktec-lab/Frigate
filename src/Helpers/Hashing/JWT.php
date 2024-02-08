@@ -318,7 +318,7 @@ class JWT {
             $this->not_before = $data->iat - $data->nbf;
             $this->token = $token;
             // Populate data:
-            $this->set_data(Arrays::to_array($data->data));
+            $this->set_data(Arrays::toArray($data->data));
             // Return true
             return true;
 
