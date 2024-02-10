@@ -1,14 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Frigate\Routing\Http;
 
-use Sabre\Uri;
+use Sabre\Uri; //TODO: remove this We should use our own Uri class (if we keep guzzle use guzzle uri)
 
 /**
  * The Request class represents a single HTTP request.
  * You can either simply construct the object from scratch, or if you need
  */
-class Request extends Message implements RequestInterface {
+class Request extends Message implements RequestInterface
+{
 
     /**
      * HTTP Method.
@@ -387,5 +390,4 @@ class Request extends Message implements RequestInterface {
 
         return $out;
     }
-
 }

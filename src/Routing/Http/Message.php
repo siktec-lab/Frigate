@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Frigate\Routing\Http;
 
 use Frigate\Routing\Http\HTTP2;
+
 /**
  * This is the abstract base class for both the Request and Response objects.
  *

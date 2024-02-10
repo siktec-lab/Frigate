@@ -388,8 +388,8 @@ class Router
             // Prepare the request:
             // TODO: this might be an expression, not a route so wrap it in a requests
             $accept = $request->negotiateAccept(
-                $branch->exp->getSupportedReturnTypes(), 
-                $branch->exp->getDefaultReturn()
+                $branch->exp->returnTypes(), 
+                $branch->exp->defaultReturn()
             );
 
             // Return an error if the accept header is not supported:
@@ -550,8 +550,8 @@ class Router
             $returns = [ "text/html", "application/json" ];
             $default = "text/html";
             $expects = $request->negotiateAccept(
-                ($handler?->getSupportedReturnTypes() ?? $returns), 
-                ($handler?->getDefaultReturn() ?? $default)
+                ($handler?->returnTypes() ?? $returns), 
+                ($handler?->defaultReturn() ?? $default)
             );
             $response->setHeader("Content-Type", $expects);
         }
