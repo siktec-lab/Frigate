@@ -94,7 +94,7 @@ interface MessageInterface {
      *
      * @param string|string[] $value
      */
-    public function setHeader(string $name, array|string $value) : MessageInterface;
+    public function setHeader(string $name, array|string|int|float $value) : MessageInterface;
 
     /**
      * Sets a new set of HTTP headers.

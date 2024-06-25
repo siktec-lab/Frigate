@@ -201,7 +201,7 @@ abstract class Message implements MessageInterface
      * @param string $name The name of the header.
      * @param string|array<string> $value
      */
-    public function setHeader(string $name, array|string $value) : self
+    public function setHeader(string $name, array|string|int|float $value) : self
     {
         $this->headers[strtolower($name)] = [$name, (array) $value];
         return $this;
