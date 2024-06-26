@@ -11,16 +11,129 @@ The router is initialized with the `init` method. The `init` method takes:
 
 // We use the Frigate Base class to help with environment variables.
 // This is not required but it is recommended.
-Router::init();
+Router::init(
+    load_request    : true, // (bool) Load the request immediately. Default is true.
+    debug           : null, // (null|bool) Enable debug mode. Default is null which will use the environment variable.
+    use_request     : null, // (null|string) Use a specific request object. Default is null which will use the default request object.
+    use_response    : null, // (null|string) Use a specific response object. Default is null which will use the default response object.
+);
 
-// That's it, the router is now initialized we can parse the request.
+// If the request is not loaded immediately we can load it later:
 Router::loadRequest();
 
 ```
 
-Parsing the request will simply load the current request method in the router.
+The router is now initialized and ready to define routes.
+The router parses the request and matches it against the defined routes. After the execution of the route, the response is sent to the client.
+
 
 ## Defining Routes
+
+Routes are defined with the `define` method. The `define` method takes:
+- `method` - the HTTP method of the route. This can be a string or an array of strings.
+- `route` - the `Route` object that defines the route logic.
+
+```php
+<?php
+    // ..... Initialize the App and Router
+
+    use Frigate\Routing\Http\Methods;
+    use Frigate\Routing\Routes\Route;
+
+    /* 
+        Define a route - In this case a GET route that matches the path "/me/{some_name}""
+        and executes the MyEndpoint class.
+    */
+    Router::define(Methods::GET, new Route(
+        path : "/me/?{name}", // The path of the route.
+        context: [ // The context that will be passed to the endpoint.
+            "name" => "John" // The default value of the name parameter.
+        ],
+        exp  : new MyEndpoint( debug: null) // The endpoint class this route will execute.
+    );
+
+```
+
+This is the most basic way to define a route. The route will match the path `/me/` and `/me/John` etc... and will execute the `MyEndpoint` class which is a class that extends the `Endpoint` class - [about endpoints](#endpoints).
+
+### Generic Routes
+
+For convenience, the `Router` class has dome predefined methods for the most common HTTP methods and for the most common route types. These methods are:
+
+- `get` - defines a GET route.
+- `post` - defines a POST route.
+- `put` - defines a PUT route.
+- `patch` - defines a PATCH route.
+- `delete` - defines a DELETE route.
+- `options` - defines an OPTIONS route.
+- `head` - defines a HEAD route.
+- `any` - defines a route that matches any HTTP method.
+- `static` - defines a static route that serves a file.
+- `error` - defines an error route that will be executed when an error occurs.
+
+For all the generic routes and the `any` route you can simply use them as a method of the `Router` class. For example:
+
+```php
+<?php
+    // ..... Initialize the App and Router
+    
+    Router::get( // Or any other method like post, put, patch, delete, options, head, any
+        path : "/me/?{name}",
+        context: [
+            "name" => "John"
+        ],
+        exp  : new MyEndpoint( debug: null)
+    );
+
+```
+
+This is the same as the previous example but with a more convenient way to define the route.
+
+`static` and `error` routes are special routes that have predefined behavior. The `static` route will serve a file from the file system and the `error` route will be executed when an error occurs. The `error` route is described in the [error handling section](#error-handling).
+
+### Static Routes
+
+Static routes are routes that serve files from the file system. The `static` route is defined with the `static` method of the `Router` class. The `static` method takes:
+- `path` - (string) the path of the route - using the path syntax described below.
+- `directory` - (string) the absolute path to the directory that contains the files.
+- `types` - (string|array) the file types that will be served. This can be a string or an array of strings. The default is `["*/*"]` which will serve all files.
+
+Here is an example of a static route:
+
+```php
+<?php
+
+    // ..... Initialize the App and Router
+
+    Router::static(
+        path        : "/storage", // The path of the route.
+        directory   : __DIR__ . DIRECTORY_SEPARATOR . "files", // The directory that contains the files. 
+        types       : ["image/*", "text/*", "video/*"] // The types of files that will be served.
+    );
+
+```
+
+This will serve files from the `files` directory when the path `/storage/...` is requested. The files will be served with the correct mime type based on the file extension.
+
+??? info "How do I set the file disposition?"
+    By default, the file disposition is set to `inline`. This means that the file will be displayed in the browser. Which means that if the browser can display the file it will. If you want to force the download of the file you can set the file disposition to `attachment`. This can be done by passing the `types` parameter as an associative array where the key is the mime type and the value is the file disposition. For example:
+
+    ```php
+
+    <?php
+       // ....
+       types : [
+           "image/*" => "inline",
+           "text/*"  => "attachment",
+           "video/*" => "inline"
+       ]
+       // ....
+    ```
+
+!!! note
+    1. You can use the path syntax described below to define the path of the static route. But the path should not contain `path parameters`.
+    2. All the logic of the static route is handled by a custom handler that is provided by Frigate. This `Endpoint` is called `StaticEndpoint` and is described in the [endpoints section](#endpoints).
+
 
 ## Path Syntax
 
