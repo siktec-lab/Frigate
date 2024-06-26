@@ -218,7 +218,7 @@ trait RouterHelpersTrait
             )
         ));
     }
-
+    
     /**
      * dump the defined routes trees for debugging
      */

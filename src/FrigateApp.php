@@ -68,7 +68,7 @@ class FrigateApp
         string|array|null $env  = null,
         array $extra_env        = [],
         bool $load_session      = true, 
-        bool $start_page_buffer = false,
+        bool $start_page_buffer = true,
         ?bool $adjust_ini       = true
     ) : void {
 
@@ -180,7 +180,7 @@ class FrigateApp
     }
 
     static public function endPageBuffer() : string {
-        return ob_get_clean();
+        return ob_get_clean() ?: "";
     }
 
     static public function debug(object|string $from, string $message, mixed $variable = null) : void {

@@ -12,6 +12,7 @@ use Frigate\Routing\Http\Response;
 use Frigate\Routing\Http\RouteRequest;
 use Frigate\Routing\Http\Methods;
 use Frigate\Api\EndPointInterface;
+use Frigate\Middlewares\MiddlewareInterface;
 use Frigate\Routing\Paths\PathBranch;
 use Frigate\Routing\Paths\PathTree;
 use Frigate\Routing\Routes\Route;
@@ -210,6 +211,7 @@ class Router
         );
 
     }
+
     /**
      * build a request object for passing to the route handler
      * 
@@ -282,6 +284,31 @@ class Router
     } 
 
     /**
+     * Attach a route expression to the router specified by the method and path
+     * 
+     * @param  Methods|string $method the main method
+     * @param  string $path the path to match
+     * @param  object|array|string $exp the expression to register
+     */
+    private static function attachRouteExpression(
+        Methods|string $method, 
+        string $path, 
+        object|array|string $exp
+    ) : void {
+
+        // Normalize:
+        $method = is_string($method) ? Methods::fromString($method) : $method;
+
+        // Check if the method needs to be defined:
+        if (!array_key_exists($method->value, self::$routes)) {
+            self::$routes[$method->value] = new PathTree();
+        }
+
+        // Register the route:
+        self::$routes[$method->value]->define($path, $exp);
+    }
+
+    /**
      * define a route to be used when a request matches the route and the method
      *
      * @param  Methods|string|array $method the method or an array of methods
@@ -295,15 +322,7 @@ class Router
         // Initialize a new PathTree if it doesn't exist for this method:
         foreach ($methods as $m) {
             
-            // Validate the method:
-            $m = is_string($m) ? Methods::fromString($m) : $m;
-
-            // Check if the method needs to be defined:
-            if (!array_key_exists($m->value, self::$routes)) {
-                self::$routes[$m->value] = new PathTree();
-            }
-            // Register the route:
-            self::$routes[$m->value]->define($route->path, $route);
+            self::attachRouteExpression($m, $route->path, $route);
         }
     }
     
@@ -316,6 +335,34 @@ class Router
     public static function error(int|string $code, EndPointInterface $endpoint) : void 
     {
         self::$errors[$code] = new Route(path: "/", exp: $endpoint);
+    }
+
+    public static function middleware(
+        Methods|string|array $method, 
+        array|string $path, 
+        MiddlewareInterface $middle_ware
+    ) : void
+    {   
+        // Normalize:
+        $path = is_array($path) ? $path : [$path];
+        $methods = is_array($method) ? $method : [$method];
+
+        // Make sure the path is a shadow branch:
+        foreach ($path as &$p) {
+            // If the path doesn't contain any shadow branch, we'll add one to the end of the path:
+            if (!str_contains($p, PathBranch::TOKEN_SHADOW_BRANCH)) {
+                $p = rtrim($p, "/").PathBranch::TOKEN_SHADOW_BRANCH;
+            }
+            // truncate the path to the last shadow branch - a path can have multiple shadow branches
+            // Example: /path^/name/path2^/name2 => /path^/name/path2^
+            $i = strrpos($p, PathBranch::TOKEN_SHADOW_BRANCH);
+            $p = substr($p, 0, $i + 1);
+
+            // Attach the middleware to the path:
+            foreach ($methods as $m) {
+                self::attachRouteExpression($m, $p, $middle_ware);
+            }
+        }
     }
 
     /**
@@ -379,8 +426,14 @@ class Router
             if (!array_key_exists($method->value, self::$routes)) {
                 throw new \Exception("Request method '{$method->value}' is not supported", 404);
             }
+
             //Get the route & evaluate it:
-            [$branch, $con] = self::$routes[$method->value]->eval($request->getPath());
+
+            /** 
+             * @var PathBranch|null $branch 
+             * @var array $context 
+             */
+            [$branch, $context] = self::$routes[$method->value]->eval($request->getPath());
             if (is_null($branch)) {
                 throw new \Exception("Not Found", 404);
             }
@@ -397,12 +450,31 @@ class Router
                 throw new \Exception("Accept header not supported", 406);
             }
 
+            // Set the response content type:
             $response->setHeader("Content-Type", $accept);
 
             // TODO: apply middlewares here:
+            $middlewares = $branch->getShadowExpressions();
+            foreach ($middlewares as $middleware) {
+                if ($middleware instanceof MiddlewareInterface) {
+                    
+                    // Execute the middleware:
+                    $middleware->exec(
+                        $method, 
+                        $request,
+                        $response, 
+                        $context,
+                        $branch->exp
+                    );
+
+                } elseif (is_array($middleware)) {
+                    // Merge the context:
+                    $context = array_merge($context, $middleware);
+                }
+            }
 
             //Apply the context:
-            $branch->exp->applyContext($con);
+            $branch->exp->applyContext($context);
 
             //Is override?
             if (!is_null($debug) || !is_null($auth) || !is_null($auth_method)) {

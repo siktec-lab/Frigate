@@ -246,7 +246,7 @@ class PathBranch {
     /**
      * get the shadow expressions
      * 
-     * If its a expression branch it will return all the shadow expressions
+     * If its an expression branch it will return all the shadow expressions
      * from the parent branches also
      *
      * @return array<object|array|string>
