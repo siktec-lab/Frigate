@@ -16,6 +16,7 @@ use Frigate\Middlewares\MiddlewareInterface;
 use Frigate\Routing\Paths\PathBranch;
 use Frigate\Routing\Paths\PathTree;
 use Frigate\Routing\Routes\Route;
+use Frigate\Routing\Routes\DefineRoute;
 
 class Router 
 {
@@ -41,10 +42,10 @@ class Router
 
     /**
      * initialize the router
-     * @param bool $load_request
-     * @param ?bool $debug 
-     * @param ?string $use_request
-     * @param ?string $use_response
+     * @param bool $load_request - load the request immediately
+     * @param ?bool $debug - enable debug mode null for FRIGATE_DEBUG_ROUTER env
+     * @param ?string $use_request - the request class to use null for default
+     * @param ?string $use_response - the response class to use null for default
      * 
      * @throws Exception when the request or response class is not found or does not implement the correct interface
      */
@@ -316,16 +317,73 @@ class Router
      * @throws Exception when the route allready exists or can't be parsed properly
      * @throws InvalidArgumentException when the method is not supported
      */
-    public static function define(Methods|string|array $method, Route $route) : void 
+    public static function define(Methods|string|array $method, Route|DefineRoute $route) : void 
     {
         $methods = is_array($method) ? $method : [$method];
+
+        // If the route is a DefineRoute, we'll initialize it:
+        if ($route instanceof DefineRoute) {
+            $methods = $route->method;
+            $route = $route->init();
+        }
+
         // Initialize a new PathTree if it doesn't exist for this method:
         foreach ($methods as $m) {
-            
             self::attachRouteExpression($m, $route->path, $route);
         }
     }
     
+    /**
+     * load the routes from a folder - all files ending with Route.php will be loaded
+     *
+     * @param  string $path the path to the folder
+     * @param  bool $cache should we cache the files
+     * @return int the number of routes loaded
+     */
+    public static function defineFrom(string $folder, bool $cache = false) : int
+    {
+        //TODO: cache the files
+        // Get all the files in the folder That ends with Route.php
+        $files = glob($folder . '/*Route.php');
+
+        // Check if we found any files
+        if ($files === false) {
+            throw new Exception("Error reading the folder $folder for routes", 1);
+        }
+
+        $cachefound = 0;
+
+        // Loop through the files
+        foreach ($files as $file) {
+
+            // Include the file
+            include_once $file;
+
+            // Get the class name
+            $class = pathinfo($file, PATHINFO_FILENAME);
+            
+            // Check if the class exists
+            if (!class_exists($class)) {
+                throw new Exception("Class $class not found in $file", 1);
+            }
+
+            // Check if the class is a subclass of DefineRoute
+            if (!is_subclass_of($class, DefineRoute::class)) {
+                throw new Exception("Class $class is not a subclass of DefineRoute", 1);
+            }
+
+            // Create a new instance of the class using the modern constructor
+            /** @var DefineRoute $route */
+            $route = new $class();
+            
+            // Register the route
+            $route->register();
+
+            $cachefound++;
+        }
+
+        return $cachefound;
+    }
     /**
      * define an error route to be used when an error code is raised
      *

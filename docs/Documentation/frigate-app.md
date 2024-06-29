@@ -26,8 +26,8 @@ App::init(
     root              : __DIR__, // will set the root folder of the application. (string)
     env               : null,   // will load the environment variables from the .env file default is null. (array|string|null)
     extra_env         : [],     // will add additional environment variables to the application. (array)
-    load_session      : true,   // will load the session if needed. (bool) default is true. 
-    start_page_buffer : true,  // will start the page buffer if needed. (bool) default is true.
+    start_session     : true,   // will start the session if needed. (bool) default is true. 
+    start_page_buffer : true,   // will start the page buffer if needed. (bool) default is true.
     adjust_ini        : true    // will adjust the php configuration if needed. (bool) default is true
 );
 

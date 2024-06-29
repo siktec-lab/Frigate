@@ -29,7 +29,7 @@ The router parses the request and matches it against the defined routes. After t
 
 ## Defining Routes
 
-Routes are defined with the `define` method. The `define` method takes:
+Routes are defined using the `define` method. The `define` method takes:
 - `method` - the HTTP method of the route. This can be a string or an array of strings.
 - `route` - the `Route` object that defines the route logic.
 
@@ -75,6 +75,9 @@ For all the generic routes and the `any` route you can simply use them as a meth
 
 ```php
 <?php
+
+    // index.php file
+    
     // ..... Initialize the App and Router
     
     Router::get( // Or any other method like post, put, patch, delete, options, head, any
@@ -102,6 +105,7 @@ Here is an example of a static route:
 
 ```php
 <?php
+    // index.php file
 
     // ..... Initialize the App and Router
 
@@ -134,6 +138,79 @@ This will serve files from the `files` directory when the path `/storage/...` is
     1. You can use the path syntax described below to define the path of the static route. But the path should not contain `path parameters`.
     2. All the logic of the static route is handled by a custom handler that is provided by Frigate. This `Endpoint` is called `StaticEndpoint` and is described in the [endpoints section](#endpoints).
 
+### Auto loading routes
+
+When the application grows, the number of routes will grow as well. To make the code more readable and maintainable, the routes can be defined in separate files and auto-loaded by the router. This can be done by defining the routes in a separate file and then loading the file with the `defineFrom` method of the `Router` class. The `defineFrom` method takes:
+- `path` - (string) the path to the *folder* that contains the route files.
+
+Each route file should define a single class that extends the `DefineRoute` class. The class should have a single constructor that takes no arguments and should define the routes in the constructor. 
+
+Here is an example of a route file:
+
+```php
+<?php
+
+// MyNameRoute.php file in the routes folder - /routes/MyNameRoute.php
+
+use Frigate\Routing\Routes\DefineRoute;
+use Frigate\Routing\Http\Methods;
+use Frigate\Routing\Http\ResponseInterface;
+use Frigate\Routing\Http\RequestInterface;
+
+class MyNameRoute extends DefineRoute
+{
+    public function __construct()
+    {
+        // Define the route method(s):
+        $this->method = [Methods::GET, Methods::POST];
+
+        // Define the route path:
+        $this->path = "/say/?{name:string}";
+        
+        // Define the route context:
+        $this->context = [
+            "name" => "John Doe"
+        ];
+
+        // Define the supported return types:
+        $this->returns = [
+            "application/json"
+        ];
+
+        // Bind the route endpoint or expression:
+        $this->exp = function(array $context, RequestInterface $request, ResponseInterface $response) {
+            // Set the response data:
+            $response->setBodyJson([
+                "message"   => "success",
+                "name"      => $context["name"],
+                "context"   => $context
+            ]);
+            // return the response:
+            return $response;
+        };
+
+        // Define the request mutator:
+        $this->request_mutator = null;
+    }
+}
+```
+!!! note
+    1. The *class name* should be the same as the file name without the `.php` extension.
+
+This is how all the route files inside the *routes* will be auto-loaded by the router:
+
+```php
+<?php
+
+// index.php file
+
+// ..... Initialize the App and Router
+
+Router::defineFrom("routes"); // The path is relative so for a full path use __DIR__ . DIRECTORY_SEPARATOR . "routes"
+
+// After this line all the routes defined in the routes folder will be loaded an registered with the router.
+
+```
 
 ## Path Syntax
 

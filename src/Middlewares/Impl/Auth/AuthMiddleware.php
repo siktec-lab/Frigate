@@ -16,7 +16,7 @@ use Frigate\Routing\Routes\Route;
  * 
  * This interface defines the methods that a middleware must implement.
  */
-abstract class AuthMiddleware extends Middleware 
+class AuthMiddleware extends Middleware 
 { 
 
     /**

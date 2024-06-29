@@ -57,7 +57,7 @@ class FrigateApp
      * @param string $root - application root path
      * @param string|array $env - path to config file or array of config values
      * @param array $extra_env - extra environment variables
-     * @param bool $load_session - start session
+     * @param bool $start_session - start session
      * @param bool $start_page_buffer - start page buffer
      * @param bool|null $adjust_ini - load ini configuration
      * 
@@ -67,7 +67,7 @@ class FrigateApp
         string $root,
         string|array|null $env  = null,
         array $extra_env        = [],
-        bool $load_session      = true, 
+        bool $start_session      = true, 
         bool $start_page_buffer = true,
         ?bool $adjust_ini       = true
     ) : void {
@@ -90,7 +90,7 @@ class FrigateApp
         // TODO: load debug handler
 
         //start session:
-        if ($load_session) {
+        if ($start_session) {
             self::startSession();
         }
         
