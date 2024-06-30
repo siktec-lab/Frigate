@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Frigate\Middlewares;
+namespace Frigate\Middleware;
 
 use Frigate\FrigateApp;
 use Frigate\Routing\Http\Methods;
@@ -15,7 +15,7 @@ use Frigate\Routing\Routes\Route;
  * 
  * This interface defines the methods that a middleware must implement.
  */
-abstract class Middleware implements MiddlewareInterface 
+abstract class BaseMiddleware implements MiddlewareInterface 
 { 
 
     /**

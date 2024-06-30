@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace Frigate\Api\Impl;
 
-use Frigate\Api\EndPoint;
+use Frigate\Api\Endpoint;
 use Frigate\Routing\Http\RequestInterface;
 use Frigate\Routing\Http\ResponseInterface;
 
 /**
- * ErrorEndPoint
+ * ErrorEndpoint
  * this endpoint class implementation is used to handle errors
  * it is used to return a nice error page to the user or a json error message
  * depending on the request header. 
  * use this class to handle errors in your application - if you want you can use it as a template
  * to create your own error handling endpoint.
  */
-class ErrorEndPoint extends EndPoint { 
+class ErrorEndpoint extends Endpoint { 
 
     public function __construct(?bool $debug = null)
     {

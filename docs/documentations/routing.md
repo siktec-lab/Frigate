@@ -54,7 +54,7 @@ Routes are defined using the `define` method. The `define` method takes:
         exp: new MyEndpoint( debug: null ), // The endpoint class this route will execute.
         returns: ["application/json"],      // The supported return types.
         middleware: [],        // Additional middleware to execute before the route.
-        avoid_middleware: [],  // Middlewares to avoid.
+        avoid_middleware: [],  // Middleware to avoid.
         request_mutator: null   // The request mutator.
     ));
 

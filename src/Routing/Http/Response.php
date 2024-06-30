@@ -139,22 +139,29 @@ class Response extends Message implements ResponseInterface
      * added.
      *
      * @param string|int $status
+     * @param string|null $statusText
      *
      * @throws \InvalidArgumentException
      */
-    public function setStatus($status) : void {
-        if (is_int($status) || ctype_digit($status)) {
-            $statusCode = $status;
-            $statusText = self::$statusCodes[$status] ?? 'Unknown';
+    public function setStatus(string|int $code, string|null $text = null) : void {
+        
+        // Parse the status code:
+        if (is_int($code) || ctype_digit($code)) {
+            $statusCode = $code;
+            $statusText = is_null($text) ? (self::$statusCodes[$code] ?? 'Unknown') : trim($text);
         } else {
-            [$statusCode, $statusText] = explode(' ', $status, 2);
+            [$statusCode, $statusText] = explode(' ', $code, 2);
+            $statusText = is_null($text) ? $statusText : trim($text);
         }
+
         $statusCode = (int) $statusCode;
         if ($statusCode < 100 || $statusCode > 999) {
             $statusCode = 500;
-            $statusText = self::$statusCodes[$statusCode];
+            $statusText = is_null($text) ? self::$statusCodes[$statusCode] : trim($text);
             //throw new \InvalidArgumentException('The HTTP status code must be exactly 3 digits', 500);
         }
+
+        // Set the status:
         $this->status = $statusCode;
         $this->statusText = $statusText;
     }

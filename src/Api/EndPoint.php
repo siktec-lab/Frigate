@@ -6,7 +6,7 @@ use Frigate\FrigateApp;
 use Frigate\Routing\Http\RequestInterface;
 use Frigate\Routing\Http\ResponseInterface;
 
-abstract class EndPoint implements EndPointInterface 
+abstract class Endpoint implements EndpointInterface 
 { 
     /**
      * Debug mode flag.

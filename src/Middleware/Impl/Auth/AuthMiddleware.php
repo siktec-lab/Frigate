@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Frigate\Middlewares\Impl\Auth;
+namespace Frigate\Middleware\Impl\Auth;
 
-use Frigate\Middlewares\Middleware;
-use Frigate\Middlewares\Impl\Auth\Methods\Interfaces\AuthInterface;
+use Frigate\Middleware\BaseMiddleware;
+use Frigate\Middleware\Impl\Auth\Methods\Interfaces\AuthInterface;
 use Frigate\Routing\Http\Methods;
 use Frigate\Routing\Http\RequestInterface;
 use Frigate\Routing\Http\ResponseInterface;
@@ -16,7 +16,7 @@ use Frigate\Routing\Routes\Route;
  * 
  * This interface defines the methods that a middleware must implement.
  */
-class AuthMiddleware extends Middleware 
+class AuthMiddleware extends BaseMiddleware 
 { 
 
     /**

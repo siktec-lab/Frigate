@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Frigate\Api\Impl;
 
 use SplFileObject;
-use Frigate\Api\EndPoint;
+use Frigate\Api\Endpoint;
 use Frigate\Api\Traits\ContextHelpers;
 use Frigate\Routing\Http\RequestInterface;
 use Frigate\Routing\Http\ResponseInterface;
@@ -17,7 +17,7 @@ use Frigate\Helpers\MimeType;
  * StaticEndpoint
  * this endpoint class implementation is a pre-configured endpoint that serves static content
  */
-class StaticEndpoint extends EndPoint { 
+class StaticEndpoint extends Endpoint { 
 
     use ContextHelpers;
 

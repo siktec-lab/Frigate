@@ -9,7 +9,7 @@ use ReflectionClass;
 use Frigate\Routing\Http\RequestInterface;
 use Frigate\Routing\Http\ResponseInterface;
 use Frigate\Api\BindEndpoint;
-use Frigate\Middlewares\MiddlewareInterface;
+use Frigate\Middleware\MiddlewareInterface;
 class Route 
 {
 

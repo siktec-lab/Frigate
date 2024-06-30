@@ -30,12 +30,12 @@ interface ResponseInterface extends MessageInterface
      * Or just the code, in which case the appropriate default message will be
      * added.
      *
-     * @param string|int $status
-     *
+     * @param string|int $status The HTTP status code or code with text
+     * @param string|null $text The human-readable status string
      * @throws \InvalidArgumentException
      */
-    public function setStatus($status) : void;
-
+    public function setStatus(string|int $code, string|null $text = null) : void;
+    
     /**
      * Sets the body to a JSON string.
      */

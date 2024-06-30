@@ -3,14 +3,14 @@
 namespace Frigate\Routing\Files;
 
 use Frigate\FrigateApp;
-use Frigate\Api\EndPoint;
-use Frigate\Api\EndPointContext;
+use Frigate\Api\Endpoint;
+use Frigate\Api\Traits\ContextHelpers;
 use Frigate\Routing\Http;
 use Frigate\Routing\Files;
 
-class FileServer extends EndPoint { 
+class FileServer extends Endpoint { 
 
-    use EndPointContext;
+    use ContextHelpers;
 
     protected string $temp_folder;
     protected string $storage_folder;

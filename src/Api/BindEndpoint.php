@@ -2,7 +2,7 @@
 
 namespace Frigate\Api;
 
-use Frigate\Api\EndPointInterface;
+use Frigate\Api\EndpointInterface;
 use ReflectionClass;
 
 /**
@@ -31,9 +31,9 @@ class BindEndpoint
      * get_instance
      * returns an instance of the endpoint class - this is a lazy load
      * @throws \Exception if the endpoint class could not be instantiated will trigger a 500 error
-     * @return EndPointInterface
+     * @return EndpointInterface
      */
-    public function getInstance() : EndPointInterface
+    public function getInstance() : EndpointInterface
     {   
         try {
             if ($this->endpoint === null) {

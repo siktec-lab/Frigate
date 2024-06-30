@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Frigate\Middlewares\Impl\Auth\Methods;
+namespace Frigate\Middleware\Impl\Auth\Methods;
 
 use Frigate\FrigateApp;
 

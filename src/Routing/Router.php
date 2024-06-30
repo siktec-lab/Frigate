@@ -11,8 +11,8 @@ use Frigate\Routing\Http\ResponseInterface;
 use Frigate\Routing\Http\Response;
 use Frigate\Routing\Http\RouteRequest;
 use Frigate\Routing\Http\Methods;
-use Frigate\Api\EndPointInterface;
-use Frigate\Middlewares\MiddlewareInterface;
+use Frigate\Api\EndpointInterface;
+use Frigate\Middleware\MiddlewareInterface;
 use Frigate\Routing\Paths\PathBranch;
 use Frigate\Routing\Paths\PathTree;
 use Frigate\Routing\Routes\Route;
@@ -396,9 +396,9 @@ class Router
      * define an error route to be used when an error code is raised
      *
      * @param  int|string $code 'any' for any error
-     * @param  EndPointInterface $endpoint the endpoint to use
+     * @param  EndpointInterface $endpoint the endpoint to use
      */
-    public static function error(int|string $code, EndPointInterface $endpoint) : void 
+    public static function error(int|string $code, EndpointInterface $endpoint) : void 
     {
         self::$errors[$code] = new Route(path: "/", exp: $endpoint);
     }

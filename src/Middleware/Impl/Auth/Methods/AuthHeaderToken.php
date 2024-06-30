@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Frigate\Middlewares\Impl\Auth\Methods;
+namespace Frigate\Middleware\Impl\Auth\Methods;
 
 use Frigate\Routing\Http\RequestInterface;
-use Frigate\Middlewares\Impl\Auth\Methods\Interfaces\AuthInterface;
+use Frigate\Middleware\Impl\Auth\Methods\Interfaces\AuthInterface;
 
 
 abstract class AuthHeaderToken implements AuthInterface {

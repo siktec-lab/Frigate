@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Frigate\Middlewares;
+namespace Frigate\Middleware;
 
 use Frigate\Routing\Http\Methods;
 use Frigate\Routing\Http\RequestInterface;

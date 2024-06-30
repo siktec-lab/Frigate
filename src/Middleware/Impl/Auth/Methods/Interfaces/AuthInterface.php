@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Frigate\Middlewares\Impl\Auth\Methods\Interfaces;
+namespace Frigate\Middleware\Impl\Auth\Methods\Interfaces;
 
 use Frigate\Routing\Http\RequestInterface;
 
