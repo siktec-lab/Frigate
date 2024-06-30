@@ -1,0 +1,96 @@
+
+/*******************************************************************
+ * Base styles:
+ ******************************************************************/
+html {
+    font-size: 20px;
+}
+
+
+/*******************************************************************
+ * Typography:
+ ******************************************************************/
+.md-typeset {
+    font-size: 0.725rem;
+    line-height: 1.4;
+}
+
+/*******************************************************************
+ * Navigation:
+ ******************************************************************/
+nav.md-nav {
+    font-size: .725rem;
+    line-height: 1.3;
+}
+
+nav.md-nav .md-nav.md-nav--secondary,
+nav.md-nav .md-nav.md-nav--secondary .md-nav__list {
+    font-size: 0.645rem;
+}
+
+
+/*******************************************************************
+ * Footer:
+ ******************************************************************/
+.md-social__link svg {
+    fill: currentcolor;
+    max-height: 1rem;
+    vertical-align: -25%;
+}
+
+/*******************************************************************
+ * Code blocks:
+ ******************************************************************/
+.md-typeset .highlight :is(.k) { /* language keywords */
+    color: #f06090
+}
+.md-typeset .highlight :is(.nx) { /* language types */
+    color: #5ec0fb
+}
+.md-typeset .highlight :is(.nv,.vc,.vg,.vi) { /* variables */
+    color: #e0e0e0
+}
+.md-typeset .highlight :is(.na) { /* methods */
+    color: #8ee364
+}
+.md-typeset .highlight :is(.nd) { /* attributes */
+    color: #78d3f7
+}
+.md-typeset .highlight :is(.s2) { /* attributes */
+    color: #cddb5e
+}
+
+/*******************************************************************
+ * Headings:
+ ******************************************************************/
+
+.md-typeset h1, 
+.md-typeset h2 {
+    font-weight: 400;
+    letter-spacing: -.01em;
+}
+
+.md-typeset h2 {
+    color: var(--md-primary-fg-color--light);
+}
+
+.md-typeset h3 {
+    color: var(--md-code-hl-keyword-color);
+}
+
+
+/*******************************************************************
+ * Tooltips:
+ ******************************************************************/
+.md-tooltip {
+    background-color: var(--md-footer-bg-color--dark);
+}
+
+
+/*******************************************************************
+ * Admonitions 
+ ******************************************************************/
+.md-typeset .admonition-title:before, 
+.md-typeset summary:before {
+    height: 0.85rem;
+}
