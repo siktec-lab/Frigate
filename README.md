@@ -7,7 +7,7 @@ Frigate is a lightweight web application framework. It is designed to be easy, a
 > :warning: **WARNING**: This project is currently under development. Features may change, and it might not be stable for production use. Use at your own risk.
 
 ## Quick Links:
-- [DOCUMENTATION](https://siktec-lab.github.io/frigate/)
+- [DOCUMENTATION](https://siktec-lab.github.io/Frigate/)
 - [Installation](#installation)
 - [Features](#features)
 - [Milestones](#future-milestones)
