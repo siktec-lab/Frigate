@@ -1,6 +1,10 @@
 # Frigate V2
 
+[![Build Status](https://github.com/siktec-lab/frigate/actions/workflows/validate_test.yml/badge.svg?branch=main)](https://github.com/siktec-lab/frigate/actions/workflows/validate_test.yml)
+
 Frigate is a lightweight web application framework. It is designed to be easy, and extremely fast with the ability to scale up to complex applications.
+
+> :warning: **WARNING**: This project is currently under development. Features may change, and it might not be stable for production use. Use at your own risk.
 
 ## Quick Links:
 - [DOCUMENTATION](https://siktec-lab.github.io/frigate/)

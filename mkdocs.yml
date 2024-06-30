@@ -15,6 +15,7 @@ nav:
     - documentation/quick-start.md
     - documentation/frigate-app.md
     - documentation/routing.md
+    - documentation/middleware.md
 
 
 theme:

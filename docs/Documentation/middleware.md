@@ -1,4 +1,4 @@
-# Routing
+# Middleware
 
 ## Initialize the router
 
