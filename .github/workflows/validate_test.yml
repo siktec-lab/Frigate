@@ -3,7 +3,7 @@ name: Frigate CI Test Suite
 on:
   workflow_dispatch:
   pull_request:
-    branches: [ "main" ]
+    branches: [ "master" ]
 
 defaults:
   run:
@@ -27,7 +27,7 @@ jobs:
     name: PHP ${{ matrix.php-versions }} Test
     steps:
     
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: PHP Install
       uses: shivammathur/setup-php@v2
       with:
