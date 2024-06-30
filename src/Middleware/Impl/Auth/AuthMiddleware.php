@@ -66,16 +66,16 @@ class AuthMiddleware extends BaseMiddleware
         ResponseInterface &$response,
         array &$context,
         Route $target_route
-    ) : void {
+    ) : bool {
 
         foreach ($this->methods as $method) {
             [$granted, $user, $token] = $method->authenticate($request);
             if ($granted) {
                 $context["auth"] = ["user" => $user, "token" => $token];
-                return;
+                return true;
             }
         }
-
+        //TODO: Better error handling
         throw new \Exception("Unauthorized", 401);
     }
 }

@@ -40,6 +40,7 @@ abstract class BaseMiddleware implements MiddlewareInterface
      * @param ResponseInterface $response a mutable response object which is passed to the endpoint
      * @param array $context the context array which is passed to the endpoint
      * @param Route $target_route immutable route object of the target route
+     * @return bool true if the middleware was successful, false otherwise. false will stop the execution of the route.
      */
     abstract public function exec(
         Methods $method, 
@@ -47,7 +48,7 @@ abstract class BaseMiddleware implements MiddlewareInterface
         ResponseInterface &$response,
         array &$context,
         Route $target_route
-    ) : void;
+    ) : bool;
 
     /**
      * Get the debug mode flag.

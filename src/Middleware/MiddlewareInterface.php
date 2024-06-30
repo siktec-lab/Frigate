@@ -25,5 +25,5 @@ interface MiddlewareInterface
         ResponseInterface &$response,
         array &$context,
         Route $target_route
-    ) : void;
+    ) : bool;
 }

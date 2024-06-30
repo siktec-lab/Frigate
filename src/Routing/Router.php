@@ -531,13 +531,16 @@ class Router
                 // Check if the middleware is an instance of MiddlewareInterface and execute it:
                 if ($mw instanceof MiddlewareInterface) {
                     // Execute the middleware:
-                    $mw->exec(
+                    if (!$mw->exec(
                         $method, 
                         $request,
                         $response, 
                         $context,
                         $route
-                    );
+                    )) {
+                        // Middleware returned false, stop the route:
+                        return $response;
+                    }
                 } elseif (is_array($mw)) {
                     // Merge the context:
                     $context = array_merge($context, $mw);
