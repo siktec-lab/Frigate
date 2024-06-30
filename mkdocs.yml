@@ -7,15 +7,15 @@ site_url: |
 repo_url: |
   https://github.com/siktec-lab/frigate
 
-# Navigation:
+# Navigation: 
 nav:
   - index.md
   - Documentation : 
-    - documentation/setup.md
-    - documentation/quick-start.md
-    - documentation/frigate-app.md
-    - documentation/routing.md
-    - documentation/middleware.md
+    - documentations/setup.md
+    - documentations/quick-start.md
+    - documentations/frigate-app.md
+    - documentations/routing.md
+    - documentations/middleware.md
 
 
 theme:
@@ -65,7 +65,7 @@ extra_css:
   - stylesheets/extra.css
 
 # plugins:
-#   - social
+#   - social 
 
 extra:
   social:
