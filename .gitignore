@@ -1,6 +1,9 @@
 #general:
 .env
 
+#only include the .env file that is in tests/resources/.env
+!tests/resources/env/.env
+
 #vscode ignores
 local/*
 /.vscode/
