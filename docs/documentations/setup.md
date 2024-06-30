@@ -1,7 +1,7 @@
 # Installation & Setup
 
 
-## Prerequisites & Dependencies
+## Prerequisites & Dependencies 
 
 Frigate requires PHP 8.1 or higher. It is recommended to use the latest stable version of PHP to ensure you have all the latest security patches and performance improvements.
 Frigate depends on the following PHP extensions:
