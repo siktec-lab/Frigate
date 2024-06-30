@@ -1,16 +1,14 @@
 <?php 
 
-namespace Siktec\Frigate\Models;
+namespace Frigate\Models;
 
-use \Siktec\Frigate\DataBase\MysqliDb;
-use \Siktec\Frigate\Models\DbData;
+use Frigate\DataBase\MysqliDb;
+use Frigate\Models\DbData;
 
 /**
  * DbDataTrait
  * 
  * This trait is used to provide database functionality to a DataModel object
- * 
- * @package Siktec\Frigate\Models
  */
 trait DbDataTrait
 {

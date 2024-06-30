@@ -1,38 +1,57 @@
 <?php
 
-namespace Siktec\Frigate\Routing\Http;
+declare(strict_types=1);
 
-use \Siktec\Frigate\Routing\Auth\AuthFactory;
+namespace Frigate\Routing\Http;
 
-class RouteRequest extends RequestDecorator {
+use Frigate\Routing\Auth\AuthFactory;
 
-    private string $method = "";
-    public string  $expects = "text/plain";
+class RouteRequest extends Request 
+{
 
-    public function isTest() : bool {
+    /**
+     * The main request implementation used in the routing system as a default request object
+     * 
+     * @param RequestInterface|null $from - a request to copy from, all other parameters will be ignored
+     * @param string|Methods $method - the request method
+     * @param string $url - the request url
+     * @param array $headers - the request headers
+     * @param resource|string|callable|null $body - the request body
+     * @throws \Exception - if the method is not supported
+     */
+    public function __construct(
+        ?RequestInterface $from = null, 
+        string|Methods $method = Methods::GET, 
+        string $url = "", 
+        array $headers = [], 
+        mixed $body = null
+    ) {
+        if ($from) {
+            $method  = $from->getMethod();
+            $url     = $from->getUrl();
+            $headers = $from->getHeaders();
+            $body    = $from->getBody();
+        }
+        parent::__construct($method, $url, $headers, $body);
+    }
+
+    /**
+     * check if the request is a test request
+     * Based on the X-Perform header
+     */
+    public function isTest() : bool
+    {
         return strtolower($this->getHeader('X-Perform') ?? "") === "test";
     }
 
-    // get the accepted content type from the request
-    public function getAccept() : array {
-        $accept = $this->getHeader('Accept');
-        if (empty($accept)) {
-            return [];
-        }
-        $accept = preg_replace("/;.*$/", "", $accept); //remove the q=1.0 from the accept header and the charset
-        $accept = explode(",", $accept);
-        $accept = array_map("trim", $accept);
-        $accept = array_map("strtolower", $accept);
-        return $accept;
-    }
-        
     /**
      * getPatchData
      * return the patch data as passed in the body -> json or string 
      * this will destroy teh input.
      * @return array
      */
-    public function getPatchData() : array {
+    public function getPatchData() : array
+    {
         $data = [];
         $str = $this->getBodyAsString();
         //check is $str is json:
@@ -47,7 +66,12 @@ class RouteRequest extends RequestDecorator {
         return $data;
     }
 
-    public function authorize(string|array $methods, array|null $manual_credentials = null, bool $throw = true) : array {
+    //TODO: All of authorization should be moved to a middleware
+    public function authorize(
+        string|array $methods, 
+        array|null $manual_credentials = null, 
+        bool $throw = true
+    ) : array {
 
         if (is_string($methods)) {
             $methods = explode("|", trim($methods));
@@ -61,7 +85,7 @@ class RouteRequest extends RequestDecorator {
                 throw new \Exception("Unsupported authorization method: {$method}");
             }
             $auth = AuthFactory::get($method);
-            $authorized = $auth->authorize($this, $manual_credentials); // Authrization is the first array element returned
+            $authorized = $auth->authorize($this, $manual_credentials); // Authorization is the first array element returned
             if ($authorized[0]) {
                 return $authorized;
             }
@@ -74,7 +98,9 @@ class RouteRequest extends RequestDecorator {
         return [false, null, null]; // we return minimal data here, so that the user can check if the request was authorized
     }
     
-    public function getCredentials(string $from = "header") : ?array {
+    //TODO: All of authorization should be moved to a middleware
+    public function getCredentials(string $from = "header") : ?array 
+    {
         $auth = "xxxx";
         switch ($from) {
             case "header": 
@@ -100,7 +126,9 @@ class RouteRequest extends RequestDecorator {
         return $credentials;
     }
 
-    public function requireAuthorization(string $method, bool $throw = true) : string|bool {
+    //TODO: All of authorization should be moved to a middleware
+    public function requireAuthorization(string $method, bool $throw = true) : string|bool 
+    {
 
         $methods = explode("|", trim($method));
         $authorized = false;
@@ -145,5 +173,4 @@ class RouteRequest extends RequestDecorator {
         }
         return $authorized === true ? $user : false;
     }
-
 }

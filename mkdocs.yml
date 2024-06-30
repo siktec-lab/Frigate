@@ -1,0 +1,99 @@
+site_name: |
+  Frigate
+
+site_url: |
+  https://siktec-lab.github.io/frigate/
+
+repo_url: |
+  https://github.com/siktec-lab/frigate
+
+# Navigation:
+nav:
+  - index.md
+  - Documentation : 
+    - documentation/setup.md
+    - documentation/quick-start.md
+    - documentation/frigate-app.md
+    - documentation/routing.md
+    - documentation/middleware.md
+
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.annotation
+    - content.tabs.link
+    - content.code.copy
+  language: en
+  icon:
+    annotation: material/arrow-right-circle
+    admonition:
+      note: octicons/tag-16
+      abstract: octicons/checklist-16
+      info: octicons/info-16
+      tip: octicons/squirrel-16
+      success: octicons/check-16
+      question: octicons/question-16
+      warning: octicons/alert-16
+      failure: octicons/x-circle-16
+      danger: octicons/zap-16
+      bug: octicons/bug-16
+      example: octicons/beaker-16
+      quote: octicons/quote-16
+      
+  palette:
+    - scheme: slate
+      toggle:
+        icon: material/toggle-switch-off-outline 
+        name: Switch to dark mode
+      primary: teal
+      accent: purple 
+    - scheme: default 
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode    
+      primary: teal
+      accent: lime
+
+extra_css:
+  - stylesheets/extra.css
+
+# plugins:
+#   - social
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/siktec-lab/frigate
+
+markdown_extensions:
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji 
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      use_pygments: true
+      pygments_lang_class: true
+  - pymdownx.arithmatex:
+      generic: true
+  - toc:
+      baselevel: 1
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - admonition
+  - footnotes
+  - pymdownx.details
+  - pymdownx.mark
+  - attr_list
+  - md_in_html
+  - pymdownx.superfences
+  
+
+copyright: |
+  &copy; 2023 <a href="https://github.com/siktec-lab"  target="_blank" rel="noopener">SIKTEC</a>

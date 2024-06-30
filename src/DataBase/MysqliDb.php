@@ -1,24 +1,21 @@
 <?php
 
-namespace Siktec\Frigate\DataBase;
+namespace Frigate\DataBase;
+
+
+
+use Exception;
+use mysqli_stmt;
+use ReflectionClass;
 
 /**
  * MysqliDb Class
- *
- * @category  Database Access
- * @package   MysqliDb
+ * Based on MysqliDb from:
+ * @link      http://github.com/joshcam/PHP-MySQLi-Database-Class 
  * @author    Jeffery Way <jeffrey@jeffrey-way.com>
  * @author    Josh Campbell <jcampbell@ajillion.com>
- * @author    Alexander V. Butenko <a.butenka@gmail.com>
- * @copyright Copyright (c) 2010-2017
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU Public License
- * @link      http://github.com/joshcam/PHP-MySQLi-Database-Class 
- * @version   2.9.3
  */
-
- use \Exception;
- use \ReflectionClass;
-
 class MysqliDb
 {
 
@@ -557,7 +554,7 @@ class MysqliDb
      * @return string Contains the returned rows from the query.
      */
     public function rawAddPrefix($query){
-        $query = str_replace(PHP_EOL, null, $query);
+        $query = str_replace(PHP_EOL, '', $query);
         $query = preg_replace('/\s+/', ' ', $query);
         preg_match_all("/(from|into|update|join) [\\'\\´]?([a-zA-Z0-9_-]+)[\\'\\´]?/i", $query, $matches);
         list($from_table, $from, $table) = $matches;
@@ -1992,11 +1989,9 @@ class MysqliDb
     /**
      * Method attempts to prepare the SQL query
      * and throws an error if there was a problem.
-     *
-     * @return mysqli_stmt
      * @throws Exception
      */
-    protected function _prepareQuery()
+    protected function _prepareQuery() : mysqli_stmt
     {
         $stmt = $this->mysqli()->prepare($this->_query);
 

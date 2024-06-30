@@ -2,16 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Siktec\Frigate\Routing\Auth\BaseMethods;
+namespace Frigate\Routing\Auth\BaseMethods;
 
-use \Siktec\Frigate\Routing\Http\RequestInterface;
-use \Siktec\Frigate\Routing\Auth\AuthInterface;
-use \Siktec\Frigate\Routing\Auth\AuthTraits;
-use \Siktec\Frigate\Tools\Hashing\JWT;
+use Frigate\Routing\Http\RequestInterface;
+use Frigate\Routing\Auth\AuthInterface;
+use Frigate\Routing\Auth\AuthTraits;
+use Frigate\Helpers\Hashing\JWT;
 
-class AuthJWT implements AuthInterface {
-
-
+class AuthJWT implements AuthInterface
+{
     use AuthTraits\BasicCredentialsTrait;
 
     /* 
@@ -31,15 +30,14 @@ class AuthJWT implements AuthInterface {
     public ?JWT $jwt = null;
     
     /**
-     * __construct
-     *
      * @param  ?string $secret JWT secret or null to use the global secret if set
-     * @return void
      */
-    public function __construct(?string $secret = null) {
+    public function __construct(?string $secret = null)
+    {
         // Create new JWTWrapper object if secret is set
         $this->jwt = new JWT($secret);
     }
+
     /**
      * credentials - get credentials from request header
      * Authorization: Basic base64_encode(username:password)
@@ -47,8 +45,8 @@ class AuthJWT implements AuthInterface {
      * @param  RequestInterface $request
      * @return array|null [username or userId, hash] or null if not found
      */
-    public function credentials(RequestInterface $request) : array|null {
-        
+    public function credentials(RequestInterface $request) : array|null
+    {
         // Args:
         $header_key = $this->custom_header_key ?? $this->default_header_key;
         $header_value_prefix = $this->custom_header_value_prefix ?? $this->default_header_value_prefix;
@@ -58,7 +56,6 @@ class AuthJWT implements AuthInterface {
         $token = strtolower($header_value_prefix) !== strtolower(substr($auth, 0, $prefix_len)) ? null : trim(substr($auth, $prefix_len));
 
         if (!$auth) return null;
-
         //Validate token
         $validated = $this->jwt->validate_token($token);
 
@@ -73,10 +70,9 @@ class AuthJWT implements AuthInterface {
      * @param  string|array|null $credentials pass null we will get the credentials from the request
      * @return array returned values [bool, data] // data is the data from the token or the error message
      */
-    public function authorize(RequestInterface $request, string|array|null $credentials) : array {
-        
+    public function authorize(RequestInterface $request, string|array|null $credentials) : array
+    {
         $data = $this->credentials($request);
-        
         if (is_array($data)) {
             return [true, $data];
         } else {

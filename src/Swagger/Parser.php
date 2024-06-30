@@ -1,6 +1,6 @@
 <?php
 
-namespace Siktec\Frigate\Swagger;
+namespace Frigate\Swagger;
 
 class Parser {
 

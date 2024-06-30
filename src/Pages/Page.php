@@ -1,9 +1,9 @@
 <?php
 
-namespace Siktec\Frigate\Pages;
+namespace Frigate\Pages;
 
-use \Twig\Loader\FilesystemLoader;
-use \Twig\Environment;
+use Twig\Loader\FilesystemLoader;
+use Twig\Environment;
 
 abstract class Page {
 

@@ -1,6 +1,8 @@
 <?php
 
-namespace Siktec\Frigate\Routing\Http;
+declare(strict_types=1);
+
+namespace Frigate\Routing\Http;
 /**
  * Part of PEAR HTTP2
  * https://github.com/pear/HTTP2
@@ -8,12 +10,8 @@ namespace Siktec\Frigate\Routing\Http;
 
 /**
  * Miscellaneous HTTP Utilities
- *
- * PEAR::HTTP2 provides shorthand methods for generating HTTP dates,
- * issueing HTTP HEAD requests, building absolute URIs, firing redirects and
- * negotiating user preferred language.
  */
-
+//TODO: Refactor this class it needs a lot of work
 class HTTP2
 {
     /**
@@ -22,18 +20,16 @@ class HTTP2
      * to either RFC850 or RFC822.
      *
      * @param mixed $time unix timestamp or date (default = current time)
-     *
-     * @return string|boolean GMT date string, or FALSE for an invalid
+     * @return string|bool GMT date string, or FALSE for an invalid
      *                        $time parameter
      */
-    public function date($time = null)
+    public static function date($time = null) : string|bool
     {
         if (!isset($time)) {
             $time = time();
         } elseif (!is_numeric($time) && (-1 === $time = strtotime($time))) {
             return false;
         }
-
         // RFC822 or RFC850
         $format = ini_get('y2k_compliance') ? 'D, d M Y' : 'l, d-M-y';
 
@@ -69,10 +65,9 @@ class HTTP2
      * @param array  $supported An associative array of supported languages,
      *                          whose values must evaluate to true.
      * @param string $default   The default language to use if none is found.
-     *
      * @return string The negotiated language result or the supplied default.
      */
-    public function negotiateLanguage($supported, $default = 'en-US')
+    public static function negotiateLanguage($supported, $default = 'en-US') : string
     {
         $supp = array();
         foreach ($supported as $lang => $isSupported) {
@@ -86,7 +81,7 @@ class HTTP2
         }
 
         if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-            $match = $this->matchAccept(
+            $match = self::matchAccept(
                 $_SERVER['HTTP_ACCEPT_LANGUAGE'],
                 $supp
             );
@@ -127,7 +122,7 @@ class HTTP2
      *
      * @return string The negotiated language result or the supplied default.
      */
-    public function negotiateCharset($supported, $default = 'ISO-8859-1')
+    public static function negotiateCharset($supported, $default = 'ISO-8859-1') : string
     {
         $supp = array();
         foreach ($supported as $charset) {
@@ -139,7 +134,7 @@ class HTTP2
         }
 
         if (isset($_SERVER['HTTP_ACCEPT_CHARSET'])) {
-            $match = $this->matchAccept(
+            $match = self::matchAccept(
                 $_SERVER['HTTP_ACCEPT_CHARSET'],
                 $supp
             );
@@ -174,15 +169,19 @@ class HTTP2
      * @param array   $supported    An associative array of supported MIME types.
      * @param ?string $query        The Accept request or null for auto extract.
      * @param mixed  $default      The default type to use if none match.
-     * @return mixed The negotiated MIME type result or the supplied default.
      */
-    public function negotiateMimeType(array $supported, ?string $query = null, mixed $default = null) : mixed
-    {
+    public static function negotiateMimeType(
+        array $supported, 
+        ?string $query = null, 
+        mixed $default = null
+    ) : mixed {
+
         //Normalize the supported array
         $supp = [];
         foreach ($supported as $type) {
             $supp[strtolower($type)] = $type;
         }
+
         if (!count($supp)) {
             return $default;
         }
@@ -192,19 +191,21 @@ class HTTP2
 
         if (isset($accepts)) {
             
-            //Build teh list of accepted types - will weighted.
-
-            $accepts = $this->sortAccept($accepts);
+            //Build the list of accepted types - will be weighted.
+            $accepts = self::sortAccept($accepts);
             
+            // If */* is acceptable, return the first supported format
+            if (isset($accepts['*/*'])) {
+                return array_shift($supp);
+            }
+
+            // Loop through the accepted types and return the first supported
             foreach ($accepts as $type => $q) {
                 if (substr($type, -2) != '/*') {
                     if (isset($supp[$type])) {
                         return $supp[$type];
                     }
                     continue;
-                }
-                if ($type == '*/*') {
-                    return array_shift($supp);
                 }
                 [$general, $specific] = explode('/', $type, 2);
                 $general .= '/';
@@ -225,12 +226,10 @@ class HTTP2
      *
      * @param string $header    The HTTP "Accept" header to parse
      * @param array  $supported A list of supported values
-     *
-     * @return string|NULL a matched option, or NULL if no match
      */
-    protected function matchAccept($header, $supported)
+    public static function matchAccept(string $header, array $supported) : ?string
     {
-        $matches = $this->sortAccept($header);
+        $matches = self::sortAccept($header);
         foreach ($matches as $key => $q) {
             if (isset($supported[$key])) {
                 return $supported[$key];
@@ -247,10 +246,9 @@ class HTTP2
      * Parses and sorts a weighed "Accept" HTTP header
      *
      * @param string $header The HTTP "Accept" header to parse
-     *
      * @return array Sorted list of "accept" options
      */
-    protected function sortAccept($header)
+    public static function sortAccept(string $header) : array
     {
         $matches = array();
         foreach (explode(',', $header) as $option) {
@@ -361,10 +359,11 @@ class HTTP2
      *                        redirecting to (Redirecting to
      *                        <a href="...">...</a>.)
      *
-     * @return boolean Returns TRUE on success (or exits) or FALSE if headers
+     * @return bool Returns TRUE on success (or exits) or FALSE if headers
      *                 have already been sent.
      */
-    function redirect($url, $exit = true, $rfc2616 = false) : bool {
+    public static function redirect($url, $exit = true, $rfc2616 = false) : bool 
+    {
         if (headers_sent()) {
             return false;
         }
@@ -635,4 +634,3 @@ class HTTP2
     //     return $str;
     // }
 }
-?>

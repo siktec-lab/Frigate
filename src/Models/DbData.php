@@ -1,12 +1,10 @@
 <?php 
 
-namespace Siktec\Frigate\Models;
+namespace Frigate\Models;
 
 /**
  * DbData
  * this class is used to store data that defines a table mapping for a database in DataModel
- * 
- * @package Siktec\Frigate\Models
  */
 class DbData
 {

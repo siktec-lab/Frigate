@@ -1,6 +1,10 @@
 <?php
 
-namespace Siktec\Frigate\Routing\Http;
+declare(strict_types=1);
+
+namespace Frigate\Routing\Http;
+
+use Frigate\Routing\Http\HTTP2;
 
 /**
  * This is the abstract base class for both the Request and Response objects.
@@ -8,7 +12,9 @@ namespace Siktec\Frigate\Routing\Http;
  * This object contains a few simple methods that are shared by both.
  *
  */
-abstract class Message implements MessageInterface {
+abstract class Message implements MessageInterface
+{
+
     /**
      * Request body.
      *
@@ -16,12 +22,12 @@ abstract class Message implements MessageInterface {
      *
      * @var resource|string|callable|null
      */
-    protected $body = null;
+    protected mixed $body = null;
 
     /**
      * Contains the list of HTTP headers.
      *
-     * @var array<string, mixed>
+     * @var array<string,mixed>
      */
     protected array $headers = [];
 
@@ -31,6 +37,11 @@ abstract class Message implements MessageInterface {
     protected string $httpVersion = '1.1';
 
     /**
+     * The expected content type. after negotiation.
+     */
+    public string $expects = "text/plain";
+    
+    /**
      * Returns the body as a readable stream resource.
      *
      * Note that the stream may not be rewindable, and therefore may only be
@@ -38,7 +49,7 @@ abstract class Message implements MessageInterface {
      *
      * @return resource
      */
-    public function getBodyAsStream()
+    public function getBodyAsStream() : mixed
     {
         $body = $this->getBody();
         if (is_callable($this->body)) {
@@ -94,7 +105,7 @@ abstract class Message implements MessageInterface {
      *
      * @return resource|string|callable|null
      */
-    public function getBody()
+    public function getBody() : mixed
     {
         return $this->body;
     }
@@ -104,9 +115,10 @@ abstract class Message implements MessageInterface {
      *
      * @param resource|string|callable $body
      */
-    public function setBody($body) : void
+    public function setBody(mixed $body) : self
     {
         $this->body = $body;
+        return $this;
     }
 
     /**
@@ -114,7 +126,7 @@ abstract class Message implements MessageInterface {
      *
      * Every header is returned as an array, with one or more values.
      *
-     * @return array<string, mixed>
+     * @return array<string,mixed>
      */
     public function getHeaders() : array
     {
@@ -166,7 +178,7 @@ abstract class Message implements MessageInterface {
      *
      * If the header did not exist, this method will return an empty array.
      *
-     * @return string[]
+     * @return array<string>
      */
     public function getHeaderAsArray(string $name) : array
     {
@@ -186,11 +198,13 @@ abstract class Message implements MessageInterface {
      *
      * If the header already existed, it will be overwritten.
      *
-     * @param string|string[] $value
+     * @param string $name The name of the header.
+     * @param string|array<string> $value
      */
-    public function setHeader(string $name, $value) : void
+    public function setHeader(string $name, array|string|int|float $value) : self
     {
         $this->headers[strtolower($name)] = [$name, (array) $value];
+        return $this;
     }
 
     /**
@@ -201,13 +215,14 @@ abstract class Message implements MessageInterface {
      *
      * Any header that already existed will be overwritten.
      *
-     * @param array<string, mixed> $headers
+     * @param array<string,mixed> $headers
      */
-    public function setHeaders(array $headers) : void
+    public function setHeaders(array $headers) : self
     {
         foreach ($headers as $name => $value) {
             $this->setHeader($name, $value);
         }
+        return $this;
     }
 
     /**
@@ -217,9 +232,10 @@ abstract class Message implements MessageInterface {
      * another value. Individual values can be retrieved with
      * getHeadersAsArray.
      *
-     * @param mixed|mixed[] $value
+     * @param string $name The name of the header.
+     * @param string|array<string> $value
      */
-    public function addHeader(string $name, $value) : void
+    public function addHeader(string $name, array|string $value) : self
     {
         $lName = strtolower($name);
         if (isset($this->headers[$lName])) {
@@ -233,6 +249,7 @@ abstract class Message implements MessageInterface {
                 (array) $value,
             ];
         }
+        return $this;
     }
 
     /**
@@ -240,13 +257,14 @@ abstract class Message implements MessageInterface {
      *
      * Any existing headers will not be overwritten.
      *
-     * @param array<string, mixed> $headers
+     * @param array<string,mixed> $headers
      */
-    public function addHeaders(array $headers) : void
+    public function addHeaders(array $headers) : self
     {
         foreach ($headers as $name => $value) {
             $this->addHeader($name, $value);
         }
+        return $this;
     }
 
     /**
@@ -256,7 +274,7 @@ abstract class Message implements MessageInterface {
      * This method should return true if the header was successfully deleted,
      * and false if the header did not exist.
      */
-    public function removeHeader(string $name) : bool
+    public function removeHeader(string $name) : self
     {
         $name = strtolower($name);
         if (!isset($this->headers[$name])) {
@@ -264,7 +282,22 @@ abstract class Message implements MessageInterface {
         }
         unset($this->headers[$name]);
 
-        return true;
+        return $this;
+    }
+
+    /**
+     * Negotiates the content type to be returned.
+     * Sets the expects property, and returns the negotiated content type.
+    */
+    public function negotiateAccept(array $supported, ?string $default = null) : ?string
+    {
+        //TODO: test this...
+        $this->expects = HTTP2::negotiateMimeType(
+            $supported,
+            $this->getHeader("accept"),
+            $default
+        );
+        return $this->expects;
     }
 
     /**
@@ -272,9 +305,10 @@ abstract class Message implements MessageInterface {
      *
      * Should be 1.0, 1.1 or 2.0.
      */
-    public function setHttpVersion(string $version) : void
+    public function setHttpVersion(string $version) : self
     {
         $this->httpVersion = $version;
+        return $this;
     }
 
     /**

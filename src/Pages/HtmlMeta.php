@@ -1,12 +1,12 @@
 <?php
 
-namespace Siktec\Frigate\Pages;
+namespace Frigate\Pages;
 
-use \Siktec\Frigate\Tools\Arrays;
+use Frigate\Helpers;
 
-class HtmlMeta implements Arrays\ToArrayAccess {
+class HtmlMeta implements Helpers\Interfaces\ToArrayAccess {
 
-    use Arrays\toArrayTrait;
+    use Helpers\Traits\toArrayTrait;
     
     public ?string $lang           = "en";
     public ?string $charset        = "UTF-8";

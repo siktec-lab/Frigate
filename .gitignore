@@ -1,9 +1,39 @@
-
-/vendor/
+#general:
 .env
-.vscode
-php_errors.log
-*.zip
+
+#vscode ignores
+local/*
+/.vscode/
 /temp/
-pages_admin/templates/cache/
+*.code-workspace
+.VSCodeCounter/
+
+#PHP:
+php_errors.log
+
+# Cpmposer ignores
+/vendor/
 composer.lock
+composer.phar
+
+# Docker ignores
+docker-compose.override.yml
+
+
+# phpunit caches
+.phpunit.result.cache
+.phpunit.cache
+
+# php-cs
+.php_cs.cache
+phpcs.result
+
+#no .devcontainer folder
+.devcontainer/*
+
+#no docker folder
+docker/*
+
+#python ignores:
+__pycache__/
+venv/

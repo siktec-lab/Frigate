@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Siktec\Frigate\Routing\Http;
+namespace Frigate\Routing\Http;
 
 /**
  * The MessageInterface is the base interface that's used by both
@@ -18,7 +18,7 @@ interface MessageInterface {
      *
      * @return resource
      */
-    public function getBodyAsStream();
+    public function getBodyAsStream() : mixed;
 
     /**
      * Returns the body as a string.
@@ -35,18 +35,18 @@ interface MessageInterface {
      *
      * @return resource|string|callable|null
      */
-    public function getBody();
+    public function getBody() : mixed;
 
     /**
      * Updates the body resource with a new stream.
      *
      * @param resource|string|callable $body
      */
-    public function setBody($body) : void;
+    public function setBody(mixed $body) : MessageInterface;
 
     /**
      * Returns all the HTTP headers as an array.
-     *
+     *s
      * Every header is returned as an array, with one or more values.
      *
      * @return array<string, mixed>
@@ -94,7 +94,7 @@ interface MessageInterface {
      *
      * @param string|string[] $value
      */
-    public function setHeader(string $name, $value) : void;
+    public function setHeader(string $name, array|string|int|float $value) : MessageInterface;
 
     /**
      * Sets a new set of HTTP headers.
@@ -106,7 +106,7 @@ interface MessageInterface {
      *
      * @param array<string, mixed> $headers
      */
-    public function setHeaders(array $headers) : void;
+    public function setHeaders(array $headers) : MessageInterface;
 
     /**
      * Adds a HTTP header.
@@ -117,7 +117,7 @@ interface MessageInterface {
      *
      * @param string|string[] $value
      */
-    public function addHeader(string $name, $value) : void;
+    public function addHeader(string $name, array|string $value) : MessageInterface;
 
     /**
      * Adds a new set of HTTP headers.
@@ -126,7 +126,7 @@ interface MessageInterface {
      *
      * @param array<string, mixed> $headers
      */
-    public function addHeaders(array $headers): void;
+    public function addHeaders(array $headers): MessageInterface;
 
     /**
      * Removes a HTTP header.
@@ -135,14 +135,19 @@ interface MessageInterface {
      * This method should return true if the header was successfully deleted,
      * and false if the header did not exist.
      */
-    public function removeHeader(string $name) : bool;
+    public function removeHeader(string $name) : MessageInterface;
+
+    /**
+     * Negotiates the accept header.
+     */
+    public function negotiateAccept(array $supported, ?string $default = null) : ?string;
 
     /**
      * Sets the HTTP version.
      *
      * Should be 1.0, 1.1 or 2.0.
      */
-    public function setHttpVersion(string $version) : void;
+    public function setHttpVersion(string $version) : MessageInterface;
 
     /**
      * Returns the HTTP version.

@@ -1,12 +1,12 @@
 <?php
 
-namespace Siktec\Frigate\Pages;
+namespace Frigate\Pages;
 
-use \Siktec\Frigate\Tools\Arrays;
+use Frigate\Helpers;
 
-class PageSources implements Arrays\ToArrayAccess {
+class PageSources implements Helpers\Interfaces\ToArrayAccess {
 
-    use Arrays\toArrayTrait;
+    use Helpers\Traits\toArrayTrait;
     
     public HtmlHeadIncludes $head;
     public HtmlBodyIncludes $body;

@@ -1,6 +1,17 @@
-# Frigate
+# Frigate V2
+
+[![Build Status](https://github.com/siktec-lab/frigate/actions/workflows/validate_test.yml/badge.svg?branch=main)](https://github.com/siktec-lab/frigate/actions/workflows/validate_test.yml)
 
 Frigate is a lightweight web application framework. It is designed to be easy, and extremely fast with the ability to scale up to complex applications.
+
+> :warning: **WARNING**: This project is currently under development. Features may change, and it might not be stable for production use. Use at your own risk.
+
+## Quick Links:
+- [DOCUMENTATION](https://siktec-lab.github.io/frigate/)
+- [Installation](#installation)
+- [Features](#features)
+- [Milestones](#future-milestones)
+
 
 ## Features:
 - Easy and Powerfull routing system.
@@ -8,13 +19,25 @@ Frigate is a lightweight web application framework. It is designed to be easy, a
 - Build an API
 - Serve Files, Pages, JSON.
 - Build Hybrid application (e.g an API with a administration panel).
-- PHP - 8 Syntax.
+- PHP - 8.
 - Easy framework syntax.
 - Very Flexible design.
 
-## Example project:
+## Installation
 
-## Future Milestones:
+Install Frigate with composer:
+
+```bash
+composer require siktec/frigate
+```
+
+Use a bootstrap project to get started:
+
+```bash
+composer create-project siktec/frigate-bootstrap
+```
+
+## Milestones:
 - [v] support returns negotiation of */* and text/* etc....
 
 - [v] File server for chunking

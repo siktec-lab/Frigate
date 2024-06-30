@@ -1,13 +1,15 @@
 <?php 
 
-namespace Siktec\Frigate\Api;
+namespace Frigate\Api;
 
-use \Siktec\Frigate\Routing\Http\RouteRequest;
-use \Siktec\Frigate\Routing\Http\Response;
+use Frigate\Routing\Http\RequestInterface;
+use Frigate\Routing\Http\ResponseInterface;
 
 interface EndPointInterface
 {
-    public function __construct(bool $debug, bool $auth, string $auth_method);
 
-    public function call(array $context, RouteRequest $request): Response;
+    public function call(array $context, RequestInterface $request, ResponseInterface $response): ResponseInterface;
+
+    public function debug() : bool;
+
 }

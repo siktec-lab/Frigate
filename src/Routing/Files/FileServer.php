@@ -1,12 +1,12 @@
 <?php 
 
-namespace Siktec\Frigate\Routing\Files;
+namespace Frigate\Routing\Files;
 
-use \Siktec\Frigate\Base;
-use \Siktec\Frigate\Api\EndPoint;
-use \Siktec\Frigate\Api\EndPointContext;
-use \Siktec\Frigate\Routing\Http;
-use \Siktec\Frigate\Routing\Files;
+use Frigate\FrigateApp;
+use Frigate\Api\EndPoint;
+use Frigate\Api\EndPointContext;
+use Frigate\Routing\Http;
+use Frigate\Routing\Files;
 
 class FileServer extends EndPoint { 
 
@@ -76,7 +76,7 @@ class FileServer extends EndPoint {
 
         /** @var RouteRequest $request */ // we use this to force type hinting
         
-        Base::debug($this, "Execute endpoint - CreateProject\n".$request);
+        FrigateApp::debug($this, "Execute endpoint - CreateProject\n".$request);
         
         // 4 types of requests:
         // 1. GET:    Get a file

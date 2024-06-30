@@ -1,12 +1,11 @@
 <?php 
 
-namespace Siktec\Frigate\Models;
+namespace Frigate\Models;
 
 /**
  * DataModel
  * a base class for data models
- * @package \Siktec\Frigate\Models
- * @property \Siktec\Frigate\DataBase\MysqliDb $_conn - For intelliphense error suppression
+ * @property Frigate\DataBase\MysqliDb $_conn - For intelliphense error suppression
  */
 abstract class DataModel {
 
@@ -15,7 +14,7 @@ abstract class DataModel {
      * the supported trait for database interaction
      * @var string
      */
-    static private string $_db_use_trait = "Siktec\\Frigate\\Models\\DbDataTrait";
+    static private string $_db_use_trait = "Frigate\\Models\\DbDataTrait";
 
     /**
      * $keys

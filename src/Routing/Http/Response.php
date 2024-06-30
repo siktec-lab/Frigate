@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Siktec\Frigate\Routing\Http;
+namespace Frigate\Routing\Http;
 
 /**
  * This class represents a single HTTP response.
@@ -180,6 +180,7 @@ class Response extends Message implements ResponseInterface
      * @return array|null an array or null if conversion failed.
      */
     public function getBodyArray() : ?array {
+        //TODO: this should be validated and throw an exception if the json is invalid.
         // Get the body:
         $body = $this->getBody();
         // If the body is a string, try to decode it safely:
