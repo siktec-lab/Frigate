@@ -3,7 +3,7 @@ name: Frigate CI Test Suite
 on:
   workflow_dispatch:
   pull_request:
-    branches: [ "main" ]
+    branches: [ "master" ]
 
 defaults:
   run:

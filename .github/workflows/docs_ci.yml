@@ -2,7 +2,7 @@ name: docs_ci
 on:
   push:
     branches:
-      - main
+      - master
       - dev2
     paths: # only run on changes to the docs folder
       - 'docs/**'
