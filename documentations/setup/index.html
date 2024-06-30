@@ -8,9 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://siktec-lab.github.io/frigate/Documentation/quick-start/">
+        <link rel="canonical" href="https://siktec-lab.github.io/frigate/documentations/setup/">
       
       
+        <link rel="prev" href="../..">
+      
+      
+        <link rel="next" href="../quick-start/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -18,7 +22,7 @@
     
     
       
-        <title>Quick Start - Frigate
+        <title>Installation & Setup - Frigate
 </title>
       
     
@@ -120,7 +124,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#quick-start" class="md-skip">
+        <a href="#installation-setup" class="md-skip">
           Skip to content
         </a>
       
@@ -157,7 +161,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Quick Start
+              Installation &amp; Setup
             
           </span>
         </div>
@@ -281,11 +285,13 @@
         
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../documentation/setup.md" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
           
   
   Documentation
@@ -370,25 +376,30 @@
       
   
   
+    
   
   
+  
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
             
   
   <span class="md-ellipsis">
@@ -399,7 +410,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             Documentation
@@ -410,14 +421,144 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../documentation/setup.md" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Installation &amp; Setup
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
-    None
+    Installation &amp; Setup
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites-dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prerequisites &amp; Dependencies
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Installation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-a-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create a project
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#project-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      Project Structure
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setting-up-the-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      Setting up the server
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Setting up the server">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#apache" class="md-nav__link">
+    <span class="md-ellipsis">
+      Apache
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nginx" class="md-nav__link">
+    <span class="md-ellipsis">
+      Nginx
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../quick-start/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Quick Start
   </span>
   
 
@@ -434,11 +575,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../documentation/quick-start.md" class="md-nav__link">
+      <a href="../frigate-app/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    None
+    Frigate Application
   </span>
   
 
@@ -455,11 +596,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../documentation/frigate-app.md" class="md-nav__link">
+      <a href="../routing/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    None
+    Routing
   </span>
   
 
@@ -476,32 +617,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../documentation/routing.md" class="md-nav__link">
+      <a href="../middleware/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    None
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../documentation/middleware.md" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    None
+    Middleware
   </span>
   
 
@@ -536,10 +656,154 @@
   
 
 
-<h1 id="quick-start">Quick Start</h1>
+<h1 id="installation-setup">Installation &amp; Setup</h1>
+<h2 id="prerequisites-dependencies">Prerequisites &amp; Dependencies</h2>
+<p>Frigate requires PHP 8.1 or higher. It is recommended to use the latest stable version of PHP to ensure you have all the latest security patches and performance improvements.
+Frigate depends on the following PHP extensions:</p>
+<ul>
+<li><a href="https://www.php.net/manual/en/book.mbstring.php">mbstring</a> - Multibyte string functions (should be available everywhere)</li>
+<li><a href="https://www.php.net/manual/en/book.json.php">json</a> - JavaScript Object Notation (should be available everywhere)</li>
+</ul>
+<p>Beside core PHP extensions, Frigate also depends on the following PHP libraries, which are dependencies managed by Composer automatically:</p>
+<ul>
+<li><a href="https://github.com/guzzle/guzzle">guzzlehttp/guzzle</a> Used for making HTTP requests.</li>
+<li><a href="https://github.com/sabre-io/uri">sabre/uri</a> Functions for making sense out of URIs.</li>
+<li><a href="https://github.com/vlucas/phpdotenv">vlucas/phpdotenv</a> PHP dotenv loads environment variables from <code>.env</code> to <code>getenv()</code>, <code>$_ENV</code> and <code>$_SERVER</code> automagically.</li>
+<li><a href="https://github.com/twigphp/Twig">twig/twig</a> Twig, the flexible, fast, and secure template language for PHP.</li>
+<li><a href="https://github.com/firebase/php-jwt">firebase/php-jwt</a> A simple library to encode and decode JSON Web Tokens (JWT) in PHP.</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Frigate aims to be lightweight and minimalistic. That's why we are doing our best to keep the number of dependencies as low as possible and only use the most essential and stable libraries.</p>
+</div>
+<h2 id="installation">Installation</h2>
+<p>Install Frigate with composer:</p>
+<div class="language-bash highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>composer<span class="w"> </span>require<span class="w"> </span>siktec/frigate
+</code></pre></div>
+<h2 id="create-a-project">Create a project</h2>
+<p>You may want to start with a bootstrap project to get started:</p>
+<div class="language-bash highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>composer<span class="w"> </span>create-project<span class="w"> </span>siktec/frigate-bootstrap
+</code></pre></div>
+<h2 id="project-structure">Project Structure</h2>
+<p>Frigate is designed to be simple and flexible. It does not enforce any specific project structure. You are free to organize your project however you want. However, we recommend the following project structure (which is also used in the Frigate Bootstrap project):</p>
+<div class="language-bash highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>├──<span class="w"> </span>root
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>│<span class="w">   </span>│
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>│<span class="w">   </span>├──<span class="w"> </span>api<span class="w"> </span><span class="c1"># API endpoints goes here (PSR-4)</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>│<span class="w">   </span>├──<span class="w"> </span>routes<span class="w"> </span><span class="c1"># Routes goes here (PSR-4)</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>│<span class="w">   </span>├──<span class="w"> </span>models<span class="w"> </span><span class="c1"># Models goes here (PSR-4)</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>│<span class="w">   </span>├──<span class="w"> </span>static<span class="w"> </span><span class="c1"># Static files goes here</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>│<span class="w">   </span>├──<span class="w"> </span>pages<span class="w"> </span><span class="c1"># Front-end stuff goes here (PSR-4)</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>│<span class="w">   </span>├──<span class="w"> </span>cli<span class="w"> </span><span class="c1"># CLI files goes here (PSR-4)</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>│<span class="w">   </span>│
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>│<span class="w">   </span>├──<span class="w"> </span>index.php<span class="w"> </span><span class="c1"># Entry point</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>│<span class="w">   </span>├──<span class="w"> </span>.env<span class="w"> </span><span class="c1"># Environment variables goes here</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>│<span class="w">   </span>├──<span class="w"> </span>.htaccess<span class="w"> </span><span class="c1"># Apache configuration file (optional)</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>│<span class="w">   </span>├──<span class="w"> </span>composer.json<span class="w"> </span><span class="c1"># Composer configuration file</span>
+</code></pre></div>
+<h2 id="setting-up-the-server">Setting up the server</h2>
+<p>Frigate is designed to run on Apache and Nginx web servers. It is recommended to use the latest stable version of Apache or Nginx to ensure you have all the latest security patches and performance improvements.</p>
+<p>No matter which web server you are using you will need to make sure that any requests to your Frigate application are sent to the <code>index.php</code> file. This is called "routing" and is configured differently depending on which web server you are using. For more information on configuring your web server, see the <a href="https://httpd.apache.org/docs/current/">official Apache</a> or <a href="https://docs.nginx.com/nginx/admin-guide/web-server/web-server/">Nginx</a> documentation.</p>
+<h3 id="apache">Apache</h3>
+<p>When using Apache, you need to make sure that the <code>mod_rewrite</code> <a href="https://httpd.apache.org/docs/current/mod/mod_rewrite.html">module</a> is enabled. This can be done by running the following command:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Enable mod_rewrite</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>sudo<span class="w"> </span>a2enmod<span class="w"> </span>rewrite
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Restart Apache to apply changes</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>sudo<span class="w"> </span>service<span class="w"> </span>apache2<span class="w"> </span>restart
+</code></pre></div>
+<p>If you are using Apache, you can use the following <code>.htaccess</code> file in the root of your project to route all requests to the <code>index.php</code> file.
+Besides routing, this <code>.htaccess</code> file also disables directory browsing and hides all environment files.</p>
+<div class="language-apacheconf annotate highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c"># Disable directory browsing</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">Options</span><span class="w"> </span>-Indexes
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c"># Hide all environment files</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="nt">&lt;Files</span><span class="w"> </span><span class="s">.env</span><span class="nt">&gt;</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="nb">Order</span><span class="w"> </span>allow,deny
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span><span class="nb">Deny</span><span class="w"> </span>from<span class="w"> </span><span class="k">all</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="nt">&lt;/Files&gt;</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="nt">&lt;IfModule</span><span class="w"> </span><span class="s">mod_rewrite.c</span><span class="nt">&gt;</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">    </span><span class="nb">RewriteEngine</span><span class="w"> </span><span class="k">On</span><span class="w"> </span>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">    </span><span class="c"># allow HTTP basic authentication (1)</span>
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">    </span><span class="nb">RewriteCond</span><span class="w"> </span>%{HTTP:Authorization}<span class="w"> </span>^(.+)$
+<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">    </span><span class="nb">RewriteRule</span><span class="w"> </span>.*<span class="w"> </span>-<span class="w"> </span>[E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>
+<a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="w">    </span><span class="c"># Optional: Set the base path to the public folder</span>
+<a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="w">    </span><span class="c"># RewriteBase / </span>
+<a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a><span class="w">    </span><span class="nb">RewriteRule</span><span class="w"> </span>.<span class="w"> </span>index.php<span class="w"> </span>[QSA,L]
+<a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>
+<a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="nt">&lt;/IfModule&gt;</span>
+</code></pre></div>
+<ol>
+<li>This is required if you are using HTTP Basic Authentication. Without this, the <code>Authorization</code> header will not be available to Frigate. Its mainly for Development and Testing purposes; so unless you are using HTTP Basic Authentication for production, comment out these lines.</li>
+</ol>
 <div class="admonition info">
-<p class="admonition-title">Did you install Frigate?</p>
-<p>If you haven't installed Frigate yet, please read the <a href="../setup/">Installation</a> guide.</p>
+<p class="admonition-title">Info</p>
+<p>If you created your project using the Frigate Bootstrap project, this <code>.htaccess</code> file is already included in your project.</p>
+</div>
+<p>Once you have created your <code>.htaccess</code> file, you need to make sure that your Apache virtual host is configured with the <code>AllowOverride</code> option. This will allow your <code>.htaccess</code> file to override the default settings of your Apache virtual host. You can do this by editing your virtual host configuration file and changing the <code>AllowOverride</code> option from <code>None</code> to <code>All</code>:</p>
+<div class="language-apacheconf annotate highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nb">sudo</span><span class="w"> </span>nano<span class="w"> </span><span class="sx">/etc/apache2/sites-available/000-default.conf</span>
+</code></pre></div>
+<p>Inside the <code>&lt;VirtualHost *:80&gt;</code> block, change the <code>AllowOverride</code> option to <code>All</code>:</p>
+<div class="language-apacheconf highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">&lt;VirtualHost</span><span class="w"> </span><span class="s">*:80</span><span class="nt">&gt;</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span><span class="nt">&lt;Directory</span><span class="w"> </span><span class="s">/var/www/html</span><span class="nt">&gt;</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">        </span><span class="nb">Options</span><span class="w"> </span>Indexes<span class="w"> </span>FollowSymLinks
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="hll"><span class="w">        </span><span class="nb">AllowOverride</span><span class="w"> </span><span class="k">All</span>
+</span><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">        </span><span class="nb">Require</span><span class="w"> </span><span class="k">all</span><span class="w"> </span>granted
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="nt">&lt;/Directory&gt;</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">    </span>.<span class="w"> </span>.<span class="w"> </span>.
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="nt">&lt;/VirtualHost&gt;</span>
+</code></pre></div>
+<p>Then restart Apache to apply changes:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>sudo<span class="w"> </span>service<span class="w"> </span>apache2<span class="w"> </span>restart
+</code></pre></div>
+<p>If everything is configured correctly, any requests to your Frigate application should now be routed to the <code>index.php</code> file.</p>
+<details class="note">
+<summary>Performance Considerations</summary>
+<p><code>.htaccess</code> files and <code>mod_rewrite</code> are sometimes considered as a performance issue. When using <code>.htaccess</code> files every request to your application will be checked for the existence of a <code>.htaccess</code> file in every part of the directory tree. This means that several "additional" filesystem accesses are required for every request.</p>
+<p>In our case, we are using a single <code>.htaccess</code> file in the root of our project. The rule will terminate immediately for any request <code>[QSA,L]</code>. This should minimize the performance impact of using <code>.htaccess</code> files. However, if you are concerned about performance, you can disable <code>.htaccess</code> files and move the rules to your virtual host configuration file. This will reduce the number of filesystem accesses required for every request. see the <a href="https://httpd.apache.org/docs/current/rewrite/">mod_rewrite</a> documentation for more information.</p>
+<p>The reason we are using <code>.htaccess</code> is that most shared hosting providers do not allow you to edit the virtual host configuration file. <code>.htaccess</code> files are the only way to configure your application in this case. It is also the easiest way to configure your application and add additional rules that may be required for your application to work correctly.</p>
+</details>
+<h3 id="nginx">Nginx</h3>
+<p>When using Nginx, you need to make sure that the <code>try_files</code> <a href="https://nginx.org/en/docs/http/ngx_http_core_module.html#try_files">directive</a> is configured correctly. This can be done by editing your Nginx configuration file, the goal is to make sure that any requests to your Frigate application are routed to the <code>index.php</code> file.</p>
+<p>Nginx <a href="https://www.nginx.com/resources/wiki/start/topics/examples/likeapache-htaccess/">does not support</a> <code>.htaccess</code> files, so you need to make sure that your Nginx configuration file is configured correctly. If you are using Nginx, you need to adjust the configuration file to include the following <code>location</code> block, This will route all requests to the <code>index.php</code>:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>server<span class="w"> </span><span class="o">{</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span>listen<span class="w"> </span><span class="m">80</span><span class="w"> </span>default_server<span class="p">;</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span>listen<span class="w"> </span><span class="o">[</span>::<span class="o">]</span>:80<span class="w"> </span>default_server<span class="p">;</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span>root<span class="w"> </span>/var/www/html<span class="p">;</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">    </span>index<span class="w"> </span>index.php<span class="w"> </span>index.html<span class="w"> </span>index.htm<span class="w"> </span>index.nginx-debian.html<span class="p">;</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">    </span>server_name<span class="w"> </span>example.com<span class="w"> </span>www.example.com<span class="p">;</span>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="hll"><span class="w">    </span><span class="c1"># Block access to environment files (just in case)</span>
+</span><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="hll"><span class="w">    </span>location<span class="w"> </span>~<span class="w"> </span>/<span class="se">\.</span>env<span class="w"> </span><span class="o">{</span><span class="w"> </span>
+</span><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="hll"><span class="w">        </span>deny<span class="w"> </span>all<span class="p">;</span>
+</span><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="hll"><span class="w">    </span><span class="o">}</span>
+</span><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="hll">
+</span><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="hll"><span class="w">    </span><span class="c1"># Route all requests to index.php </span>
+</span><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="hll"><span class="w">    </span>location<span class="w"> </span>/<span class="w"> </span><span class="o">{</span>
+</span><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="hll"><span class="w">        </span>try_files<span class="w"> </span>/index.php?<span class="nv">$query_string</span><span class="p">;</span>
+</span><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="hll"><span class="w">    </span><span class="o">}</span>
+</span><a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a>
+<a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="w">    </span>location<span class="w"> </span>~<span class="w"> </span><span class="se">\.</span>php$<span class="w"> </span><span class="o">{</span>
+<a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a><span class="w">        </span>include<span class="w"> </span>snippets/fastcgi-php.conf<span class="p">;</span>
+<a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a><span class="w">        </span>fastcgi_pass<span class="w"> </span>unix:/var/run/php/php8.2-fpm.sock<span class="p">;</span>
+<a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a><span class="w">    </span><span class="o">}</span>
+<a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a>
+<a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a><span class="w">    </span><span class="c1"># deny access to .htaccess, .htpasswd.</span>
+<a id="__codelineno-8-27" name="__codelineno-8-27" href="#__codelineno-8-27"></a><span class="w">    </span>location<span class="w"> </span>~<span class="w"> </span>/<span class="se">\.</span>ht<span class="w"> </span><span class="o">{</span>
+<a id="__codelineno-8-28" name="__codelineno-8-28" href="#__codelineno-8-28"></a><span class="w">        </span>deny<span class="w"> </span>all<span class="p">;</span>
+<a id="__codelineno-8-29" name="__codelineno-8-29" href="#__codelineno-8-29"></a><span class="w">    </span><span class="o">}</span>
+<a id="__codelineno-8-30" name="__codelineno-8-30" href="#__codelineno-8-30"></a><span class="o">}</span>
+</code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Nginx configuration file location</p>
+<p>The configuration file by default is located at <code>/etc/nginx/sites-available/default</code> or <code>/etc/nginx/nginx.conf</code> depending on your setup.</p>
 </div>
 
 

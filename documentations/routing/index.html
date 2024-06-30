@@ -8,9 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://siktec-lab.github.io/frigate/Documentation/routing/">
+        <link rel="canonical" href="https://siktec-lab.github.io/frigate/documentations/routing/">
       
       
+        <link rel="prev" href="../frigate-app/">
+      
+      
+        <link rel="next" href="../middleware/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -281,11 +285,13 @@
         
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../documentation/setup.md" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../setup/" class="md-tabs__link">
           
   
   Documentation
@@ -370,25 +376,30 @@
       
   
   
+    
   
   
+  
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
             
   
   <span class="md-ellipsis">
@@ -399,7 +410,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             Documentation
@@ -413,11 +424,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../documentation/setup.md" class="md-nav__link">
+      <a href="../setup/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    None
+    Installation &amp; Setup
   </span>
   
 
@@ -434,11 +445,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../documentation/quick-start.md" class="md-nav__link">
+      <a href="../quick-start/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    None
+    Quick Start
   </span>
   
 
@@ -455,11 +466,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../documentation/frigate-app.md" class="md-nav__link">
+      <a href="../frigate-app/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    None
+    Frigate Application
   </span>
   
 
@@ -473,18 +484,160 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../documentation/routing.md" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Routing
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
-    None
+    Routing
   </span>
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#initialize-the-router" class="md-nav__link">
+    <span class="md-ellipsis">
+      Initialize the router
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#defining-routes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Defining Routes
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Defining Routes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#generic-routes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Generic Routes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#static-routes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Static Routes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#auto-loading-routes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Auto loading routes
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#path-syntax" class="md-nav__link">
+    <span class="md-ellipsis">
+      Path Syntax
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Path Syntax">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#path-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Path parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#variation-macro" class="md-nav__link">
+    <span class="md-ellipsis">
+      Variation Macro
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#default-parameter-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      Default parameter values
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shadow-path-markers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Shadow path markers
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -497,11 +650,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../documentation/middleware.md" class="md-nav__link">
+      <a href="../middleware/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    None
+    Middleware
   </span>
   
 
