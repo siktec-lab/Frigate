@@ -9,30 +9,60 @@ use ReflectionClass;
 use Frigate\Routing\Http\RequestInterface;
 use Frigate\Routing\Http\ResponseInterface;
 use Frigate\Api\BindEndpoint;
-
+use Frigate\Middlewares\MiddlewareInterface;
 class Route 
 {
 
+    /**
+     *  Default return type:
+     *  @var string
+     */
     public const DEFAULT_RETURN = "application/json";
 
+    /**
+     * The route path syntax
+     */
     public string $path;
     
+    /**
+     * The route initial context
+     */
     public array $context = [];
     
+    /**
+     * The supported return types in a hierarchy of preference
+     */
     private array $returns = [
         "application/json",
         "text/html"
     ];
     
+    /**
+     * The route endpoint or a bind endpoint
+     */
     public object|array|string|null $exp;
     
+    /**
+     * The request mutator
+     */
     protected ?ReflectionClass $request_mutator = null;
     
-    private array $override_params = [ //TODO: do we need this????
-        "debug"         => null,
-        "auth"          => null,
-        "auth_method"   => null
-    ];
+    /**
+     * The route additional middlewares
+     * @var array<string|MiddlewareInterface> $middlewares - class names of the middlewares to apply
+     */
+    public array $middlewares = [];
+
+    /**
+     * The route middlewares to avoid
+     * @var array<string> $avoid_middlewares - class names of the middlewares to avoid
+     */
+    public array $avoid_middlewares = [];
+
+    /**
+     * Avoid all middlewares
+     */
+    public bool $avoid_all_middlewares = false;
 
     /**
      * construct a new route
@@ -41,6 +71,8 @@ class Route
      * @param array<string,mixed> $context the route default context
      * @param array<string> $returns the supported return types i.e mime-types
      * @param object|array|string|null $exp the route endpoint or a bind endpoint
+     * @param array<string|MiddlewareInterface> $middlewares the route middlewares class names to apply
+     * @param array<string|MiddlewareInterface>|bool $avoid_middlewares the route middlewares class names to avoid if true avoid all
      * @param ReflectionClass|string|null $request_mutator the request mutator
      */
     public function __construct(
@@ -48,6 +80,8 @@ class Route
         array $context = [], 
         array $returns = [], 
         object|array|string|null $exp = null, 
+        array $middlewares = [],
+        array|bool $avoid_middlewares = [],
         ReflectionClass|string|null $request_mutator = null
     ) {
         $this->path = trim($path, "\t\n\r /\\");
@@ -56,6 +90,21 @@ class Route
         if (!empty($returns)) {
             $this->setSupportedReturnTypes(...$returns);
         }
+
+        // set the middlewares:
+        foreach ($middlewares as $middleware) {
+            $this->addMiddleware($middleware);
+        }
+
+        // set the avoid middlewares:
+        if ($avoid_middlewares === true) {
+            $this->avoid_all_middlewares = true;
+        } elseif (is_array($avoid_middlewares)) {
+            foreach ($avoid_middlewares as $middleware) {
+                $this->avoidMiddleware($middleware);
+            }
+        }
+        
         // set the request mutator:
         if (is_string($request_mutator)) {
             $this->request_mutator = new ReflectionClass($request_mutator);
@@ -67,7 +116,36 @@ class Route
         }
     }
 
-        
+    /**
+     * add a middleware to this route
+     * 
+     * @param string|MiddlewareInterface|array<string|MiddlewareInterface> $middleware the middleware class name or instance
+     * @return self
+     */
+    public function addMiddleware(string|MiddlewareInterface|array $middleware) : self
+    {
+        $middleware = is_array($middleware) ? $middleware : [$middleware];
+        foreach ($middleware as $m) {
+            $this->middlewares[] = is_string($m) ? $m : get_class($m);
+        }
+        return $this;
+    }
+
+    /**
+     * avoid a middleware for this route
+     * 
+     * @param string|MiddlewareInterface|array<string|MiddlewareInterface> $middleware the middleware class name or instance
+     * @return self
+     */
+    public function avoidMiddleware(string|MiddlewareInterface|array $middleware) : self
+    {
+        $middleware = is_array($middleware) ? $middleware : [$middleware];
+        foreach ($middleware as $m) {
+            $this->avoid_middlewares[] = is_string($m) ? $m : get_class($m);
+        }
+        return $this;
+    }
+
     /**
      * set return types for this route which are the accepted content types
      */
@@ -113,23 +191,6 @@ class Route
         return $request;
     }
 
-    public function overrideEndpointParams(
-        ?bool $debug = null,
-        ?bool $auth  = null,
-        $auth_method = null
-    ) : self {
-        if (!is_null($debug)) {
-            $this->override_params["debug"] = $debug;
-        }
-        if (!is_null($auth)) {
-            $this->override_params["auth"] = $auth;
-        }
-        if (!is_null($auth_method)) {
-            $this->override_params["auth_method"] = $auth_method;
-        }
-        return $this;
-    }
-
     /**
      * exec
      * execute the route endpoint
@@ -144,24 +205,15 @@ class Route
 
         // Lazy load the endpoint?
         if (is_object($this->exp) && is_a($this->exp, BindEndpoint::class)) {
-            $this->exp = $this->exp->getInstance( // All overrides are passed to the endpoint
-                $this->override_params["debug"], 
-                $this->override_params["auth"],
-                $this->override_params["auth_method"]
-            ); // will build the endpoint only at this point
+            $this->exp = $this->exp->getInstance(); // will build the endpoint only at this point
         }
 
         //Execute the route endpoint:
         if (is_object($this->exp) && !$this->exp instanceof Closure && method_exists($this->exp, "call")) {
             return $this->exp->call($this->context, $request, $response);
         }
-
-        // Execute the route function:
-        //TODO: Make this more modern.
-        return call_user_func_array(
-            $this->exp, 
-            [$this->context, $request, $response]
-        );
+        // Execute the route function using modern PHP syntax:
+        return ($this->exp)($this->context, $request, $response);
     }
 
     public function __toString() : string

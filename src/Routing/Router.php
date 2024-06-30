@@ -307,6 +307,7 @@ class Router
 
         // Register the route:
         self::$routes[$method->value]->define($path, $exp);
+
     }
 
     /**
@@ -329,7 +330,14 @@ class Router
 
         // Initialize a new PathTree if it doesn't exist for this method:
         foreach ($methods as $m) {
+
+            // Attach the route expression to the router:
             self::attachRouteExpression($m, $route->path, $route);
+
+            // Additional middlewares?
+            foreach ($route->middlewares as $middleware) {
+                self::middleware($m, $route->path, $middleware);
+            }
         }
     }
     
@@ -395,10 +403,17 @@ class Router
         self::$errors[$code] = new Route(path: "/", exp: $endpoint);
     }
 
+    /**
+     * define a middleware to be used when a request matches the method and path
+     *
+     * @param  Methods|string|array $method the method or an array of methods
+     * @param  string|array $path the path or an array of paths
+     * @param  MiddlewareInterface|string $middleware the middleware to use
+     */
     public static function middleware(
         Methods|string|array $method, 
         array|string $path, 
-        MiddlewareInterface $middle_ware
+        MiddlewareInterface|string $middleware
     ) : void
     {   
         // Normalize:
@@ -418,7 +433,7 @@ class Router
 
             // Attach the middleware to the path:
             foreach ($methods as $m) {
-                self::attachRouteExpression($m, $p, $middle_ware);
+                self::attachRouteExpression($m, $p, $middleware);
             }
         }
     }
@@ -453,17 +468,11 @@ class Router
      * execute
      *
      * @param  RequestInterface $request null when current request should be used
-     * @param  ?bool $debug Override debug setting
-     * @param  ?bool $auth Override auth setting
-     * @param  mixed $auth_method Override auth method
      * @return ResponseInterface
      * @throws Exception when the request can't be executed
      */
     public static function execute(
-        RequestInterface $request,
-        ?bool $debug = null, // Override debug setting
-        ?bool $auth  = null, // Override auth setting
-        $auth_method = null // Override auth method
+        RequestInterface $request
     ) : ResponseInterface {
         
         //Get the Request method:
@@ -479,14 +488,11 @@ class Router
         );
         
         try {
-            
             //Check that the method is supported:
             if (!array_key_exists($method->value, self::$routes)) {
                 throw new \Exception("Request method '{$method->value}' is not supported", 404);
             }
-
             //Get the route & evaluate it:
-
             /** 
              * @var PathBranch|null $branch 
              * @var array $context 
@@ -495,36 +501,43 @@ class Router
             if (is_null($branch)) {
                 throw new \Exception("Not Found", 404);
             }
-
+            /** @var Route $route */
+            $route = $branch->exp;
             // Prepare the request:
-            // TODO: this might be an expression, not a route so wrap it in a requests
             $accept = $request->negotiateAccept(
-                $branch->exp->returnTypes(), 
-                $branch->exp->defaultReturn()
+                $route->returnTypes(), 
+                $route->defaultReturn()
             );
-
             // Return an error if the accept header is not supported:
             if (empty($accept)) {
                 throw new \Exception("Accept header not supported", 406);
             }
-
             // Set the response content type:
             $response->setHeader("Content-Type", $accept);
-
-            // TODO: apply middlewares here:
+            // Apply the middlewares:
             $middlewares = $branch->getShadowExpressions();
             foreach ($middlewares as $middleware) {
+
+                $class_name = is_string($middleware) ? $middleware : get_class($middleware);
+                // Avoid or continue?
+                if ($route->avoid_all_middlewares || in_array($class_name, $route->avoid_middlewares)) {
+                    continue;
+                }
+                // Check if the middleware is a class name:
+                if (is_string($middleware) && is_subclass_of($middleware, MiddlewareInterface::class, true)) {
+                    // Create the middleware using
+                    $middleware = new $middleware();
+                }
+                // Check if the middleware is an instance of MiddlewareInterface and execute it:
                 if ($middleware instanceof MiddlewareInterface) {
-                    
                     // Execute the middleware:
                     $middleware->exec(
                         $method, 
                         $request,
                         $response, 
                         $context,
-                        $branch->exp
+                        $route
                     );
-
                 } elseif (is_array($middleware)) {
                     // Merge the context:
                     $context = array_merge($context, $middleware);
@@ -532,18 +545,10 @@ class Router
             }
 
             //Apply the context:
-            $branch->exp->applyContext($context);
-
-            //Is override?
-            if (!is_null($debug) || !is_null($auth) || !is_null($auth_method)) {
-                $branch->exp->overrideEndpointParams(
-                    $debug, $auth, $auth_method
-                );
-            }
-
+            $route->applyContext($context);
+            
             //Execute the route:
-            //TODO: this might be an expression, not a route so wrap it in a response
-            return $branch->exp->exec($request, $response);
+            return $route->exec($request, $response);
             
         } catch(Exception $e) {
 

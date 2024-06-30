@@ -77,7 +77,7 @@ For all the generic routes and the `any` route you can simply use them as a meth
 <?php
 
     // index.php file
-    
+
     // ..... Initialize the App and Router
     
     Router::get( // Or any other method like post, put, patch, delete, options, head, any
@@ -189,6 +189,12 @@ class MyNameRoute extends DefineRoute
             return $response;
         };
 
+        // Define the route additional middlewares:
+        $this->middlewares = [];
+
+        // Define the route middlewares to avoid:
+        $this->avoid_middlewares = [];
+        
         // Define the request mutator:
         $this->request_mutator = null;
     }
