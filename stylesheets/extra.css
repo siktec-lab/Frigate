@@ -60,6 +60,11 @@ nav.md-nav .md-nav.md-nav--secondary .md-nav__list {
     color: #cddb5e
 }
 
+/* Hack to hide the opening and closing PHP tags when inline php code is used */
+code.language-php.highlight > span.cp {
+    display: none;
+}
+
 /*******************************************************************
  * Headings:
  ******************************************************************/

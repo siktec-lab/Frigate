@@ -552,104 +552,11 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#initialize-the-router" class="md-nav__link">
+  <a href="#basic-middleware" class="md-nav__link">
     <span class="md-ellipsis">
-      Initialize the router
+      Basic Middleware
     </span>
   </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#defining-routes" class="md-nav__link">
-    <span class="md-ellipsis">
-      Defining Routes
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Defining Routes">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#generic-routes" class="md-nav__link">
-    <span class="md-ellipsis">
-      Generic Routes
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#static-routes" class="md-nav__link">
-    <span class="md-ellipsis">
-      Static Routes
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#auto-loading-routes" class="md-nav__link">
-    <span class="md-ellipsis">
-      Auto loading routes
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#path-syntax" class="md-nav__link">
-    <span class="md-ellipsis">
-      Path Syntax
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Path Syntax">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#path-parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      Path parameters
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#variation-macro" class="md-nav__link">
-    <span class="md-ellipsis">
-      Variation Macro
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#default-parameter-values" class="md-nav__link">
-    <span class="md-ellipsis">
-      Default parameter values
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#shadow-path-markers" class="md-nav__link">
-    <span class="md-ellipsis">
-      Shadow path markers
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -688,310 +595,66 @@
 
 
 <h1 id="middleware">Middleware</h1>
-<h2 id="initialize-the-router">Initialize the router</h2>
-<p>After the frigate <code>FrigateApp</code> has been initialized, the router can be initialized.
-The router is initialized with the <code>init</code> method. The <code>init</code> method takes:
-- <code>debug</code> - a boolean value to enable debug mode for the router.</p>
+<p>Frigate has a powerful middleware system that allows you to execute code before and after a route is executed. Middleware can be used to modify the request, modify the response, or to execute additional logic before the route is executed. Middleware can be attached to a route or to a group of routes. Middleware can be used to implement authentication, logging, rate limiting, caching, and any other logic.</p>
+<p>Each middleware is a class that implements the <code class="language-php highlight"><span class="cp">&lt;?</span> <span class="nx">MiddlewareInterface</span></code> interface OR a class that extends the <code class="language-php highlight"><span class="cp">&lt;?</span> <span class="nx">BaseMiddleware</span></code> class. Each middleware class should implement the <code class="language-php highlight"><span class="cp">&lt;?</span> <span class="nb">exec</span></code> method that takes:</p>
+<ul>
+<li><code class="language-php highlight"><span class="cp">&lt;?</span> <span class="nx">Methods</span> <span class="nv">$method</span></code> - <strong>immutable</strong> the HTTP method of the route.</li>
+<li><code class="language-php highlight"><span class="cp">&lt;?</span> <span class="nx">RequestInterface</span> <span class="nv">$request</span></code> - <strong>mutable</strong> the request object.</li>
+<li><code class="language-php highlight"><span class="cp">&lt;?</span> <span class="nx">ResponseInterface</span> <span class="nv">$response</span></code> - <strong>mutable</strong> the response object.</li>
+<li><code class="language-php highlight"><span class="cp">&lt;?</span> <span class="k">array</span> <span class="nv">$context</span></code> - <strong>mutable</strong> the context of the route.</li>
+<li><code class="language-php highlight"><span class="cp">&lt;?</span> <span class="nx">Route</span> <span class="nv">$route</span></code> - <strong>immutable</strong> the final route object.</li>
+</ul>
+<p>The <code class="language-php highlight"><span class="cp">&lt;?</span> <span class="nb">exec</span></code> return a boolean value indicating wether execution should continue or not. It should modify the request, response, context to pass data between middleware modules and the target route.</p>
+<h2 id="basic-middleware">Basic Middleware</h2>
+<p>Here is an example of a basic middleware that modifies the context of the route:</p>
 <div class="language-php highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="cp">&lt;?php</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1">// We use the Frigate Base class to help with environment variables.</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1">// This is not required but it is recommended.</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nx">Router</span><span class="o">::</span><span class="na">init</span><span class="p">(</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="nx">load_request</span> <span class="o">:</span> <span class="k">true</span><span class="p">,</span> <span class="c1">// (bool) Load the request immediately. Default is true.</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="nx">debug</span>        <span class="o">:</span> <span class="k">null</span><span class="p">,</span> <span class="c1">// (null|bool) Enable debug mode. Default is null which will use the environment variable.</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="nx">use_request</span>  <span class="o">:</span> <span class="k">null</span><span class="p">,</span> <span class="c1">// (null|string) Use a specific request object. Default is null which will use the default request object.</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="nx">use_response</span> <span class="o">:</span> <span class="k">null</span><span class="p">,</span> <span class="c1">// (null|string) Use a specific response object. Default is null which will use the default response object.</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">);</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="c1">// If the request is not loaded immediately we can load it later:</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="nx">Router</span><span class="o">::</span><span class="na">loadRequest</span><span class="p">();</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">use</span> <span class="nx">Frigate\Middleware\BaseMiddleware</span><span class="p">;</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="k">use</span> <span class="nx">Frigate\Routing\Http\RequestInterface</span><span class="p">;</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="k">use</span> <span class="nx">Frigate\Routing\Http\ResponseInterface</span><span class="p">;</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="k">use</span> <span class="nx">Frigate\Routing\Routes\Route</span><span class="p">;</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="k">class</span> <span class="nc">MyMiddleware</span> <span class="k">extends</span> <span class="nx">BaseMiddleware</span> 
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">{</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="k">public</span> <span class="k">function</span> <span class="nf">exec</span><span class="p">(</span>               <span class="c1">// The only required method to implement</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>        <span class="nx">Methods</span> <span class="nv">$method</span><span class="p">,</span>                <span class="c1">// The HTTP method of the route</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>        <span class="nx">RequestInterface</span> <span class="o">&amp;</span><span class="nv">$request</span><span class="p">,</span>     <span class="c1">// The request object which will be passed on. </span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>        <span class="nx">ResponseInterface</span> <span class="o">&amp;</span><span class="nv">$response</span><span class="p">,</span>   <span class="c1">// The response object which will be passed on.</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>        <span class="k">array</span> <span class="o">&amp;</span><span class="nv">$context</span><span class="p">,</span>                <span class="c1">// The context of the route</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>        <span class="nx">Route</span> <span class="nv">$target_route</span>             <span class="c1">// The final route object</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>    <span class="p">)</span> <span class="o">:</span> <span class="nx">bool</span> <span class="p">{</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>        <span class="c1">// Middleware logic goes here:</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>        <span class="nv">$context</span><span class="p">[</span><span class="s1">&#39;my_middleware&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;I am a middleware&#39;</span><span class="p">;</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>        <span class="c1">// Return true to continue the execution of the route.</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>        <span class="c1">// Return false to stop the execution of the route and return the response.</span>
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>        <span class="k">return</span> <span class="k">true</span><span class="p">;</span> 
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>    <span class="p">}</span>
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="p">}</span>
 </code></pre></div>
-<p>The router is now initialized and ready to define routes.
-The router parses the request and matches it against the defined routes. After the execution of the route, the response is sent to the client.</p>
-<h2 id="defining-routes">Defining Routes</h2>
-<p>Routes are defined using the <code>define</code> method. The <code>define</code> method takes:
-- <code>method</code> - the HTTP method of the route. This can be a string or an array of strings.
-- <code>route</code> - the <code>Route</code> object that defines the route logic.</p>
+<p>After a middleware is executed, the context, request, and response objects are passed on to the next middleware or to the route handler. In case a middleware should stop the execution of the route, it can do so in two ways:</p>
+<ul>
+<li>By returning the <code class="language-php highlight"><span class="cp">&lt;?</span> <span class="k">False</span></code> value which will stop the execution of the route and return the response.</li>
+<li>By throwing an <code class="language-php highlight"><span class="cp">&lt;?</span> <span class="nx">Exception</span></code> with the relevant error message and status code.</li>
+</ul>
 <div class="language-php highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="cp">&lt;?php</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="c1">// index.php file</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="c1">// ..... Initialize the App and Router</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="k">use</span> <span class="nx">Frigate\Routing\Http\Methods</span><span class="p">;</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="k">use</span> <span class="nx">Frigate\Routing\Routes\Route</span><span class="p">;</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="c1">// ... Middleware exec body</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="c1">// Example of a middleware that stops the execution of the route.</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="nv">$response</span><span class="o">-&gt;</span><span class="na">setStatus</span><span class="p">(</span><span class="mi">401</span><span class="p">,</span> <span class="s2">&quot;Unauthorized&quot;</span><span class="p">);</span> 
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
 <a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="cm">/* </span>
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="cm">        Define a route - In this case a GET route that matches the path &quot;/me/{some_name}&quot;&quot;</span>
-<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="cm">        and executes the MyEndpoint class.</span>
-<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="cm">    */</span>
-<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    <span class="nx">Router</span><span class="o">::</span><span class="na">define</span><span class="p">(</span><span class="nx">Methods</span><span class="o">::</span><span class="na">GET</span><span class="p">,</span> <span class="k">new</span> <span class="nx">Route</span><span class="p">(</span>
-<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>        <span class="nx">path</span><span class="o">:</span> <span class="s2">&quot;/me/?{name}&quot;</span><span class="p">,</span>    <span class="c1">// The path of the route.</span>
-<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>        <span class="nx">context</span><span class="o">:</span> <span class="p">[</span>              <span class="c1">// The context that will be passed to the endpoint.</span>
-<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>            <span class="s2">&quot;name&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;John&quot;</span>    <span class="c1">// The default value of the name parameter.</span>
-<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>        <span class="p">],</span>
-<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>        <span class="nb">exp</span><span class="o">:</span> <span class="k">new</span> <span class="nx">MyEndpoint</span><span class="p">(</span> <span class="nx">debug</span><span class="o">:</span> <span class="k">null</span> <span class="p">),</span> <span class="c1">// The endpoint class this route will execute.</span>
-<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>        <span class="nx">returns</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;application/json&quot;</span><span class="p">],</span>      <span class="c1">// The supported return types.</span>
-<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>        <span class="nx">middleware</span><span class="o">:</span> <span class="p">[],</span>        <span class="c1">// Additional middleware to execute before the route.</span>
-<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>        <span class="nx">avoid_middleware</span><span class="o">:</span> <span class="p">[],</span>  <span class="c1">// Middlewares to avoid.</span>
-<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>        <span class="nx">request_mutator</span><span class="o">:</span> <span class="k">null</span>   <span class="c1">// The request mutator.</span>
-<a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>    <span class="p">));</span>
-<a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a>
-<a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a>    <span class="c1">// ..... Run the router</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="c1">//Or:</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    <span class="nv">$response</span><span class="o">-&gt;</span><span class="na">setStatus</span><span class="p">(</span><span class="mi">401</span><span class="p">);</span> <span class="c1">// Status message will be automatically set based on the status code.</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    <span class="c1">//Or:</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    <span class="k">throw</span> <span class="k">new</span> <span class="nx">Exception</span><span class="p">(</span><span class="s2">&quot;Unauthorized&quot;</span><span class="p">,</span> <span class="mi">401</span><span class="p">);</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>    <span class="c1">// ... Middleware exec body</span>
 </code></pre></div>
-<p>This is the most basic way to define a route. The route will match the path <code>/me/</code> and <code>/me/John</code> etc... and will execute the <code>MyEndpoint</code> class which is a class that extends the <code>Endpoint</code> class - <a href="#endpoints">about endpoints</a>.</p>
-<h3 id="generic-routes">Generic Routes</h3>
-<p>For convenience, the <code>Router</code> class has dome predefined methods for the most common HTTP methods and for the most common route types. These methods are:</p>
-<ul>
-<li><code>get</code> - defines a GET route.</li>
-<li><code>post</code> - defines a POST route.</li>
-<li><code>put</code> - defines a PUT route.</li>
-<li><code>patch</code> - defines a PATCH route.</li>
-<li><code>delete</code> - defines a DELETE route.</li>
-<li><code>options</code> - defines an OPTIONS route.</li>
-<li><code>head</code> - defines a HEAD route.</li>
-<li><code>any</code> - defines a route that matches any HTTP method.</li>
-<li><code>static</code> - defines a static route that serves a file.</li>
-<li><code>error</code> - defines an error route that will be executed when an error occurs.</li>
-</ul>
-<p>For all the generic routes and the <code>any</code> route you can simply use them as a method of the <code>Router</code> class. For example:</p>
-<div class="language-php highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="cp">&lt;?php</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="c1">// index.php file</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="c1">// ..... Initialize the App and Router</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="nx">Router</span><span class="o">::</span><span class="na">get</span><span class="p">(</span> <span class="c1">// Or any other method like post, put, patch, delete, options, head, any</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>        <span class="nx">path</span> <span class="o">:</span> <span class="s2">&quot;/me/?{name}&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>        <span class="nx">context</span><span class="o">:</span> <span class="p">[</span>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>            <span class="s2">&quot;name&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;John&quot;</span>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>        <span class="p">],</span>
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>        <span class="nb">exp</span>  <span class="o">:</span> <span class="k">new</span> <span class="nx">MyEndpoint</span><span class="p">(</span> <span class="nx">debug</span><span class="o">:</span> <span class="k">null</span><span class="p">)</span>
-<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>    <span class="p">);</span>
-</code></pre></div>
-<p>This is the same as the previous example but with a more convenient way to define the route.</p>
-<p><code>static</code> and <code>error</code> routes are special routes that have predefined behavior. The <code>static</code> route will serve a file from the file system and the <code>error</code> route will be executed when an error occurs. The <code>error</code> route is described in the <a href="#error-handling">error handling section</a>.</p>
-<h3 id="static-routes">Static Routes</h3>
-<p>Static routes are routes that serve files from the file system. The <code>static</code> route is defined with the <code>static</code> method of the <code>Router</code> class. The <code>static</code> method takes:
-- <code>path</code> - (string) the path of the route - using the path syntax described below.
-- <code>directory</code> - (string) the absolute path to the directory that contains the files.
-- <code>types</code> - (string|array) the file types that will be served. This can be a string or an array of strings. The default is <code>["*/*"]</code> which will serve all files.</p>
-<p>Here is an example of a static route:</p>
-<div class="language-php highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="cp">&lt;?php</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="c1">// index.php file</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="c1">// ..... Initialize the App and Router</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="nx">Router</span><span class="o">::</span><span class="na">static</span><span class="p">(</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>        <span class="nx">path</span>        <span class="o">:</span> <span class="s2">&quot;/storage&quot;</span><span class="p">,</span> <span class="c1">// The path of the route.</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>        <span class="nx">directory</span>   <span class="o">:</span> <span class="no">__DIR__</span> <span class="o">.</span> <span class="nx">DIRECTORY_SEPARATOR</span> <span class="o">.</span> <span class="s2">&quot;files&quot;</span><span class="p">,</span> <span class="c1">// The directory that contains the files. </span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>        <span class="nx">types</span>       <span class="o">:</span> <span class="p">[</span><span class="s2">&quot;image/*&quot;</span><span class="p">,</span> <span class="s2">&quot;text/*&quot;</span><span class="p">,</span> <span class="s2">&quot;video/*&quot;</span><span class="p">]</span> <span class="c1">// The types of files that will be served.</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="p">);</span>
-</code></pre></div>
-<p>This will serve files from the <code>files</code> directory when the path <code>/storage/...</code> is requested. The files will be served with the correct mime type based on the file extension.</p>
-<details class="info">
-<summary>How do I set the file disposition?</summary>
-<p>By default, the file disposition is set to <code>inline</code>. This means that the file will be displayed in the browser. Which means that if the browser can display the file it will. If you want to force the download of the file you can set the file disposition to <code>attachment</code>. This can be done by passing the <code>types</code> parameter as an associative array where the key is the mime type and the value is the file disposition. For example:</p>
-<div class="language-php highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="cp">&lt;?php</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>   <span class="c1">// ....</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>   <span class="nx">types</span> <span class="o">:</span> <span class="p">[</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>       <span class="s2">&quot;image/*&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;inline&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>       <span class="s2">&quot;text/*&quot;</span>  <span class="o">=&gt;</span> <span class="s2">&quot;attachment&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>       <span class="s2">&quot;video/*&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;inline&quot;</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>   <span class="p">]</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>   <span class="c1">// ....</span>
-</code></pre></div>
-</details>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<ol>
-<li>You can use the path syntax described below to define the path of the static route. But the path should not contain <code>path parameters</code>.</li>
-<li>All the logic of the static route is handled by a custom handler that is provided by Frigate. This <code>Endpoint</code> is called <code>StaticEndpoint</code> and is described in the <a href="#endpoints">endpoints section</a>.</li>
-</ol>
-</div>
-<h3 id="auto-loading-routes">Auto loading routes</h3>
-<p>When the application grows, the number of routes will grow as well. To make the code more readable and maintainable, the routes can be defined in separate files and auto-loaded by the router. This can be done by defining the routes in a separate file and then loading the file with the <code>defineFrom</code> method of the <code>Router</code> class. The <code>defineFrom</code> method takes:
-- <code>path</code> - (string) the path to the <em>folder</em> that contains the route files.</p>
-<p>Each route file should define a single class that extends the <code>DefineRoute</code> class. The class should have a single constructor that takes no arguments and should define the routes in the constructor. </p>
-<p>Here is an example of a route file:</p>
-<div class="language-php highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="cp">&lt;?php</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="c1">// MyNameRoute.php file in the routes folder - /routes/MyNameRoute.php</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="k">use</span> <span class="nx">Frigate\Routing\Routes\DefineRoute</span><span class="p">;</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="k">use</span> <span class="nx">Frigate\Routing\Http\Methods</span><span class="p">;</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="k">use</span> <span class="nx">Frigate\Routing\Http\ResponseInterface</span><span class="p">;</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="k">use</span> <span class="nx">Frigate\Routing\Http\RequestInterface</span><span class="p">;</span>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="k">class</span> <span class="nc">MyNameRoute</span> <span class="k">extends</span> <span class="nx">DefineRoute</span>
-<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="p">{</span>
-<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">()</span>
-<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>    <span class="p">{</span>
-<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>        <span class="c1">// Define the route method(s):</span>
-<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">method</span> <span class="o">=</span> <span class="p">[</span><span class="nx">Methods</span><span class="o">::</span><span class="na">GET</span><span class="p">,</span> <span class="nx">Methods</span><span class="o">::</span><span class="na">POST</span><span class="p">];</span>
-<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>
-<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>        <span class="c1">// Define the route path:</span>
-<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">path</span> <span class="o">=</span> <span class="s2">&quot;/say/?{name:string}&quot;</span><span class="p">;</span>
-<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>
-<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>        <span class="c1">// Define the route context:</span>
-<a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">context</span> <span class="o">=</span> <span class="p">[</span>
-<a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a>            <span class="s2">&quot;name&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;John Doe&quot;</span>
-<a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>        <span class="p">];</span>
-<a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a>
-<a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a>        <span class="c1">// Define the supported return types:</span>
-<a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">returns</span> <span class="o">=</span> <span class="p">[</span>
-<a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a>            <span class="s2">&quot;application/json&quot;</span>
-<a id="__codelineno-5-28" name="__codelineno-5-28" href="#__codelineno-5-28"></a>        <span class="p">];</span>
-<a id="__codelineno-5-29" name="__codelineno-5-29" href="#__codelineno-5-29"></a>
-<a id="__codelineno-5-30" name="__codelineno-5-30" href="#__codelineno-5-30"></a>        <span class="c1">// Bind the route endpoint or expression:</span>
-<a id="__codelineno-5-31" name="__codelineno-5-31" href="#__codelineno-5-31"></a>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">exp</span> <span class="o">=</span> <span class="k">function</span><span class="p">(</span><span class="k">array</span> <span class="nv">$context</span><span class="p">,</span> <span class="nx">RequestInterface</span> <span class="nv">$request</span><span class="p">,</span> <span class="nx">ResponseInterface</span> <span class="nv">$response</span><span class="p">)</span> <span class="p">{</span>
-<a id="__codelineno-5-32" name="__codelineno-5-32" href="#__codelineno-5-32"></a>            <span class="c1">// Set the response data:</span>
-<a id="__codelineno-5-33" name="__codelineno-5-33" href="#__codelineno-5-33"></a>            <span class="nv">$response</span><span class="o">-&gt;</span><span class="na">setBodyJson</span><span class="p">([</span>
-<a id="__codelineno-5-34" name="__codelineno-5-34" href="#__codelineno-5-34"></a>                <span class="s2">&quot;message&quot;</span>   <span class="o">=&gt;</span> <span class="s2">&quot;success&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-35" name="__codelineno-5-35" href="#__codelineno-5-35"></a>                <span class="s2">&quot;name&quot;</span>      <span class="o">=&gt;</span> <span class="nv">$context</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span>
-<a id="__codelineno-5-36" name="__codelineno-5-36" href="#__codelineno-5-36"></a>                <span class="s2">&quot;context&quot;</span>   <span class="o">=&gt;</span> <span class="nv">$context</span>
-<a id="__codelineno-5-37" name="__codelineno-5-37" href="#__codelineno-5-37"></a>            <span class="p">]);</span>
-<a id="__codelineno-5-38" name="__codelineno-5-38" href="#__codelineno-5-38"></a>            <span class="c1">// return the response:</span>
-<a id="__codelineno-5-39" name="__codelineno-5-39" href="#__codelineno-5-39"></a>            <span class="k">return</span> <span class="nv">$response</span><span class="p">;</span>
-<a id="__codelineno-5-40" name="__codelineno-5-40" href="#__codelineno-5-40"></a>        <span class="p">};</span>
-<a id="__codelineno-5-41" name="__codelineno-5-41" href="#__codelineno-5-41"></a>
-<a id="__codelineno-5-42" name="__codelineno-5-42" href="#__codelineno-5-42"></a>        <span class="c1">// Define the route additional middleware:</span>
-<a id="__codelineno-5-43" name="__codelineno-5-43" href="#__codelineno-5-43"></a>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">middleware</span> <span class="o">=</span> <span class="p">[];</span>
-<a id="__codelineno-5-44" name="__codelineno-5-44" href="#__codelineno-5-44"></a>
-<a id="__codelineno-5-45" name="__codelineno-5-45" href="#__codelineno-5-45"></a>        <span class="c1">// Define the route middleware to avoid:</span>
-<a id="__codelineno-5-46" name="__codelineno-5-46" href="#__codelineno-5-46"></a>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">avoid_middleware</span> <span class="o">=</span> <span class="p">[];</span>
-<a id="__codelineno-5-47" name="__codelineno-5-47" href="#__codelineno-5-47"></a>
-<a id="__codelineno-5-48" name="__codelineno-5-48" href="#__codelineno-5-48"></a>        <span class="c1">// Define the request mutator:</span>
-<a id="__codelineno-5-49" name="__codelineno-5-49" href="#__codelineno-5-49"></a>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">request_mutator</span> <span class="o">=</span> <span class="k">null</span><span class="p">;</span>
-<a id="__codelineno-5-50" name="__codelineno-5-50" href="#__codelineno-5-50"></a>    <span class="p">}</span>
-<a id="__codelineno-5-51" name="__codelineno-5-51" href="#__codelineno-5-51"></a><span class="p">}</span>
-</code></pre></div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<ol>
-<li>The <em>class name</em> should be the same as the file name without the <code>.php</code> extension.</li>
-</ol>
-</div>
-<p>This is how all the route files inside the <em>routes</em> will be auto-loaded by the router:</p>
-<div class="language-php highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="cp">&lt;?php</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="c1">// index.php file</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="c1">// ..... Initialize the App and Router</span>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="nx">Router</span><span class="o">::</span><span class="na">defineFrom</span><span class="p">(</span><span class="s2">&quot;routes&quot;</span><span class="p">);</span> <span class="c1">// The path is relative so for a full path use __DIR__ . DIRECTORY_SEPARATOR . &quot;routes&quot;</span>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="c1">// After this line all the routes defined in the routes folder will be loaded an registered with the router.</span>
-</code></pre></div>
-<h2 id="path-syntax">Path Syntax</h2>
-<p>The route path is the URI that the router will match against.
-The route path can contain path parameters, and path parameters can have a type:</p>
-<ul>
-<li><code class="language-js highlight"><span class="s2">&quot;/&quot;</span></code> - will match the root path.</li>
-<li><code class="language-js highlight"><span class="s2">&quot;users&quot;</span></code> - will match the path "/users"</li>
-<li><code class="language-js highlight"><span class="s2">&quot;users/{id}&quot;</span></code> - will match the path "/users/1" and "/users/2" etc...</li>
-<li><code class="language-js highlight"><span class="s2">&quot;users/{id:int}&quot;</span></code> - will match the path "/users/1" and "/users/2" and will place the id in the context as an integer.</li>
-</ul>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<ol>
-<li>The path is case insensitive. This means that the path <code>/users</code> will match <code>/Users</code> and <code>/USERS</code> etc...</li>
-<li>When defining the <strong>same path</strong> with the <strong>same method</strong> twice, the last definition will <strong>override</strong> the previous one.</li>
-</ol>
-</div>
-<h3 id="path-parameters">Path parameters</h3>
-<p>Path parameters are defined by wrapping the parameter name with curly brackets <code>{}</code>.
-The parameter name can be any alphanumeric string and can contain underscores <code>_</code>. It is recommended to use a descriptive name.</p>
-<p>The parameter name can also contain a type. The type is used to convert the path parameter to a specific type in the context.</p>
-<ul>
-<li><code>int, integer</code> - will convert to an integer.</li>
-<li><code>float, double</code> - will convert to a float.</li>
-<li>
-<p class="annotate"><code>bool, boolean</code> - will convert to a boolean. (1)</p>
-<ol>
-<li>The boolean type will convert the following values to true: <code>1, true, on, yes</code> and the following values to false: <code>0, false, off, no</code>.</li>
-</ol>
-</li>
-<li>
-<p><code>string, str</code> - will match any string. Which is the default type.</p>
-</li>
-<li><code>path</code> - will be a string containing the rest of the path.</li>
-</ul>
-<p>The way we define the type is by adding a colon <code>:</code> after the parameter name and then the type name:</p>
-<ul>
-<li><code class="language-js highlight"><span class="s2">&quot;users/{id:int}&quot;</span></code> - id will be an <code>int</code>.</li>
-<li><code class="language-js highlight"><span class="s2">&quot;users/{height:float}&quot;</span></code> - height will be a <code>float</code>.</li>
-<li><code class="language-js highlight"><span class="s2">&quot;users/{is_active:bool}&quot;</span></code> - is_active will be a <code>bool</code>.</li>
-<li><code class="language-js highlight"><span class="s2">&quot;users/{name}&quot;</span></code> - name will be a <code>string</code>.</li>
-<li><code class="language-js highlight"><span class="s2">&quot;users/{name:string}/{id:int}/{action}&quot;</span></code> - we can mix types and non types.</li>
-<li><code class="language-js highlight"><span class="s2">&quot;users/{storage:path}&quot;</span></code> - storage will be a <code>string</code> containing the rest of the path.</li>
-</ul>
-<details class="warning">
-<summary>Exceptions and limitations</summary>
-<ol>
-<li>An exception will be thrown if the several path parameters are defined on the same level.<ul>
-<li>i.e. defining <code class="language-js highlight"><span class="s2">&quot;users/{id:int}&quot;</span></code> and <code class="language-js highlight"><span class="s2">&quot;users/{name:string}&quot;</span></code> will throw an exception.</li>
-</ul>
-</li>
-<li>The <code>path</code> parameter cannot be extended with other parameters.<ul>
-<li>i.e. <code class="language-js highlight"><span class="s2">&quot;users/{storage:path}/{id:int}&quot;</span></code> will throw an exception.</li>
-</ul>
-</li>
-</ol>
-</details>
-<h3 id="variation-macro">Variation Macro</h3>
-<p>In Frigate we can define multiple levels of a path with the variation macro <code>?</code>. The variation macro will expand to a several paths:</p>
-<ul>
-<li><code class="language-js highlight"><span class="s2">&quot;users/storage/?{find}/?{term}&quot;</span></code> - will expand to:<ul>
-<li><code class="language-js highlight"><span class="s2">&quot;users/storage/&quot;</span></code></li>
-<li><code class="language-js highlight"><span class="s2">&quot;users/storage/{find}/&quot;</span></code></li>
-<li><code class="language-js highlight"><span class="s2">&quot;users/storage/{find}/{term}&quot;</span></code></li>
-</ul>
-</li>
-</ul>
-<p>Obviously, this can be done manually but it is a lot easier to use the variation macro.
-Also, the variation macro can be used to mimic default values in path parameters. For example:</p>
-<div class="language-php highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="cp">&lt;?php</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="c1">// ...</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="nx">Router</span><span class="o">::</span><span class="na">define</span><span class="p">(</span><span class="nx">Methods</span><span class="o">::</span><span class="na">GET</span><span class="p">,</span> <span class="k">new</span> <span class="nx">Route</span><span class="p">(</span><span class="s2">&quot;users/storage/?find/?{term}&quot;</span><span class="p">,</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    <span class="nx">context</span> <span class="o">:</span> <span class="p">[</span>
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>        <span class="s2">&quot;find&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span>
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>        <span class="s2">&quot;term&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;avatar.png&quot;</span><span class="p">,</span>
-<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>    <span class="p">],</span>
-<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>    <span class="c1">// ... rest of the route definition</span>
-<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="p">));</span>
-</code></pre></div>
-<p>All the expanded paths will be matched and the context will be merged with the context defined in the route definition. This behavior will result in 3 paths that points to the same route and have "default" values for the <code>find</code> and <code>term</code> parameters.</p>
-<ul>
-<li><code class="language-js highlight"><span class="s2">&quot;users/storage/&quot;</span></code> - will have the context: <code>["find" =&gt; "all", "term" =&gt; "avatar.png"]</code></li>
-<li><code class="language-js highlight"><span class="s2">&quot;users/storage/picture/&quot;</span></code> - will have the context: <code>["find" =&gt; "picture", "term" =&gt; "avatar.png"]</code></li>
-<li><code class="language-js highlight"><span class="s2">&quot;users/storage/picture/profie.png&quot;</span></code> - will have the context: <code>["find" =&gt; "picture", "term" =&gt; "profie.png"]</code></li>
-</ul>
-<h3 id="default-parameter-values">Default parameter values</h3>
-<p>Default values are not supported in path parameters. They don't make sense in the context of a path parameter. Some frameworks support default values (sort of) by looking ahead in the path and matching the next path part. This is not supported in Frigate.</p>
-<p>The best way to handle this is to define several paths that point to the same route and have different levels of path parameters.
-This can be done easily with the variation macro <code>?</code> as <a href="#variation-macro">described above</a>.</p>
-<details class="info">
-<summary>Why not???</summary>
-<p>The reason for this is that it is not clear what the default value should be. For example, if we have the following path: <code class="language-js highlight"><span class="s2">&quot;users/{id:int}/{action}&quot;</span></code> and we want to set the default value of <code>action</code> to <code>view</code>. What should happen if the path is <code>/users/1</code>? Should the default value be set to <code>view</code> or should the path not match? This is not clear and can lead to unexpected behavior.</p>
-</details>
-<h3 id="shadow-path-markers">Shadow path markers</h3>
-<p>In Frigate shadow paths are defined by adding a <code>^</code> after the path. Internally, the shadow path marker is used to attach
-expressions that will be executed when the this marker is reached. For example:</p>
-<ul>
-<li><code class="language-js highlight"><span class="s2">&quot;/users^&quot;</span></code> - a any path that starts with <code>/users</code> will invoke the attached expressions before the route is executed.</li>
-<li><code class="language-js highlight"><span class="s2">&quot;/users^/{id:int}&quot;</span></code> - when executing the route <code>/users/1</code> the attached expressions will be executed before the route is executed, passing the modified context to the route.</li>
-<li><code class="language-js highlight"><span class="s2">&quot;/users^/{id:int}^/profile&quot;</span></code> - shadow paths can be chained together. when executing the route <code>/users/1/profile</code> the shadow expressions will be executed twice, once for <code>/users/1</code> and once for <code>/users/1/profile</code>.</li>
-</ul>
-<p>This mechanism is used to attach middleware to a route. and is described in the <a href="#middleware">middleware section</a>.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The shadow path marker is not part of the path and will not be matched. It is used to attach expressions to the path.</p>
-</div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Don't use the shadow path marker unless you know what you are doing. Frigate offers a better way to attach middleware to a route. See the <a href="#middleware">middleware section</a>.</p>
-</div>
 
 
 
