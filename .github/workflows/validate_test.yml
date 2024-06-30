@@ -50,7 +50,7 @@ jobs:
           ${{ runner.os }}-php-${{ matrix.php-versions }}-
     
     - name: Install dependencies
-      run: composer install --prefer-dist --no-progress
+      run: composer install --prefer-dist --no-progress --no-interaction --no-ansi
 
     - name: Using PHP version
       run: php -v

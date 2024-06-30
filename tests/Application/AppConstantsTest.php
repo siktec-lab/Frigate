@@ -49,8 +49,8 @@ class AppConstantsTest extends TestCase
         );
 
         $expected = [
-            "APP_ROOT"          => __DIR__,
-            "APP_VENDOR"        => __DIR__ . DIRECTORY_SEPARATOR . "vendor",
+            "APP_ROOT"          => ltrim(__DIR__, DIRECTORY_SEPARATOR),
+            "APP_VENDOR"        => ltrim(__DIR__ . DIRECTORY_SEPARATOR . "vendor", DIRECTORY_SEPARATOR),
             "APP_BASE_PATH"     => DIRECTORY_SEPARATOR . "web" . DIRECTORY_SEPARATOR . "files",
             "APP_BASE_URI"      => "/web/files",
             "APP_BASE_URL"      => "http://localhost/web/files",
