@@ -43,7 +43,7 @@ class AppConstantsTest extends TestCase
             root : __DIR__,
             env : [ self::ENV_FOLDER , ".env.test.nested_root" ],
             extra_env : [],
-            load_session : false,
+            start_session : false,
             start_page_buffer : false,
             adjust_ini : false
         );

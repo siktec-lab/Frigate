@@ -334,9 +334,9 @@ class Router
             // Attach the route expression to the router:
             self::attachRouteExpression($m, $route->path, $route);
 
-            // Additional middlewares?
-            foreach ($route->middlewares as $middleware) {
-                self::middleware($m, $route->path, $middleware);
+            // Additional middleware?
+            foreach ($route->middleware as $mw) {
+                self::middleware($m, $route->path, $mw);
             }
         }
     }
@@ -514,33 +514,33 @@ class Router
             }
             // Set the response content type:
             $response->setHeader("Content-Type", $accept);
-            // Apply the middlewares:
-            $middlewares = $branch->getShadowExpressions();
-            foreach ($middlewares as $middleware) {
+            // Apply the middleware:
+            $middleware = $branch->getShadowExpressions();
+            foreach ($middleware as $mw) {
 
-                $class_name = is_string($middleware) ? $middleware : get_class($middleware);
+                $class_name = is_string($mw) ? $mw : get_class($mw);
                 // Avoid or continue?
-                if ($route->avoid_all_middlewares || in_array($class_name, $route->avoid_middlewares)) {
+                if ($route->avoid_all_middleware || in_array($class_name, $route->avoid_middleware)) {
                     continue;
                 }
                 // Check if the middleware is a class name:
-                if (is_string($middleware) && is_subclass_of($middleware, MiddlewareInterface::class, true)) {
+                if (is_string($mw) && is_subclass_of($mw, MiddlewareInterface::class, true)) {
                     // Create the middleware using
-                    $middleware = new $middleware();
+                    $mw = new $mw();
                 }
                 // Check if the middleware is an instance of MiddlewareInterface and execute it:
-                if ($middleware instanceof MiddlewareInterface) {
+                if ($mw instanceof MiddlewareInterface) {
                     // Execute the middleware:
-                    $middleware->exec(
+                    $mw->exec(
                         $method, 
                         $request,
                         $response, 
                         $context,
                         $route
                     );
-                } elseif (is_array($middleware)) {
+                } elseif (is_array($mw)) {
                     // Merge the context:
-                    $context = array_merge($context, $middleware);
+                    $context = array_merge($context, $mw);
                 }
             }
 

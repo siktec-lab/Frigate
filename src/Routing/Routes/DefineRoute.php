@@ -39,21 +39,21 @@ abstract class DefineRoute
     public object|array|string|null $exp = null;
 
     /**
-     * The route additional middlewares
-     * @var array<string|MiddlewareInterface> $middlewares - class names of the middlewares to apply
+     * The route additional middleware
+     * @var array<string|MiddlewareInterface> $middleware - class names of the middleware to apply
      */
-    public array $middlewares = [];
+    public array $middleware = [];
 
     /**
-     * The route middlewares to avoid
-     * @var array<string|MiddlewareInterface> $avoid_middlewares - class names of the middlewares to avoid
+     * The route middleware to avoid
+     * @var array<string|MiddlewareInterface> $avoid_middleware - class names of the middleware to avoid
      */
-    public array $avoid_middlewares = [];
+    public array $avoid_middleware = [];
 
     /**
-     * Avoid all middlewares
+     * Avoid all middleware
      */
-    public bool $avoid_all_middlewares = false;
+    public bool $avoid_all_middleware = false;
 
     /**
      * The request mutator
@@ -70,8 +70,8 @@ abstract class DefineRoute
             context             : $this->context,
             returns             : $this->returns,
             exp                 : $this->exp,
-            middlewares         : $this->middlewares,
-            avoid_middlewares   : $this->avoid_all_middlewares ? true : $this->avoid_middlewares,
+            middleware          : $this->middleware,
+            avoid_middleware    : $this->avoid_all_middleware ? true : $this->avoid_middleware,
             request_mutator     : $this->request_mutator
         );
     }

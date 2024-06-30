@@ -40,7 +40,7 @@ class AppEnvTest extends TestCase
             root : __DIR__,
             env : [ self::ENV_FOLDER , ".env.test.working" ],
             extra_env : [],
-            load_session : false,
+            start_session : false,
             start_page_buffer : false,
             adjust_ini : false
         );
@@ -58,7 +58,7 @@ class AppEnvTest extends TestCase
             root : self::ENV_FOLDER,
             env : null,
             extra_env : [],
-            load_session : false,
+            start_session : false,
             start_page_buffer : false,
             adjust_ini : false
         );
@@ -75,7 +75,7 @@ class AppEnvTest extends TestCase
             root : __DIR__,
             env : [ self::ENV_FOLDER , [ ".env.test.working", ".env.test.extra" ] ],
             extra_env : [ "MANUALLY_ASSIGNED" => "yes" ],
-            load_session : false,
+            start_session : false,
             start_page_buffer : false,
             adjust_ini : false
         );
@@ -96,7 +96,7 @@ class AppEnvTest extends TestCase
             root : __DIR__,
             env : [ self::ENV_FOLDER , ".env.test.self_ref" ],
             extra_env : [],
-            load_session : false,
+            start_session : false,
             start_page_buffer : false,
             adjust_ini : false
         );
@@ -130,7 +130,7 @@ class AppEnvTest extends TestCase
                 "FLOAT_0" => "0.0",
                 "FLOAT_NEG_1" => "-1.1"
             ],
-            load_session : false,
+            start_session : false,
             start_page_buffer : false,
             adjust_ini : false
         );
@@ -188,7 +188,7 @@ class AppEnvTest extends TestCase
             root: __DIR__,
             env : [ self::ENV_FOLDER , ".env.test.working" ],
             extra_env : $expected,
-            load_session : false,
+            start_session : false,
             start_page_buffer : false,
             adjust_ini : false
         );
@@ -214,7 +214,7 @@ class AppEnvTest extends TestCase
             root: __DIR__,
             env : [ self::ENV_FOLDER , ".env.test.empty_domain" ],
             extra_env : [],
-            load_session : false,
+            start_session : false,
             start_page_buffer : false,
             adjust_ini : false
         );
@@ -232,7 +232,7 @@ class AppEnvTest extends TestCase
             root: __DIR__,
             env : [ self::ENV_FOLDER , ".env.test.missing_required" ],
             extra_env : [],
-            load_session : false,
+            start_session : false,
             start_page_buffer : false,
             adjust_ini : false
         );
@@ -250,7 +250,7 @@ class AppEnvTest extends TestCase
             root: __DIR__,
             env : [ self::ENV_FOLDER , ".env.test.not_bool" ],
             extra_env : [],
-            load_session : false,
+            start_session : false,
             start_page_buffer : false,
             adjust_ini : false
         );
@@ -282,7 +282,7 @@ class AppEnvTest extends TestCase
             root: __DIR__,
             env : [ self::ENV_FOLDER , ".env.test.working" ],
             extra_env : $expected,
-            load_session : false,
+            start_session : false,
             start_page_buffer : false,
             adjust_ini : false
         );

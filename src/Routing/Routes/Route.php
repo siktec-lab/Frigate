@@ -48,21 +48,21 @@ class Route
     protected ?ReflectionClass $request_mutator = null;
     
     /**
-     * The route additional middlewares
-     * @var array<string|MiddlewareInterface> $middlewares - class names of the middlewares to apply
+     * The route additional middleware
+     * @var array<string|MiddlewareInterface> $middleware - class names of the middleware to apply
      */
-    public array $middlewares = [];
+    public array $middleware = [];
 
     /**
-     * The route middlewares to avoid
-     * @var array<string> $avoid_middlewares - class names of the middlewares to avoid
+     * The route middleware to avoid
+     * @var array<string> $avoid_middleware - class names of the middleware to avoid
      */
-    public array $avoid_middlewares = [];
+    public array $avoid_middleware = [];
 
     /**
-     * Avoid all middlewares
+     * Avoid all middleware
      */
-    public bool $avoid_all_middlewares = false;
+    public bool $avoid_all_middleware = false;
 
     /**
      * construct a new route
@@ -71,8 +71,8 @@ class Route
      * @param array<string,mixed> $context the route default context
      * @param array<string> $returns the supported return types i.e mime-types
      * @param object|array|string|null $exp the route endpoint or a bind endpoint
-     * @param array<string|MiddlewareInterface> $middlewares the route middlewares class names to apply
-     * @param array<string|MiddlewareInterface>|bool $avoid_middlewares the route middlewares class names to avoid if true avoid all
+     * @param array<string|MiddlewareInterface> $middleware the route middleware class names to apply
+     * @param array<string|MiddlewareInterface>|bool $avoid_middleware the route middleware class names to avoid if true avoid all
      * @param ReflectionClass|string|null $request_mutator the request mutator
      */
     public function __construct(
@@ -80,8 +80,8 @@ class Route
         array $context = [], 
         array $returns = [], 
         object|array|string|null $exp = null, 
-        array $middlewares = [],
-        array|bool $avoid_middlewares = [],
+        array $middleware = [],
+        array|bool $avoid_middleware = [],
         ReflectionClass|string|null $request_mutator = null
     ) {
         $this->path = trim($path, "\t\n\r /\\");
@@ -91,17 +91,17 @@ class Route
             $this->setSupportedReturnTypes(...$returns);
         }
 
-        // set the middlewares:
-        foreach ($middlewares as $middleware) {
-            $this->addMiddleware($middleware);
+        // set the middleware:
+        foreach ($middleware as $mw) {
+            $this->addMiddleware($mw);
         }
 
-        // set the avoid middlewares:
-        if ($avoid_middlewares === true) {
-            $this->avoid_all_middlewares = true;
-        } elseif (is_array($avoid_middlewares)) {
-            foreach ($avoid_middlewares as $middleware) {
-                $this->avoidMiddleware($middleware);
+        // set the avoid middleware:
+        if ($avoid_middleware === true) {
+            $this->avoid_all_middleware = true;
+        } elseif (is_array($avoid_middleware)) {
+            foreach ($avoid_middleware as $mw) {
+                $this->avoidMiddleware($mw);
             }
         }
         
@@ -126,7 +126,7 @@ class Route
     {
         $middleware = is_array($middleware) ? $middleware : [$middleware];
         foreach ($middleware as $m) {
-            $this->middlewares[] = is_string($m) ? $m : get_class($m);
+            $this->middleware[] = is_string($m) ? $m : get_class($m);
         }
         return $this;
     }
@@ -141,7 +141,7 @@ class Route
     {
         $middleware = is_array($middleware) ? $middleware : [$middleware];
         foreach ($middleware as $m) {
-            $this->avoid_middlewares[] = is_string($m) ? $m : get_class($m);
+            $this->avoid_middleware[] = is_string($m) ? $m : get_class($m);
         }
         return $this;
     }

@@ -31,7 +31,8 @@ class RoutingInitTest extends TestCase
             root : __DIR__,
             env : [ __DIR__ . "/../resources/env" , ".env.test.working" ],
             extra_env: [ "FRIGATE_DEBUG_ROUTER" => "true" ],
-            load_session: false,
+            start_session: false,
+            start_page_buffer: false,
             adjust_ini: false
         );
 
@@ -49,7 +50,8 @@ class RoutingInitTest extends TestCase
             root : __DIR__,
             env : [ __DIR__ . "/../resources/env" , ".env.test.working" ],
             extra_env: [ "FRIGATE_DEBUG_ROUTER" => "off" ], // Should disable debug mode
-            load_session: false,
+            start_session: false,
+            start_page_buffer: false,
             adjust_ini: false
         );
 
@@ -66,7 +68,8 @@ class RoutingInitTest extends TestCase
             root : __DIR__,
             env : [ __DIR__ . "/../resources/env" , ".env.test.working" ],
             extra_env: [ "FRIGATE_DEBUG_ROUTER" => "true" ],
-            load_session: false,
+            start_session: false,
+            start_page_buffer: false,
             adjust_ini: false
         );
 
@@ -103,7 +106,8 @@ class RoutingInitTest extends TestCase
             root : __DIR__,
             env : [ __DIR__ . "/../resources/env" , ".env.test.working" ],
             extra_env: [ "FRIGATE_DEBUG_ROUTER" => "true" ],
-            load_session: false,
+            start_session: false,
+            start_page_buffer: false,
             adjust_ini: false
         );
 

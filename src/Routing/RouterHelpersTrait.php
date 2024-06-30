@@ -20,8 +20,8 @@ trait RouterHelpersTrait
      * @param  object|array|string $exp the endpoint to execute
      * @param  array $context the context to pass to the endpoint
      * @param  array $returns the supported return types i.e mime-types
-     * @param array<string|MiddlewareInterface> $middlewares the route middlewares class names to apply
-     * @param array<string|MiddlewareInterface>|bool $avoid_middlewares the route middlewares class names to avoid if true avoid all
+     * @param array<string|MiddlewareInterface> $middleware the route middleware class names to apply
+     * @param array<string|MiddlewareInterface>|bool $avoid_middleware the route middleware class names to avoid if true avoid all
      * @param  ReflectionClass|string|null $request_mutator the request mutator to use
      */
     public static function get(
@@ -29,8 +29,8 @@ trait RouterHelpersTrait
         object|array|string $exp, 
         array $context = [], 
         array $returns = [], 
-        array $middlewares = [],
-        array|bool $avoid_middlewares = [],
+        array $middleware = [],
+        array|bool $avoid_middleware = [],
         ReflectionClass|string|null $request_mutator = null
     ) : void {
         Router::define( Methods::GET, new Route( 
@@ -38,8 +38,8 @@ trait RouterHelpersTrait
             context: $context,
             returns: $returns,
             exp: $exp,
-            middlewares: $middlewares,
-            avoid_middlewares: $avoid_middlewares,
+            middleware: $middleware,
+            avoid_middleware: $avoid_middleware,
             request_mutator: $request_mutator
         ));
 
@@ -54,8 +54,8 @@ trait RouterHelpersTrait
      * @param  object|array|string $exp the endpoint to execute
      * @param  array $context the context to pass to the endpoint
      * @param  array $returns the supported return types i.e mime-types
-     * @param array<string|MiddlewareInterface> $middlewares the route middlewares class names to apply
-     * @param array<string|MiddlewareInterface>|bool $avoid_middlewares the route middlewares class names to avoid if true avoid all
+     * @param array<string|MiddlewareInterface> $middleware the route middleware class names to apply
+     * @param array<string|MiddlewareInterface>|bool $avoid_middleware the route middleware class names to avoid if true avoid all
      * @param  ReflectionClass|string|null $request_mutator the request mutator to use
      */
     public static function post(
@@ -63,8 +63,8 @@ trait RouterHelpersTrait
         object|array|string $exp, 
         array $context = [], 
         array $returns = [], 
-        array $middlewares = [],
-        array|bool $avoid_middlewares = [],
+        array $middleware = [],
+        array|bool $avoid_middleware = [],
         ReflectionClass|string|null $request_mutator = null
     ) : void {
         Router::define( Methods::POST, new Route(
@@ -72,8 +72,8 @@ trait RouterHelpersTrait
             context: $context,
             returns: $returns,
             exp: $exp,
-            middlewares: $middlewares,
-            avoid_middlewares: $avoid_middlewares,
+            middleware: $middleware,
+            avoid_middleware: $avoid_middleware,
             request_mutator: $request_mutator
         ));
     }
@@ -87,8 +87,8 @@ trait RouterHelpersTrait
      * @param  object|array|string $exp the endpoint to execute
      * @param  array $context the context to pass to the endpoint
      * @param  array $returns the supported return types i.e mime-types
-     * @param array<string|MiddlewareInterface> $middlewares the route middlewares class names to apply
-     * @param array<string|MiddlewareInterface>|bool $avoid_middlewares the route middlewares class names to avoid if true avoid all
+     * @param array<string|MiddlewareInterface> $middleware the route middleware class names to apply
+     * @param array<string|MiddlewareInterface>|bool $avoid_middleware the route middleware class names to avoid if true avoid all
      * @param  ReflectionClass|string|null $request_mutator the request mutator to use
      */
     public static function put(
@@ -96,8 +96,8 @@ trait RouterHelpersTrait
         object|array|string $exp, 
         array $context = [], 
         array $returns = [], 
-        array $middlewares = [],
-        array|bool $avoid_middlewares = [],
+        array $middleware = [],
+        array|bool $avoid_middleware = [],
         ReflectionClass|string|null $request_mutator = null
     ) : void {
         Router::define( Methods::PUT, new Route(
@@ -105,8 +105,8 @@ trait RouterHelpersTrait
             context: $context,
             returns: $returns,
             exp: $exp,
-            middlewares: $middlewares,
-            avoid_middlewares: $avoid_middlewares,
+            middleware: $middleware,
+            avoid_middleware: $avoid_middleware,
             request_mutator: $request_mutator
         ));
     }
@@ -120,8 +120,8 @@ trait RouterHelpersTrait
      * @param  object|array|string $exp the endpoint to execute
      * @param  array $context the context to pass to the endpoint
      * @param  array $returns the supported return types i.e mime-types
-     * @param array<string|MiddlewareInterface> $middlewares the route middlewares class names to apply
-     * @param array<string|MiddlewareInterface>|bool $avoid_middlewares the route middlewares class names to avoid if true avoid all
+     * @param array<string|MiddlewareInterface> $middleware the route middleware class names to apply
+     * @param array<string|MiddlewareInterface>|bool $avoid_middleware the route middleware class names to avoid if true avoid all
      * @param  ReflectionClass|string|null $request_mutator the request mutator to use
      */
     public static function delete(
@@ -129,8 +129,8 @@ trait RouterHelpersTrait
         object|array|string $exp, 
         array $context = [], 
         array $returns = [], 
-        array $middlewares = [],
-        array|bool $avoid_middlewares = [],
+        array $middleware = [],
+        array|bool $avoid_middleware = [],
         ReflectionClass|string|null $request_mutator = null
     ) : void {
         Router::define( Methods::DELETE, new Route(
@@ -138,8 +138,8 @@ trait RouterHelpersTrait
             context: $context,
             returns: $returns,
             exp: $exp,
-            middlewares: $middlewares,
-            avoid_middlewares: $avoid_middlewares,
+            middleware: $middleware,
+            avoid_middleware: $avoid_middleware,
             request_mutator: $request_mutator
         ));
     }
@@ -153,8 +153,8 @@ trait RouterHelpersTrait
      * @param  object|array|string $exp the endpoint to execute
      * @param  array $context the context to pass to the endpoint
      * @param  array $returns the supported return types i.e mime-types
-     * @param array<string|MiddlewareInterface> $middlewares the route middlewares class names to apply
-     * @param array<string|MiddlewareInterface>|bool $avoid_middlewares the route middlewares class names to avoid if true avoid all
+     * @param array<string|MiddlewareInterface> $middleware the route middleware class names to apply
+     * @param array<string|MiddlewareInterface>|bool $avoid_middleware the route middleware class names to avoid if true avoid all
      * @param  ReflectionClass|string|null $request_mutator the request mutator to use
      */
     public static function patch(
@@ -162,8 +162,8 @@ trait RouterHelpersTrait
         object|array|string $exp, 
         array $context = [], 
         array $returns = [], 
-        array $middlewares = [],
-        array|bool $avoid_middlewares = [],
+        array $middleware = [],
+        array|bool $avoid_middleware = [],
         ReflectionClass|string|null $request_mutator = null
     ) : void {
         Router::define( Methods::PATCH, new Route(
@@ -171,8 +171,8 @@ trait RouterHelpersTrait
             context: $context,
             returns: $returns,
             exp: $exp,
-            middlewares: $middlewares,
-            avoid_middlewares: $avoid_middlewares,
+            middleware: $middleware,
+            avoid_middleware: $avoid_middleware,
             request_mutator: $request_mutator
         ));
     }
@@ -186,8 +186,8 @@ trait RouterHelpersTrait
      * @param  object|array|string $exp the endpoint to execute
      * @param  array $context the context to pass to the endpoint
      * @param  array $returns the supported return types i.e mime-types
-     * @param array<string|MiddlewareInterface> $middlewares the route middlewares class names to apply
-     * @param array<string|MiddlewareInterface>|bool $avoid_middlewares the route middlewares class names to avoid if true avoid all
+     * @param array<string|MiddlewareInterface> $middleware the route middleware class names to apply
+     * @param array<string|MiddlewareInterface>|bool $avoid_middleware the route middleware class names to avoid if true avoid all
      * @param  ReflectionClass|string|null $request_mutator the request mutator to use
      */
     public static function head(
@@ -195,8 +195,8 @@ trait RouterHelpersTrait
         object|array|string $exp, 
         array $context = [], 
         array $returns = [], 
-        array $middlewares = [],
-        array|bool $avoid_middlewares = [],
+        array $middleware = [],
+        array|bool $avoid_middleware = [],
         ReflectionClass|string|null $request_mutator = null
     ) : void {
         Router::define( Methods::HEAD, new Route(
@@ -204,8 +204,8 @@ trait RouterHelpersTrait
             context: $context,
             returns: $returns,
             exp: $exp,
-            middlewares: $middlewares,
-            avoid_middlewares: $avoid_middlewares,
+            middleware: $middleware,
+            avoid_middleware: $avoid_middleware,
             request_mutator: $request_mutator
         ));
     }
@@ -219,8 +219,8 @@ trait RouterHelpersTrait
      * @param  object|array|string $exp the endpoint to execute
      * @param  array $context the context to pass to the endpoint
      * @param  array $returns the supported return types i.e mime-types
-     * @param array<string|MiddlewareInterface> $middlewares the route middlewares class names to apply
-     * @param array<string|MiddlewareInterface>|bool $avoid_middlewares the route middlewares class names to avoid if true avoid all
+     * @param array<string|MiddlewareInterface> $middleware the route middleware class names to apply
+     * @param array<string|MiddlewareInterface>|bool $avoid_middleware the route middleware class names to avoid if true avoid all
      * @param  ReflectionClass|string|null $request_mutator the request mutator to use
      */
     public static function options(
@@ -228,8 +228,8 @@ trait RouterHelpersTrait
         object|array|string $exp, 
         array $context = [], 
         array $returns = [], 
-        array $middlewares = [],
-        array|bool $avoid_middlewares = [],
+        array $middleware = [],
+        array|bool $avoid_middleware = [],
         ReflectionClass|string|null $request_mutator = null
     ) : void {
         Router::define( Methods::OPTIONS, new Route(
@@ -237,8 +237,8 @@ trait RouterHelpersTrait
             context: $context,
             returns: $returns,
             exp: $exp,
-            middlewares: $middlewares,
-            avoid_middlewares: $avoid_middlewares,
+            middleware: $middleware,
+            avoid_middleware: $avoid_middleware,
             request_mutator: $request_mutator
         ));
     }
@@ -252,8 +252,8 @@ trait RouterHelpersTrait
      * @param  object|array|string $exp the endpoint to execute
      * @param  array $context the context to pass to the endpoint
      * @param  array $returns the supported return types i.e mime-types
-     * @param array<string|MiddlewareInterface> $middlewares the route middlewares class names to apply
-     * @param array<string|MiddlewareInterface>|bool $avoid_middlewares the route middlewares class names to avoid if true avoid all
+     * @param array<string|MiddlewareInterface> $middleware the route middleware class names to apply
+     * @param array<string|MiddlewareInterface>|bool $avoid_middleware the route middleware class names to avoid if true avoid all
      * @param  ReflectionClass|string|null $request_mutator the request mutator to use
      */
     public static function any(
@@ -261,8 +261,8 @@ trait RouterHelpersTrait
         object|array|string $exp, 
         array $context = [], 
         array $returns = [], 
-        array $middlewares = [],
-        array|bool $avoid_middlewares = [],
+        array $middleware = [],
+        array|bool $avoid_middleware = [],
         ReflectionClass|string|null $request_mutator = null
     ) : void {
         Router::define( 
@@ -280,8 +280,8 @@ trait RouterHelpersTrait
                 context: $context,
                 returns: $returns,
                 exp: $exp,
-                middlewares: $middlewares,
-                avoid_middlewares: $avoid_middlewares,
+                middleware: $middleware,
+                avoid_middleware: $avoid_middleware,
                 request_mutator: $request_mutator
             )
         );
@@ -296,15 +296,15 @@ trait RouterHelpersTrait
      * @param  string $path the path to match
      * @param  string $directory the directory to serve files from (all sub-directories will be served)
      * @param  array|string $types the supported mime-types to serve (also file extensions are allowed)
-     * @param array<string|MiddlewareInterface> $middlewares the route middlewares class names to apply
-     * @param array<string|MiddlewareInterface>|bool $avoid_middlewares the route middlewares class names to avoid if true avoid all
+     * @param array<string|MiddlewareInterface> $middleware the route middleware class names to apply
+     * @param array<string|MiddlewareInterface>|bool $avoid_middleware the route middleware class names to avoid if true avoid all
      */
     public static function static(
         string $path, 
         string $directory, 
         array|string $types = "*/*",
-        array $middlewares = [],
-        array|bool $avoid_middlewares = [],
+        array $middleware = [],
+        array|bool $avoid_middleware = [],
     ) : void
     {
         $path = trim($path, "\t\n\r /\\");
@@ -321,8 +321,8 @@ trait RouterHelpersTrait
                 directory: $directory, 
                 types: (array)$types
             ),
-            middlewares: $middlewares,
-            avoid_middlewares: $avoid_middlewares
+            middleware: $middleware,
+            avoid_middleware: $avoid_middleware
         ));
     }
     
