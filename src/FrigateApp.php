@@ -7,6 +7,7 @@ namespace Frigate;
 use Exception;
 use ReflectionMethod;
 use Dotenv\Dotenv;
+use Frigate\Contracts\Session\SessionManager;
 use Frigate\Exceptions\FrigateException;
 use ReflectionClass;
 
@@ -88,6 +89,9 @@ class FrigateApp
         }
 
         // TODO: load debug handler
+        
+        // Set Session handler:
+        SessionManager::init();
 
         //start session:
         if ($start_session) {
@@ -124,11 +128,13 @@ class FrigateApp
         // - session name
     }
 
+    /**
+     * Start the session
+     * 
+     * @return bool
+     */
     public static function startSession() : bool {
-        if (session_status() === PHP_SESSION_NONE) {
-            return session_start();
-        }
-        return true;
+        return SessionManager::start();
     }
 
     public static function setPaths(string $root, string $base_path = "/", $app_url = "http://localhost/") : void {
